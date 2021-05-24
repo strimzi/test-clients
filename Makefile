@@ -1,7 +1,7 @@
 RELEASE_VERSION ?= latest
 
-SUBDIRS=java/kafka/consumer java/kafka/producer java/kafka/streams http/vertx/java-http-vertx-consumer http/vertx/java-http-vertx-producer
-DOCKER_TARGETS=docker_build docker_push docker_tag
+SUBDIRS=kafka/consumer kafka/producer
+DOCKER_TARGETS=docker_build docker_tag
 
 all: $(SUBDIRS)
 build: $(SUBDIRS)
