@@ -1,0 +1,19 @@
+sudo: required
+language: java
+jdk:
+  - openjdk11
+services:
+  - docker
+script:
+  - "./.travis/build.sh"
+cache:
+  directories:
+    - "$HOME/.m2"
+env:
+  global:
+    - PULL_REQUEST=${TRAVIS_PULL_REQUEST}
+    - COMMIT=${TRAVIS_COMMIT::8}
+    - TAG=${TRAVIS_TAG:-latest}
+    - BRANCH=${TRAVIS_BRANCH:-main}
+    - DOCKER_REGISTRY=quay.io
+    - DOCKER_ORG=strimzi-test-client

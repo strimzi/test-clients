@@ -1,0 +1,6 @@
+# Maven build targets
+target/
+
+# IntelliJ IDEA specific
+.idea/
+*.iml
