@@ -1,4 +1,4 @@
-PROJECT_NAME=kafka-producer
+PROJECT_NAME=test-client-kafka-producer
 
 all: java_build docker_build docker_push
 build: java_build

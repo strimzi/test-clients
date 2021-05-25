@@ -16,4 +16,4 @@ env:
     - TAG=${TRAVIS_TAG:-latest}
     - BRANCH=${TRAVIS_BRANCH:-main}
     - DOCKER_REGISTRY=quay.io
-    - DOCKER_ORG=strimzi-examples
+    - DOCKER_ORG=strimzi

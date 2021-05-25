@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>strimzi.io</groupId>
+        <groupId>io.strimzi</groupId>
         <artifactId>kafka-test-clients</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>kafka-consumer</artifactId>
+    <artifactId>test-client-kafka-consumer</artifactId>
 
     <dependencies>
         <dependency>
