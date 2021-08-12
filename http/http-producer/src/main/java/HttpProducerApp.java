@@ -9,12 +9,16 @@ import io.opentracing.util.GlobalTracer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Main {
+import java.net.URISyntaxException;
+import java.util.concurrent.ExecutionException;
 
-    private static final Logger LOGGER = LogManager.getLogger(Main.class);
+public class HttpProducerApp {
 
-    public static void main(String[] args) {
+    private static final Logger LOGGER = LogManager.getLogger(HttpProducerApp.class);
+
+    public static void main(String[] args) throws URISyntaxException, InterruptedException, ExecutionException {
         HttpProducerConfiguration producerConfig = new HttpProducerConfiguration();
+        HttpProducer producer = new HttpProducer(producerConfig);
 
         LOGGER.info("HTTP Producer is starting with configuration:\n{}", producerConfig.toString());
 
@@ -22,5 +26,9 @@ public class Main {
             Tracer tracer = Configuration.fromEnv().getTracer();
             GlobalTracer.registerIfAbsent(tracer);
         }
+
+        LOGGER.info("Sending {} messages: ", producerConfig.getMessageCount());
+
+        System.exit(producer.sendMessages() ? 0 : 1);
     }
 }
