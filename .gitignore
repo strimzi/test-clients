@@ -1,6 +1,8 @@
-# Maven build targets
-target/
+# Maven specific
+**/target/*
 
 # IntelliJ IDEA specific
 .idea/
 *.iml
+
+**/dependency-reduced-pom.xml

@@ -10,7 +10,7 @@
         <version>0.1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>kafka-test-clients</artifactId>
+    <artifactId>http-test-clients</artifactId>
     <packaging>pom</packaging>
 
     <dependencyManagement>
@@ -64,7 +64,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>consumer</module>
-        <module>producer</module>
+        <module>http-consumer</module>
+        <module>http-producer</module>
     </modules>
 </project>
