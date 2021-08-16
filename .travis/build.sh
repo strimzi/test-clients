@@ -2,25 +2,28 @@
 
 set -e
 
-export PULL_REQUEST=${PULL_REQUEST:-true}
-export BRANCH=${BRANCH:-main}
-export TAG=${TAG:-latest}
-export DOCKER_ORG=${DOCKER_ORG:-strimzici}
-export DOCKER_REGISTRY=${DOCKER_REGISTRY:-docker.io}
+export DOCKER_ORG=${DOCKER_ORG:-strimzi-test-clients}
+export DOCKER_REGISTRY=${DOCKER_REGISTRY:-quay.io}
 export DOCKER_TAG=$COMMIT
 
 make build
 
-if [ "$PULL_REQUEST" != "false" ] ; then
+if [ "$TRAVIS_PULL_REQUEST" != "false" ] ; then
   make docker_build
   echo "Building PR: Nothing to push"
+elif [[ "$TRAVIS_BRANCH" != "refs/tags/"* ]] && [ "$TRAVIS_BRANCH" != "refs/heads/main" ]; then
+    make docker_build
+    echo "Not in main branch or in release tag - nothing to push"
 else
-  if [ "$TAG" = "latest" ] && [ "$BRANCH" != "main" ]; then
-    make docker_build
-    echo "Not in tag or main branch: Nothing to push"
-  else
-    export DOCKER_TAG=$TAG
-    make docker_build
-  fi
+    if [ "$TRAVIS_BRANCH" == "refs/heads/main" ]; then
+        export DOCKER_TAG="latest"
+    else
+        export DOCKER_TAG="${TRAVIS_BRANCH#refs/tags/}"
+    fi
 
+    make docker_build
+
+    echo "In main branch or in release tag - pushing images"
+    docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REGISTRY
+    make docker_push
 fi
