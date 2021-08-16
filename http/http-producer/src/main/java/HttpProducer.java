@@ -73,6 +73,8 @@ public class HttpProducer {
                             if (result.statusCode() != HttpResponseStatus.OK.code()) {
                                 LOGGER.error("Error while sending message {} : {}", record.getMessage(), result.body());
                                 sendSuccessful[0] = false;
+                            } else if (result.body().equals("[]") && result.statusCode() == HttpResponseStatus.OK.code()) {
+                                LOGGER.info("Array with messages is empty, no messages were received!");
                             }
                             return new JsonObject(result.body()).getJsonArray("offsets").toString();
                         })
