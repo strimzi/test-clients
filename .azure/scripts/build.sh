@@ -2,7 +2,7 @@
 
 set -e
 
-export DOCKER_ORG=${DOCKER_ORG:-strimzi-examples}
+export DOCKER_ORG=${DOCKER_ORG:-strimzi-test-clients}
 export DOCKER_REGISTRY=${DOCKER_REGISTRY:-quay.io}
 export DOCKER_TAG=$COMMIT
 
