@@ -29,7 +29,7 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         ProducerConfiguration config = new ProducerConfiguration();
 
-        LOGGER.info("Kafka consumer is starting with configuration: {}", config.toString());
+        LOGGER.info("Kafka producer is starting with configuration: {}", config.toString());
 
         Properties props = ProducerConfiguration.createProperties(config);
         List<Header> headers = null;

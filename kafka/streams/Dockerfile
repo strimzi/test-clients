@@ -19,8 +19,8 @@ ENV VERSION ${version}
 COPY ./scripts/ /bin
 COPY ./src/resources/log4j2.properties /bin/log4j2.properties
 
-ADD target/test-client-kafka-consumer.jar /
+ADD target/test-client-kafka-streams.jar /
 
 USER 1001
 
-CMD ["/bin/run.sh", "/test-client-kafka-consumer.jar"]
+CMD ["/bin/run.sh", "/test-client-kafka-streams.jar"]
