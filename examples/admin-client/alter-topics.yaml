@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job 
+metadata:
+    labels:
+      app: alter-admin-client
+      user-test-app: kafka-clients
+    name: alter-admin-client
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: alter-admin-client
+        job-name: alter-admin-client
+        user-test-app: kafka-clients
+      name: alter-admin-client
+      namespace: namespace-0
+    spec:
+      containers:
+      - env:
+        - name: BOOTSTRAP_SERVERS
+          value: my-cluster-kafka-bootstrap:9092
+        - name: TOPIC
+          value: "test-topic"
+        - name: TOPIC_OPERATION
+          value: alter
+        - name: PARTITIONS
+          value: "10"
+        - name: TOPICS_COUNT
+          value: "100"
+        - name: LOG_LEVEL
+          value: DEBUG
+        image: quay.io/strimzi-test-clients/test-client-kafka-admin:latest
+        imagePullPolicy: IfNotPresent
+        name: alter-admin-client
+      restartPolicy: "Never"
+      
+      
