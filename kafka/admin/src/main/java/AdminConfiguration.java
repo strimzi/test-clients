@@ -4,7 +4,7 @@
  */
 
 import org.apache.kafka.clients.CommonClientConfigs;
-import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.logging.log4j.LogManager;
@@ -13,18 +13,16 @@ import org.apache.logging.log4j.Logger;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
-public class ProducerConfiguration {
-    private static final Logger log = LogManager.getLogger(ProducerConfiguration.class);
+public class AdminConfiguration {
+    private static final Logger log = LogManager.getLogger(AdminConfiguration.class);
 
-    private static final long DEFAULT_MESSAGES_COUNT = 10;
-    private static final String DEFAULT_MESSAGE = "Hello world";
     private final String bootstrapServers;
+    private final String topicOperation;
     private final String topic;
-    private final int delay;
-    private final Long messageCount;
-    private final String message;
-    private final String acks;
-    private final String headers;
+    private final String topicPartitions;
+    private final String replicationFactor;
+    private final String numberOfTopics;
+    private final String topicOffset;
     private final String sslTruststoreCertificates;
     private final String sslKeystoreKey;
     private final String sslKeystoreCertificateChain;
@@ -36,12 +34,14 @@ public class ProducerConfiguration {
     private final String additionalConfig;
     private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
 
-    public ProducerConfiguration() {
+    public AdminConfiguration() {
         this.bootstrapServers = System.getenv("BOOTSTRAP_SERVERS");
         this.topic = System.getenv("TOPIC");
-        this.delay = Integer.parseInt(System.getenv().getOrDefault("DELAY_MS", "0"));
-        this.messageCount = System.getenv("MESSAGE_COUNT") == null ? DEFAULT_MESSAGES_COUNT : Long.parseLong(System.getenv("MESSAGE_COUNT"));
-        this.message = System.getenv("MESSAGE") == null ? DEFAULT_MESSAGE : System.getenv("MESSAGE");
+        this.topicPartitions = System.getenv().getOrDefault("PARTITIONS", "1");
+        this.replicationFactor = System.getenv().getOrDefault("REPLICATION_FACTOR", "1");
+        this.numberOfTopics = System.getenv().getOrDefault("TOPICS_COUNT", "1");
+        this.topicOffset = System.getenv().getOrDefault("TOPIC_OFFSET", "0");
+        this.topicOperation = System.getenv("TOPIC_OPERATION");
         this.sslTruststoreCertificates = System.getenv("CA_CRT");
         this.sslKeystoreKey = System.getenv("USER_KEY");
         this.sslKeystoreCertificateChain = System.getenv("USER_CRT");
@@ -50,18 +50,16 @@ public class ProducerConfiguration {
         this.oauthAccessToken = System.getenv("OAUTH_ACCESS_TOKEN");
         this.oauthRefreshToken = System.getenv("OAUTH_REFRESH_TOKEN");
         this.oauthTokenEndpointUri = System.getenv("OAUTH_TOKEN_ENDPOINT_URI");
-        this.acks = System.getenv().getOrDefault("PRODUCER_ACKS", "1");
-        this.headers = System.getenv("HEADERS");
         this.additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
     }
 
     @SuppressWarnings("BooleanExpressionComplexity")
-    public static Properties createProperties(ProducerConfiguration config) {
+    public static Properties createProperties(AdminConfiguration config) {
         Properties props = new Properties();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
-        props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
+
+        props.put("config.providers", "secrets");
+        props.put("config.providers.secrets.class", "io.strimzi.kafka.KubernetesSecretConfigProvider");
 
         if (config.getSslTruststoreCertificates() != null)   {
             log.info("Configuring truststore");
@@ -94,8 +92,8 @@ public class ProducerConfiguration {
         }
 
         if ((config.getOauthAccessToken() != null)
-            || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
-            || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
+                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
+                || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
             log.info("Configuring OAuth");
             props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
@@ -110,28 +108,33 @@ public class ProducerConfiguration {
 
         return props;
     }
+
     public String getBootstrapServers() {
         return bootstrapServers;
+    }
+
+    public String getTopicOperation() {
+        return topicOperation;
     }
 
     public String getTopic() {
         return topic;
     }
 
-    public int getDelay() {
-        return delay;
+    public String getTopicPartitions() {
+        return topicPartitions;
     }
 
-    public Long getMessageCount() {
-        return messageCount;
+    public String getReplicationFactor() {
+        return replicationFactor;
     }
 
-    public String getMessage() {
-        return message;
+    public String getNumberOfTopics() {
+        return numberOfTopics;
     }
 
-    public String getAcks() {
-        return acks;
+    public java.lang.String getTopicOffset() {
+        return topicOffset;
     }
 
     public String getSslTruststoreCertificates() {
@@ -166,27 +169,23 @@ public class ProducerConfiguration {
         return oauthTokenEndpointUri;
     }
 
-    public String getHeaders() {
-        return headers;
-    }
-
     public String getAdditionalConfig() {
         return additionalConfig;
     }
 
     @Override
     public String toString() {
-        return "KafkaProducerConfig{" +
+        return "KafkaAdminConfig{" +
             "bootstrapServers='" + bootstrapServers + '\'' +
+            ", topicOperation='" + topicOperation + '\'' +
+            ", numberOfTopics='" + numberOfTopics + '\'' +
+            ", topicOffset='" + topicOffset + '\'' +
             ", topic='" + topic + '\'' +
-            ", delay=" + delay +
-            ", messageCount=" + messageCount +
-            ", message='" + message + '\'' +
-            ", acks='" + acks + '\'' +
-            ", headers='" + headers + '\'' +
-            ", trustStorePassword='" + sslTruststoreCertificates + '\'' +
-            ", trustStorePath='" + sslKeystoreKey + '\'' +
-            ", keyStorePassword='" + sslKeystoreCertificateChain + '\'' +
+            ", topicPartitions='" + topicPartitions + '\'' +
+            ", replicationFactor='" + replicationFactor + '\'' +
+            ", sslTruststoreCertificates='" + sslTruststoreCertificates + '\'' +
+            ", sslKeystoreKey='" + sslKeystoreKey + '\'' +
+            ", sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + '\'' +
             ", oauthClientId='" + oauthClientId + '\'' +
             ", oauthClientSecret='" + oauthClientSecret + '\'' +
             ", oauthAccessToken='" + oauthAccessToken + '\'' +

@@ -67,5 +67,6 @@
         <module>consumer</module>
         <module>producer</module>
         <module>streams</module>
+        <module>admin</module>
     </modules>
 </project>
