@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: http-producer
+    user-test-app: kafka-clients
+  name: http-producer
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: http-producer
+        job-name: http-producer
+        user-test-app: kafka-clients
+      name: http-producer
+      namespace: my-project
+    spec:
+      containers:
+        - env:
+            - name: HOSTNAME
+              value: my-cluster-bridge-service
+            - name: PORT
+              value: "8080"
+            - name: SEND_INTERVAL
+              value: "1000"
+            - name: TOPIC
+              value: my-topic
+            - name: MESSAGE_COUNT
+              value: "100"
+            - name: LOG_LEVEL
+              value: DEBUG
+          image: quay.io/strimzi-test-clients/test-client-http-producer:latest
+          imagePullPolicy: IfNotPresent
+          name: http-producer
+      restartPolicy: "Never"

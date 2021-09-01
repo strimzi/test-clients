@@ -2,9 +2,9 @@ apiVersion: batch/v1
 kind: Job 
 metadata:
     labels:
-      app: create-admin-client
+      app: alter-admin-client
       user-test-app: kafka-clients
-    name: create-admin-client
+    name: alter-admin-client
 spec:
   backoffLimit: 0
   completions: 1
@@ -12,10 +12,10 @@ spec:
   template:
     metadata:
       labels:
-        app: create-admin-client
-        job-name: create-admin-client
+        app: alter-admin-client
+        job-name: alter-admin-client
         user-test-app: kafka-clients
-      name: create-admin-client
+      name: alter-admin-client
       namespace: namespace-0
     spec:
       containers:
@@ -25,18 +25,14 @@ spec:
         - name: TOPIC
           value: "test-topic"
         - name: TOPIC_OPERATION
-          value: create
-        - name: REPLICATION_FACTOR
-          value: "1"
+          value: alter
         - name: PARTITIONS
-          value: "2"
+          value: "10"
         - name: TOPICS_COUNT
           value: "100"
         - name: LOG_LEVEL
           value: DEBUG
         image: quay.io/strimzi-test-clients/test-client-kafka-admin:latest
         imagePullPolicy: IfNotPresent
-        name: create-admin-client
+        name: alter-admin-client
       restartPolicy: "Never"
-      
-      

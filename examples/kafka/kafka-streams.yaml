@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: kafka-streams-client
+    user-test-app: kafka-clients
+  name: kafka-streams-client
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-streams-client
+        job-name: kafka-streams-client
+        user-test-app: kafka-clients
+      name: kafka-streams-client
+      namespace: my-project
+    spec:
+      containers:
+        - env:
+            - name: BOOTSTRAP_SERVERS
+              value: my-cluster-kafka-bootstrap:9092
+            - name: APPLICATION_ID
+              value: kafka-streams-client
+            - name: SOURCE_TOPIC
+              value: my-topic
+            - name: TARGET_TOPIC
+              value: my-topic-reversed
+          image: quay.io/strimzi-test-clients/test-client-kafka-streams:latest
+          imagePullPolicy: IfNotPresent
+          name: kafka-streams-client
+      restartPolicy: "Never"
