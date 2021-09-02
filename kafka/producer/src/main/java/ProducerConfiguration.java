@@ -58,6 +58,12 @@ public class ProducerConfiguration {
     @SuppressWarnings("BooleanExpressionComplexity")
     public static Properties createProperties(ProducerConfiguration config) {
         Properties props = new Properties();
+
+        // Kubernetes Config Provider
+        props.put("config.providers", "secrets,configmaps");
+        props.put("config.providers.secrets.class", "io.strimzi.kafka.KubernetesSecretConfigProvider");
+        props.put("config.providers.configmaps.class", "io.strimzi.kafka.KubernetesConfigMapConfigProvider");
+
         props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(ProducerConfig.ACKS_CONFIG, config.getAcks());
         props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
