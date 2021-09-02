@@ -34,5 +34,3 @@ spec:
         imagePullPolicy: IfNotPresent
         name: delete-admin-client-1
       restartPolicy: "Never"
-      
-      

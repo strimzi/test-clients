@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app: http-consumer
+    user-test-app: kafka-clients
+  name: http-consumer
+spec:
+  backoffLimit: 0
+  completions: 1
+  parallelism: 1
+  template:
+    metadata:
+      labels:
+        app: http-consumer
+        job-name: http-consumer
+        user-test-app: kafka-clients
+      name: http-consumer
+      namespace: my-project
+    spec:
+      containers:
+        - env:
+            - name: HOSTNAME
+              value: my-cluster-bridge-service
+            - name: PORT
+              value: "8080"
+            - name: POLL_INTERVAL
+              value: "1000"
+            - name: GROUP_ID
+              value: my-group
+            - name: TOPIC
+              value: my-topic
+            - name: MESSAGE_COUNT
+              value: "100"
+            - name: LOG_LEVEL
+              value: DEBUG
+          image: quay.io/strimzi-test-clients/test-client-http-consumer:latest
+          imagePullPolicy: IfNotPresent
+          name: http-consumer
+      restartPolicy: "Never"
