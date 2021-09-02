@@ -58,8 +58,10 @@ public class AdminConfiguration {
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
 
-        props.put("config.providers", "secrets");
+        // Kubernetes Config Provider
+        props.put("config.providers", "secrets,configmaps");
         props.put("config.providers.secrets.class", "io.strimzi.kafka.KubernetesSecretConfigProvider");
+        props.put("config.providers.configmaps.class", "io.strimzi.kafka.KubernetesConfigMapConfigProvider");
 
         if (config.getSslTruststoreCertificates() != null)   {
             log.info("Configuring truststore");

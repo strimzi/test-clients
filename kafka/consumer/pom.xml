@@ -43,6 +43,11 @@
             <groupId>io.strimzi</groupId>
             <artifactId>kafka-oauth-client</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.strimzi</groupId>
+            <artifactId>kafka-kubernetes-config-provider</artifactId>
+            <version>${kafka-kubernetes-config-provider.version}</version>
+        </dependency>
     </dependencies>
 
     <build>

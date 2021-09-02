@@ -56,6 +56,12 @@ public class ConsumerConfiguration {
     @SuppressWarnings("BooleanExpressionComplexity")
     public static Properties createProperties(ConsumerConfiguration config) {
         Properties props = new Properties();
+
+        // Kubernetes Config Provider
+        props.put("config.providers", "secrets,configmaps");
+        props.put("config.providers.secrets.class", "io.strimzi.kafka.KubernetesSecretConfigProvider");
+        props.put("config.providers.configmaps.class", "io.strimzi.kafka.KubernetesConfigMapConfigProvider");
+
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(ConsumerConfig.GROUP_ID_CONFIG, config.getGroupId());
         if (config.getClientRack() != null) {

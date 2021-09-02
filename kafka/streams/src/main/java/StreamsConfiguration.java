@@ -55,6 +55,11 @@ public class StreamsConfiguration {
     public static Properties createProperties(StreamsConfiguration config) {
         Properties props = new Properties();
 
+        // Use Kafka config provider
+        props.put("config.providers", "secrets,configmaps");
+        props.put("config.providers.secrets.class", "io.strimzi.kafka.KubernetesSecretConfigProvider");
+        props.put("config.providers.configmaps.class", "io.strimzi.kafka.KubernetesConfigMapConfigProvider");
+
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, config.getApplicationId());
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());
         props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, config.getCommitInterval());
