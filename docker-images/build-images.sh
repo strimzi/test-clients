@@ -7,7 +7,7 @@ MODE=${1:-"all"}
 DOCKER_TAG=${DOCKER_TAG:-"latest"}
 
 echo "Building Kafka clients with versions inside kafka.version file"
-echo $MODE
+echo "Used build mode: $MODE"
 for KAFKA_VERSION in $KAFKA_VERSIONS
 do
   for KAFKA_MODULE in $KAFKA_MODULES
@@ -16,7 +16,7 @@ do
       then
         MVN_ARGS="-Dkafka.version=$KAFKA_VERSION" make build --directory=$KAFKA_MODULE
       else
-        DOCKER_TAG="$DOCKER_TAG-$KAFKA_VERSION" MVN_ARGS="-Dkafka.version=$KAFKA_VERSION" make all --directory=$KAFKA_MODULE
+        DOCKER_TAG="$DOCKER_TAG-kafka-$KAFKA_VERSION" MVN_ARGS="-Dkafka.version=$KAFKA_VERSION" make all --directory=$KAFKA_MODULE
     fi
   done
 done
