@@ -9,13 +9,11 @@ export DOCKER_TAG=$COMMIT
 echo "Build reason: ${BUILD_REASON}"
 echo "Source branch: ${BRANCH}"
 
-make build
+sh ./docker-images/build-images.sh build
 
 if [ "$BUILD_REASON" == "PullRequest" ] ; then
-  sh ./docker-images/build-images.sh build
   echo "Building Pull Request - nothing to push"
 elif [[ "$BRANCH" != "refs/tags/"* ]] && [ "$BRANCH" != "refs/heads/main" ]; then
-    sh ./docker-images/build-images.sh build
   echo "Not in main branch or in release tag - nothing to push"
 else
   if [ "$BRANCH" == "refs/heads/main" ]; then
@@ -26,5 +24,5 @@ else
   echo "In main branch or in release tag - pushing images"
   docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REGISTRY
 
-    sh ./docker-images/build-images.sh
+  sh ./docker-images/build-images.sh
 fi
