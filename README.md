@@ -27,7 +27,7 @@ Make sure you have `make`, `docker`, `JDK 11` and `mvn` installed.
 By default, the Docker organization to which images are pushed is the one defined by the `USER` environment variable which is assigned to the `DOCKER_ORG` one.
 The organization can be changed exporting a different value for the `DOCKER_ORG` and it can also be the internal registry of an OpenShift running cluster.
 
-The command for building the images with the latest supported Kafka version is:
+The command for building images with the latest supported Kafka version is:
 
 ```
 make all
@@ -38,10 +38,15 @@ make all
 Basic requirement to run these clients is a Kubernetes cluster with Strimzi managed Apache Kafka cluster deployed.
 Examples how to deploy Apache Kafka using Strimzi can be found on the [Strimzi website](https://strimzi.io/quickstarts/minikube/).
 
-After successfully building the images (which will cause the images to be pushed to the specified Docker repository) you are ready to deploy the producer and consumer containers along with Kafka and Zookeper.
+After successfully building images (which will cause the images to be pushed to the specified Docker repository) you are ready to deploy the producer and consumer containers along with Kafka and Zookeper.
 
-You can deploy clients by using some examples inside the [examples folder]()
+You can deploy clients by using some examples inside the [examples folder](examples)
 This will create Kubernetes `Jobs` with the example image.
+
+Example command for deploying job:
+```
+kubectl apply -f examples/kafka/kafka-consumer.yaml -n myproject
+```
 
 If you built your own version of these clients, remember to update the `image` field with the path where the image was pushed during the build, and it's available (i.e. `<my-docker-org>/test-client-http-consumer:latest`).
 
