@@ -7,12 +7,12 @@
 
 This repository contains HTTP and Apache Kafka clients used in Strimzi systemtests:
 
-* Kafka Producer which periodically produces messages into a topic
-* Kafka Streams application which reads messages from a topic, transforms them (reverses the message payload) and sends them to another topic
-* Kafka Consumer which is consuming messages from a topic
-* Kafka Admin which allows user to alter/create/remove topics via Admin API
-* HTTP Producer which produces messages to a topic using host and port
-* HTTP Consumer which consumes messages from a topic and endpoint
+* Kafka Producer, which periodically produces messages into a topic
+* Kafka Streams application which reads messages from a topic transforms them (reverses the message payload) and sends them to another topic
+* Kafka Consumer, which is consuming messages from a topic
+* Kafka Admin, which allows user to alter/create/remove topics via Admin API
+* HTTP Producer, which produces messages to a topic using host and port
+* HTTP Consumer, which consumes messages from a topic and endpoint
 
 All clients are used as K8s `Job` - example files are present in [examples folder](examples).
 Logging configuration can be found in the `log4j2.properties` file in each module separately.
@@ -25,7 +25,7 @@ But if you want to do any modifications to the clients, you will need to build y
 To build these examples you need some basic requirements.
 Make sure you have `make`, `docker`, `JDK 11` and `mvn` installed.
 By default, the Docker organization to which images are pushed is the one defined by the `USER` environment variable which is assigned to the `DOCKER_ORG` one.
-The organization can be changed exporting a different value for the `DOCKER_ORG` and it can also be the internal registry of an OpenShift running cluster.
+One can change the organization by exporting a different value for the `DOCKER_ORG`, and it can also be the internal registry of an OpenShift running cluster.
 
 The command for building images with the latest supported Kafka version is:
 
@@ -35,8 +35,8 @@ make all
 
 ## Usage
 
-Basic requirement to run these clients is a Kubernetes cluster with Strimzi managed Apache Kafka cluster deployed.
-Examples how to deploy Apache Kafka using Strimzi can be found on the [Strimzi website](https://strimzi.io/quickstarts/minikube/).
+The essential requirement to run these clients is a Kubernetes cluster with Strimzi and Apache Kafka cluster.
+How to deploy Apache Kafka using Strimzi can be found on the [Strimzi website](https://strimzi.io/quickstarts/minikube/).
 
 After successfully building images (which will cause the images to be pushed to the specified Docker repository) you are ready to deploy the producer and consumer containers along with Kafka and Zookeper.
 
@@ -108,7 +108,7 @@ For each client, you can also configure OAuth:
 * `OAUTH_TOKEN_ENDPOINT_URI` - URI (uniform resource identifier) endpoint, where the client connects and performs resolution to retrieve access token
 
 HTTP Producer
-* `HOSTNAME` - host name of service
+* `HOSTNAME` - hostname of service
 * `PORT` - port on which is service exposed
 * `TOPIC` - the topic producer will send to
 * `DELAY_MS` - the delay, in ms, between messages
@@ -116,11 +116,11 @@ HTTP Producer
 * `MESSAGE` - message which the producer should send
 
 HTTP Consumer
-* `HOSTNAME` - host name of service
+* `HOSTNAME` - hostname of service
 * `PORT` - port on which is service exposed
 * `TOPIC` - topic from which should consumer receive messages
-* `CLIENT_ID` - id of client which consumer should use
-* `GROUP_ID` - id of group which consumer should join
+* `CLIENT_ID` - id of the client which consumer should use
+* `GROUP_ID` - id of the group which consumer should join
 * `POLL_INTERVAL` - interval, in ms, between polls
 * `POLL_TIMEOUT` - timeout, in ms, of one poll
 * `MESSAGE_COUNT` - the number of messages consumer should receive 
