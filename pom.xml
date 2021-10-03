@@ -21,9 +21,9 @@
         <log4j.version>2.13.3</log4j.version>
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
         <kafka.version>3.0.0</kafka.version>
-        <opentracing-kafka.version>0.1.11</opentracing-kafka.version>
+        <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
         <jaeger.version>1.1.0</jaeger.version>
-        <strimzi-oauth-callback.version>0.7.1</strimzi-oauth-callback.version>
+        <strimzi-oauth-callback.version>0.8.1</strimzi-oauth-callback.version>
         <vertx-core.version>4.1.0</vertx-core.version>
         <netty.version>4.1.66.Final</netty.version>
         <jackson.version>2.12.4</jackson.version>
