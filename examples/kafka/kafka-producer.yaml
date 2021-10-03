@@ -34,7 +34,7 @@ spec:
               value: all
             - name: LOG_LEVEL
               value: DEBUG
-          image: quay.io/strimzi-test-clients/test-client-kafka-producer:0.1.0-kafka-3.0.0
+          image: quay.io/strimzi-test-clients/test-client-kafka-producer:0.1.1-kafka-3.0.0
           imagePullPolicy: IfNotPresent
           name: kafka-producer-client
       restartPolicy: "Never"

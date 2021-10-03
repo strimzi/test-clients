@@ -26,7 +26,7 @@ spec:
           value: list
         - name: LOG_LEVEL
           value: DEBUG
-        image: quay.io/strimzi-test-clients/test-client-kafka-admin:0.1.0-kafka-3.0.0
+        image: quay.io/strimzi-test-clients/test-client-kafka-admin:0.1.1-kafka-3.0.0
         imagePullPolicy: IfNotPresent
         name: list-admin-client
       restartPolicy: "Never"
