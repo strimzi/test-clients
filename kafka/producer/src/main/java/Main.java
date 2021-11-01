@@ -3,18 +3,14 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.TracingProducerInterceptor;
-import io.opentracing.util.GlobalTracer;
+import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         ProducerConfiguration config = new ProducerConfiguration();
 
         LOGGER.info("Kafka producer is starting with configuration: {}", config.toString());
@@ -34,12 +30,7 @@ public class Main {
         Properties props = ProducerConfiguration.createProperties(config);
         List<Header> headers = null;
 
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
-
-            props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingProducerInterceptor.class.getName());
-        }
+        TracingUtil.initialize().kafkaProducerConfig(props);
 
         if (config.getHeaders() != null) {
             headers = new ArrayList<>();
@@ -80,7 +71,7 @@ public class Main {
                 // Increment number of sent messages for non blocking producer
                 numSent.incrementAndGet();
             }
-            if (transactionalProducer && ((i + 1) % msgPerTx == 0)) {
+            if (transactionalProducer && (i + 1) % msgPerTx == 0) {
                 LOGGER.info("Committing the transaction. Messages sent: {}", i);
                 producer.commitTransaction();
             }

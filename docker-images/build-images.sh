@@ -7,6 +7,12 @@ MODE=${1:-"push"}
 DOCKER_TAG=${DOCKER_TAG:-"latest"}
 MVN_ARGS=${MVN_ARGS:-""}
 
+echo "Installing root pom"
+make java_install_single
+
+echo "Building Tracing dependency"
+make build --directory=tracing/
+
 echo "Building Kafka clients with versions inside kafka.version file"
 echo "Used build mode: $MODE"
 for KAFKA_VERSION in $KAFKA_VERSIONS
