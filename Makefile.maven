@@ -6,6 +6,14 @@ java_build:
 	echo "Building JAR file ..."
 	mvn $(MVN_ARGS) package
 
+java_install:
+	echo "Building and installing JAR file ..."
+	mvn $(MVN_ARGS) install
+
+java_install_single:
+	echo "Building and installing single module ..."
+	mvn $(MVN_ARGS) -N install
+
 java_clean:
 	echo "Cleaning Maven build ..."
 	mvn clean

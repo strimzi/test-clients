@@ -1,8 +1,9 @@
 RELEASE_VERSION ?= latest
 
 include ./Makefile.os
+include ./Makefile.maven
 
-SUBDIRS=kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
+SUBDIRS=tracing kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
 DOCKER_TARGETS=docker_build docker_push docker_tag
 
 all: $(SUBDIRS)

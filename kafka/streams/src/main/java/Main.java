@@ -3,20 +3,18 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import io.jaegertracing.Configuration;
-import io.opentracing.Tracer;
-import io.opentracing.contrib.kafka.streams.TracingKafkaClientSupplier;
-import io.opentracing.util.GlobalTracer;
+import java.util.Properties;
+
+import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
+import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Properties;
 
 public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
@@ -38,17 +36,11 @@ public class Main {
             })
             .to(config.getTargetTopic(), Produced.with(Serdes.String(), Serdes.String()));
 
-        KafkaStreams streams;
-
-        if (System.getenv("JAEGER_SERVICE_NAME") != null)   {
-            Tracer tracer = Configuration.fromEnv().getTracer();
-            GlobalTracer.registerIfAbsent(tracer);
-
-            KafkaClientSupplier supplier = new TracingKafkaClientSupplier(tracer);
-            streams = new KafkaStreams(builder.build(), props, supplier);
-        } else {
-            streams = new KafkaStreams(builder.build(), props);
-        }
+        Topology topology = builder.build();
+        KafkaClientSupplier supplier = TracingUtil.initialize().clientSupplier();
+        KafkaStreams streams = supplier != null ?
+            new KafkaStreams(topology, props, supplier) :
+            new KafkaStreams(topology, props);
 
         streams.start();
     }
