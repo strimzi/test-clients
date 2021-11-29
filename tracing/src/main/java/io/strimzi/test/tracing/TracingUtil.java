@@ -78,6 +78,11 @@ public class TracingUtil {
         public KafkaClientSupplier clientSupplier() {
             return null;
         }
+
+        @Override
+        public <T> HttpHandle<T> createHttpHandle(String operationName) {
+            return new HttpHandle<T>();
+        }
     }
 
 }

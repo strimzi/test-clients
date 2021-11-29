@@ -3,7 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
-import java.net.http.HttpRequest;
+import io.strimzi.test.tracing.HttpContext;
 
 /**
  * Represents information about a message that will be send
@@ -11,11 +11,11 @@ import java.net.http.HttpRequest;
 public class ProducerRecord {
 
     private final String message;
-    private final HttpRequest request;
+    private final HttpContext context;
 
-    public ProducerRecord(String message, HttpRequest request) {
+    public ProducerRecord(String message, HttpContext context) {
         this.message = message;
-        this.request = request;
+        this.context = context;
     }
 
     /**
@@ -26,9 +26,9 @@ public class ProducerRecord {
     }
 
     /**
-     * @return HttpRequest that will be executed
+     * @return HttpContext that will build the http request
      */
-    public HttpRequest getRequest() {
-        return request;
+    public HttpContext getContext() {
+        return context;
     }
 }
