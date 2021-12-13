@@ -4,18 +4,18 @@
  */
 package io.strimzi.test.tracing;
 
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.List;
+import java.util.Properties;
 
 /**
  * Tracing initialization
  */
 public class TracingUtil {
-    private static final Logger log = LogManager.getLogger(TracingUtil.class);
+    private static final Logger LOGGER = LogManager.getLogger(TracingUtil.class);
     private static TracingHandle tracing = new NoopTracing();
 
     private static final List<TracingHandle> HANDLES = List.of(
@@ -31,12 +31,10 @@ public class TracingUtil {
         for (TracingHandle instance : HANDLES) {
             String serviceName = instance.serviceName();
             if (serviceName != null) {
-                log.info(
-                    String.format(
-                        "Initializing Jaeger (%s) tracingConfig with service name %s",
-                        instance.type(),
-                        serviceName
-                    )
+                LOGGER.info(
+                    "Initializing Jaeger ({}) tracingConfig with service name {}",
+                    instance.type(),
+                    serviceName
                 );
                 instance.initialize();
                 tracing = instance;

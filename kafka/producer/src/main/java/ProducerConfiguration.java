@@ -55,7 +55,7 @@ public class ProducerConfiguration {
         this.additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
     }
 
-    @SuppressWarnings("BooleanExpressionComplexity")
+    @SuppressWarnings({"BooleanExpressionComplexity", "checkstyle:UnnecessaryParentheses"})
     public static Properties createProperties(ProducerConfiguration config) {
         Properties props = new Properties();
 
@@ -99,9 +99,9 @@ public class ProducerConfiguration {
             }
         }
 
-        if (config.getOauthAccessToken() != null
-            || config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null
-            || config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null)    {
+        if ((config.getOauthAccessToken() != null)
+            || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthRefreshToken() != null)
+            || (config.getOauthTokenEndpointUri() != null && config.getOauthClientId() != null && config.getOauthClientSecret() != null))    {
             log.info("Configuring OAuth");
             props.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
             props.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(props.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");

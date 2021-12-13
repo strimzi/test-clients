@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Main {
     private static final Logger LOGGER = LogManager.getLogger(Main.class);
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws InterruptedException {
         ProducerConfiguration config = new ProducerConfiguration();
 
         LOGGER.info("Kafka producer is starting with configuration: {}", config.toString());

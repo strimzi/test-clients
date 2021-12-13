@@ -33,26 +33,34 @@ import java.util.Map;
 import java.util.Properties;
 
 public class OpenTelemetryHandle implements TracingHandle {
+    private static final String OPEN_TELEMERTY = "OpenTelemetry";
+    private static final String OTEL_SERVICE_NAME = "OTEL_SERVICE_NAME";
+    private static final String OTEL_SERVICE_NAME_KEY = "otel.service.name";
+    private static final String OTEL_TRACES_EXPORTER = "OTEL_TRACES_EXPORTER";
+    private static final String OTEL_TRACES_EXPORTER_KEY = "otel.traces.exporter";
+    private static final String JAEGER = "jaeger";
+    private static final String TEST_CLIENTS = "test-clients";
+
     @Override
     public String type() {
-        return "OpenTelemetry";
+        return OPEN_TELEMERTY;
     }
 
     @Override
     public String envName() {
-        return "OTEL_SERVICE_NAME";
+        return OTEL_SERVICE_NAME;
     }
 
     @Override
     public String serviceName() {
         String serviceName = System.getenv(envName());
         if (serviceName == null) {
-            serviceName = System.getProperty("otel.service.name");
+            serviceName = System.getProperty(OTEL_SERVICE_NAME_KEY);
         } else {
-            System.setProperty("otel.service.name", serviceName);
+            System.setProperty(OTEL_SERVICE_NAME_KEY, serviceName);
         }
-        if (serviceName != null && System.getenv("OTEL_TRACES_EXPORTER") == null) {
-            System.setProperty("otel.traces.exporter", "jaeger");
+        if (serviceName != null && System.getenv(OTEL_TRACES_EXPORTER) == null) {
+            System.setProperty(OTEL_TRACES_EXPORTER_KEY, JAEGER);
         }
         return serviceName;
     }
@@ -114,14 +122,13 @@ public class OpenTelemetryHandle implements TracingHandle {
     private static class OpenTelemetryHttpHandle<T> extends HttpHandle<T> {
         private final String operationName;
         private Span span;
-        private Scope scope;
 
         public OpenTelemetryHttpHandle(String operationName) {
             this.operationName = operationName;
         }
 
         private static Tracer get() {
-            return GlobalOpenTelemetry.getTracer("test-clients");
+            return GlobalOpenTelemetry.getTracer(TEST_CLIENTS);
         }
 
         private static TextMapPropagator propagator() {
@@ -135,19 +142,19 @@ public class OpenTelemetryHandle implements TracingHandle {
             spanBuilder.setAttribute(SemanticAttributes.HTTP_METHOD, context.getRecord() == null ? "GET" : "POST");
             spanBuilder.setAttribute(SemanticAttributes.HTTP_URL, context.getUri());
             span = spanBuilder.startSpan();
-            scope = span.makeCurrent();
             HttpRequest.Builder builder = builder(context);
-            propagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
+            try (Scope ignored = span.makeCurrent()) {
+                propagator().inject(Context.current(), builder, HttpRequest.Builder::setHeader);
+            }
             return builder.build();
         }
 
         @Override
         public HttpResponse<T> finish(HttpResponse<T> response) {
-            try {
+            try (Scope ignored = span.makeCurrent()) {
                 int code = response.statusCode();
                 span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, code);
                 span.setStatus(code == 200 ? StatusCode.OK : StatusCode.ERROR);
-                scope.close();
             } finally {
                 span.end();
             }

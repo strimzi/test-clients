@@ -25,9 +25,11 @@ import java.util.Map;
 import java.util.Properties;
 
 public class OpenTracingHandle implements TracingHandle {
+    private static final String OPEN_TRACING = "OpenTracing";
+
     @Override
     public String type() {
-        return "OpenTracing";
+        return OPEN_TRACING;
     }
 
     @Override
