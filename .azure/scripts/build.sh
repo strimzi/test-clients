@@ -26,5 +26,6 @@ else
   echo "In main branch or in release tag - pushing images"
   docker login -u $DOCKER_USER -p $DOCKER_PASS $DOCKER_REGISTRY
 
+  docker buildx create --use
   ./docker-images/build-images.sh
 fi
