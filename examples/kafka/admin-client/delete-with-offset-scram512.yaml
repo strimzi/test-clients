@@ -37,7 +37,7 @@ spec:
             sasl.mechanism=SCRAM-SHA-512
             security.protocol=SASL_PLAINTEXT
             sasl.jaas.config=org.apache.kafka.common.security.scram.ScramLoginModule required username="test-user" password="myPassword";
-        image: quay.io/strimzi-test-clients/test-client-kafka-admin:latest-kafka-3.0.0
+        image: quay.io/strimzi-test-clients/test-client-kafka-admin:latest-kafka-3.1.0
         imagePullPolicy: IfNotPresent
         name: delete-admin-client-offset-scram
       restartPolicy: "Never"
