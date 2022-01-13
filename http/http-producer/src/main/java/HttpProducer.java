@@ -6,15 +6,17 @@
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.strimzi.test.tracing.HttpContext;
+import io.strimzi.test.tracing.HttpHandle;
+import io.strimzi.test.tracing.TracingHandle;
+import io.strimzi.test.tracing.TracingUtil;
 import io.vertx.core.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,8 +26,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import io.netty.handler.codec.http.HttpHeaderNames;
 
 public class HttpProducer {
 
@@ -43,12 +43,12 @@ public class HttpProducer {
         for (int i = 0; i < this.producerConfig.getMessageCount(); i++) {
             String record = "{\"records\":[{\"key\":\"key-" + i + "\",\"value\":\"" + this.producerConfig.getMessage() + "-" + i + "\"}]}";
 
-            requests.add(new ProducerRecord(record, HttpRequest.newBuilder()
-                .uri(new URI(this.producerConfig.getUri()))
-                .setHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/vnd.kafka.json.v2+json")
-                .POST(HttpRequest.BodyPublishers.ofString(record))
-                .build()
-            ));
+            HttpContext context = HttpContext.post(
+                producerConfig.getUri(),
+                "application/vnd.kafka.json.v2+json",
+                record);
+
+            requests.add(new ProducerRecord(record, context));
         }
 
         return requests;
@@ -64,11 +64,15 @@ public class HttpProducer {
         boolean[] sendSuccessful = {true};
         UncheckedObjectMapper uncheckedObjectMapper = new UncheckedObjectMapper();
 
+        TracingHandle th = TracingUtil.getTracing();
+
         for (ProducerRecord record : records) {
             executorService.schedule(() -> {
                 try {
                     LOGGER.info("Sending message: {}", record.getMessage());
-                    List<OffsetRecordSent> offsetRecords = Arrays.asList(client.sendAsync(record.getRequest(), HttpResponse.BodyHandlers.ofString())
+                    HttpHandle<String> httpHandle = th.createHttpHandle("send-messages");
+                    List<OffsetRecordSent> offsetRecords = Arrays.asList(client.sendAsync(httpHandle.build(record.getContext()), HttpResponse.BodyHandlers.ofString())
+                        .thenApply(httpHandle::finish)
                         .thenApply(result -> {
                             if (result.statusCode() != HttpResponseStatus.OK.code()) {
                                 LOGGER.error("Error while sending message {} : {}", record.getMessage(), result.body());

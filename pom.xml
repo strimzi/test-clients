@@ -10,25 +10,30 @@
     <version>0.2.0-SNAPSHOT</version>
 
     <modules>
+        <module>tracing</module>
         <module>kafka</module>
         <module>http</module>
     </modules>
 
     <properties>
-        <maven.checkstyle.version>3.1.1</maven.checkstyle.version>
+        <maven.checkstyle.version>3.1.2</maven.checkstyle.version>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <log4j.version>2.17.1</log4j.version>
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
         <kafka.version>3.0.0</kafka.version>
-        <opentracing-kafka.version>0.1.15</opentracing-kafka.version>
-        <jaeger.version>1.1.0</jaeger.version>
         <strimzi-oauth-callback.version>0.8.1</strimzi-oauth-callback.version>
         <vertx-core.version>4.2.3</vertx-core.version>
         <netty.version>4.1.72.Final</netty.version>
         <jackson.version>2.13.1</jackson.version>
         <maven-shade.version>3.2.1</maven-shade.version>
-        <kafka-kubernetes-config-provider.version>0.1.0</kafka-kubernetes-config-provider.version>
+        <kafka-kubernetes-config-provider.version>0.1.1</kafka-kubernetes-config-provider.version>
+        <jaeger.version>1.6.0</jaeger.version>
+        <opentracing.version>0.33.0</opentracing.version>
+        <opentracing-kafka-client.version>0.1.15</opentracing-kafka-client.version>
+        <opentelemetry.version>1.7.0-alpha</opentelemetry.version>
+        <opentelemetry-stable.version>1.7.0</opentelemetry-stable.version>
+        <grpc.version>1.41.0</grpc.version>
     </properties>
 
 

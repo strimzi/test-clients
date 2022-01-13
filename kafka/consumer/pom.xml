@@ -32,12 +32,8 @@
             <version>${log4j.version}</version>
         </dependency>
         <dependency>
-            <groupId>io.jaegertracing</groupId>
-            <artifactId>jaeger-client</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentracing.contrib</groupId>
-            <artifactId>opentracing-kafka-client</artifactId>
+            <groupId>io.strimzi</groupId>
+            <artifactId>test-client-tracing</artifactId>
         </dependency>
         <dependency>
             <groupId>io.strimzi</groupId>

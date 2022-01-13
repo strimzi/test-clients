@@ -52,6 +52,7 @@ public class StreamsConfiguration {
         this.additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
     }
 
+    @SuppressWarnings({"checkstyle:UnnecessaryParentheses"})
     public static Properties createProperties(StreamsConfiguration config) {
         Properties props = new Properties();
 

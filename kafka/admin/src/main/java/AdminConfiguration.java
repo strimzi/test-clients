@@ -53,7 +53,7 @@ public class AdminConfiguration {
         this.additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
     }
 
-    @SuppressWarnings("BooleanExpressionComplexity")
+    @SuppressWarnings({"BooleanExpressionComplexity", "checkstyle:UnnecessaryParentheses"})
     public static Properties createProperties(AdminConfiguration config) {
         Properties props = new Properties();
         props.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, config.getBootstrapServers());

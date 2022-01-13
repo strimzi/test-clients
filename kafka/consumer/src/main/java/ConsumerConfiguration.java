@@ -53,7 +53,7 @@ public class ConsumerConfiguration {
         this.additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
     }
 
-    @SuppressWarnings("BooleanExpressionComplexity")
+    @SuppressWarnings({"BooleanExpressionComplexity", "checkstyle:UnnecessaryParentheses"})
     public static Properties createProperties(ConsumerConfiguration config) {
         Properties props = new Properties();
 

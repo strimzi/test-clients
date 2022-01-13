@@ -55,7 +55,7 @@ public class ProducerConfiguration {
         this.additionalConfig = System.getenv().getOrDefault("ADDITIONAL_CONFIG", "");
     }
 
-    @SuppressWarnings("BooleanExpressionComplexity")
+    @SuppressWarnings({"BooleanExpressionComplexity", "checkstyle:UnnecessaryParentheses"})
     public static Properties createProperties(ProducerConfiguration config) {
         Properties props = new Properties();
 

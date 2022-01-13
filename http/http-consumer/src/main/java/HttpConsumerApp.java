@@ -3,6 +3,7 @@
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
 
+import io.strimzi.test.tracing.TracingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -20,6 +21,9 @@ public class HttpConsumerApp {
         HttpConsumer consumer = new HttpConsumer(consumerConfig);
 
         LOGGER.info("HttpConsumer is starting with configuration: {}", consumerConfig.toString());
+
+        TracingUtil.initialize();
+
         consumer.createConsumer();
         consumer.subscribeToTopic();
         System.exit(consumer.consumeMessages() ? 0 : 1);
