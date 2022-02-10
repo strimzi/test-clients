@@ -12,6 +12,7 @@
     <modules>
         <module>kafka</module>
         <module>http</module>
+        <module>tracing</module>
     </modules>
 
     <properties>
