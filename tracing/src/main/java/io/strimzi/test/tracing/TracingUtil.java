@@ -32,7 +32,7 @@ public class TracingUtil {
             String serviceName = instance.serviceName();
             if (serviceName != null) {
                 LOGGER.info(
-                    "Initializing Jaeger ({}) tracingConfig with service name {}",
+                    "Initializing {} tracingConfig with service name {}",
                     instance.type(),
                     serviceName
                 );
