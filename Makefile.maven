@@ -17,3 +17,7 @@ java_install_single:
 java_clean:
 	echo "Cleaning Maven build ..."
 	mvn clean
+
+java_verify:
+	echo "Verifying Maven build ..."
+	mvn verify
