@@ -13,6 +13,7 @@
         <module>kafka</module>
         <module>http</module>
         <module>tracing</module>
+        <module>testsuite</module>
     </modules>
 
     <properties>
@@ -27,13 +28,14 @@
         <netty.version>4.1.72.Final</netty.version>
         <jackson.version>2.13.1</jackson.version>
         <maven-shade.version>3.2.1</maven-shade.version>
-        <kafka-kubernetes-config-provider.version>0.1.1</kafka-kubernetes-config-provider.version>
+        <kafka-kubernetes-config-provider.version>1.0.0</kafka-kubernetes-config-provider.version>
+        <okhttp3.version>3.14.9</okhttp3.version>
         <jaeger.version>1.6.0</jaeger.version>
         <opentracing.version>0.33.0</opentracing.version>
         <opentracing-kafka-client.version>0.1.15</opentracing-kafka-client.version>
-        <opentelemetry.version>1.7.0-alpha</opentelemetry.version>
-        <opentelemetry-stable.version>1.7.0</opentelemetry-stable.version>
-        <grpc.version>1.41.0</grpc.version>
+        <opentelemetry.version>1.9.0-alpha</opentelemetry.version>
+        <opentelemetry-stable.version>1.9.0</opentelemetry-stable.version>
+        <grpc.version>1.44.0</grpc.version>
     </properties>
 
 

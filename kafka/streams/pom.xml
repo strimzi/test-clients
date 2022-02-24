@@ -40,6 +40,11 @@
             <artifactId>kafka-oauth-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>${okhttp3.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.strimzi</groupId>
             <artifactId>kafka-kubernetes-config-provider</artifactId>
             <version>${kafka-kubernetes-config-provider.version}</version>
@@ -72,7 +77,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>Main</mainClass>
+                                    <mainClass>io.strimzi.testclients.kafka.streams.KafkaStreamsApp</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
