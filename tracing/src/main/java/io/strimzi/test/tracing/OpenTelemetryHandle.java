@@ -16,7 +16,7 @@ import io.opentelemetry.context.propagation.TextMapPropagator;
 import io.opentelemetry.instrumentation.kafkaclients.KafkaTracing;
 import io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor;
 import io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor;
-import io.opentelemetry.sdk.autoconfigure.OpenTelemetrySdkAutoConfiguration;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -67,7 +67,7 @@ public class OpenTelemetryHandle implements TracingHandle {
 
     @Override
     public void initialize() {
-        OpenTelemetrySdkAutoConfiguration.initialize();
+        AutoConfiguredOpenTelemetrySdk.initialize();
     }
 
     @Override
