@@ -16,7 +16,7 @@ $(JAVA_TARGETS): $(SUBDIRS)
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
-$(DOCKER_TARGETS):
+$(DOCKERDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
 next_version:
@@ -32,4 +32,4 @@ release_maven:
 	mvn versions:set -DnewVersion=$(shell echo $(RELEASE_VERSION) | tr a-z A-Z)
 	mvn versions:commit
 
-.PHONY: all $(SUBDIRS) $(DOCKER_TARGETS)
+.PHONY: all $(SUBDIRS) $(DOCKERDIRS) $(DOCKER_TARGETS)
