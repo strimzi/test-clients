@@ -4,14 +4,17 @@ include ./Makefile.os
 include ./Makefile.maven
 
 SUBDIRS=tracing kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
+DOCKER_DIRS=kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
 DOCKER_TARGETS=docker_build docker_push docker_tag
+JAVA_TARGETS=java_build java_install java_clean
 
-all: $(SUBDIRS)
+all: $(SUBDIRS) $(DOCKER_DIRS)
 build: $(SUBDIRS)
-clean: $(SUBDIRS)
+clean: $(SUBDIRS) $(DOCKER_DIRS)
 release: release_examples release_maven
+$(DOCKER_TARGETS): $(DOCKER_DIRS)
+$(JAVA_TARGETS): $(SUBDIRS)
 
-$(DOCKER_TARGETS): $(SUBDIRS)
 
 $(SUBDIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
