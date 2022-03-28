@@ -3,7 +3,7 @@ RELEASE_VERSION ?= latest
 include ./Makefile.os
 
 SUBDIRS=tracing kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
-DOCKER_DIRS=kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
+DOCKER_DIRS=docker-images
 DOCKER_TARGETS=docker_build docker_push docker_tag
 JAVA_TARGETS=java_build java_install java_clean
 
