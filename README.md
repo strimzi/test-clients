@@ -5,7 +5,7 @@
 
 # Strimzi Test Clients
 
-This repository contains HTTP and Apache Kafka clients used in Strimzi systemtests:
+This repository contains HTTP and [Apache Kafka®](https://kafka.apache.org) clients used in Strimzi systemtests:
 
 * Kafka Producer, which periodically produces messages into a topic
 * Kafka Streams application which reads messages from a topic transforms them (reverses the message payload) and sends them to another topic
