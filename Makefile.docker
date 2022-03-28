@@ -20,7 +20,7 @@ endif
 
 all: docker_build docker_push
 
-docker_build_default:
+docker_build:
 	echo "Building Docker image ..."
 	mkdir -p scripts
 	cp ../../scripts/run.sh ./scripts/run.sh
@@ -49,6 +49,3 @@ docker_push_manifest:
 docker_delete_manifest:
 	# Delete the manifest to the registry, ignore the error if manifest doesn't exist
 	docker manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true
-
-docker_%: docker_%_default
-	@  true
