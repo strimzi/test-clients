@@ -1,19 +1,22 @@
 RELEASE_VERSION ?= latest
 
 include ./Makefile.os
-include ./Makefile.maven
 
 SUBDIRS=tracing kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
-DOCKER_TARGETS=docker_build docker_push docker_tag
+DOCKER_DIRS=docker-images/
+DOCKER_TARGETS=docker_build docker_push docker_tag docker_amend_manifest docker_push_manifest docker_delete_manifest
+JAVA_TARGETS=java_build java_install java_clean
 
-all: $(SUBDIRS)
-build: $(SUBDIRS)
-clean: $(SUBDIRS)
+all: $(SUBDIRS) $(DOCKER_DIRS)
+clean: $(SUBDIRS) $(DOCKER_DIRS)
 release: release_examples release_maven
-
-$(DOCKER_TARGETS): $(SUBDIRS)
+$(DOCKER_TARGETS): $(DOCKER_DIRS)
+$(JAVA_TARGETS): $(SUBDIRS)
 
 $(SUBDIRS):
+	$(MAKE) -C $@ $(MAKECMDGOALS)
+
+$(DOCKER_DIRS):
 	$(MAKE) -C $@ $(MAKECMDGOALS)
 
 next_version:
@@ -29,4 +32,4 @@ release_maven:
 	mvn versions:set -DnewVersion=$(shell echo $(RELEASE_VERSION) | tr a-z A-Z)
 	mvn versions:commit
 
-.PHONY: all $(SUBDIRS) $(DOCKER_TARGETS)
+.PHONY: all $(SUBDIRS) $(DOCKER_DIRS) $(DOCKER_TARGETS)
