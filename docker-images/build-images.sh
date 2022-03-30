@@ -11,13 +11,17 @@ DOCKER_TAG=${DOCKER_TAG:-"latest"}
 MVN_ARGS=${MVN_ARGS:-""}
 
 echo "Building Kafka clients with versions inside kafka.version file"
-echo "Used build mode: $MODE"
+echo "Used build mode: $TARGETS"
 
 for KAFKA_VERSION in $KAFKA_VERSIONS
 do
   for KAFKA_MODULE in $KAFKA_MODULES
   do
-    MVN_ARGS="$MVN_ARGS -Dkafka.version=$KAFKA_VERSION" make java_build --directory=$KAFKA_MODULE
+    # build only if docker_build is passed
+    if [[ "$TARGETS" =~ "docker_build" ]];
+    then
+      MVN_ARGS="$MVN_ARGS -Dkafka.version=$KAFKA_VERSION" make java_build --directory=$KAFKA_MODULE
+    fi
 
     for ARCH in $ARCHITECTURES
     do
