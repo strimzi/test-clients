@@ -30,7 +30,7 @@ spec:
           value: "100"
         - name: LOG_LEVEL
           value: DEBUG
-        image: quay.io/strimzi-test-clients/test-client-kafka-admin:latest-kafka-3.2.0
+        image: quay.io/strimzi-test-clients/test-client-kafka-admin:0.3.0-kafka-3.2.0
         imagePullPolicy: IfNotPresent
         name: delete-admin-client-1
       restartPolicy: "Never"
