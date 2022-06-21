@@ -65,7 +65,7 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>Main</mainClass>
+                                    <mainClass>io.strimzi.testclients.kafka.admin.KafkaAdminApp</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>

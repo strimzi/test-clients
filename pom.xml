@@ -13,6 +13,7 @@
         <module>kafka</module>
         <module>http</module>
         <module>tracing</module>
+        <module>testsuite</module>
     </modules>
 
     <properties>
