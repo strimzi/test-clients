@@ -4,8 +4,6 @@
  */
 package io.strimzi.test.tracing;
 
-import org.apache.kafka.streams.KafkaClientSupplier;
-
 import java.util.Properties;
 
 /**
@@ -17,10 +15,9 @@ public interface TracingHandle {
     String serviceName();
     void initialize();
 
-    void kafkaConsumerConfig(Properties props);
-    void kafkaProducerConfig(Properties props);
-
-    KafkaClientSupplier clientSupplier();
+    void addTracingPropsToConsumerConfig(Properties props);
+    void addTracingPropsToProducerConfig(Properties props);
+    void addTracingPropsToStreamsConfig(Properties props);
 
     <T> HttpHandle<T> createHttpHandle(String operationName);
 }

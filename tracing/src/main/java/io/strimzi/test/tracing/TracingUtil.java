@@ -4,7 +4,6 @@
  */
 package io.strimzi.test.tracing;
 
-import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,6 +43,15 @@ public class TracingUtil {
         return tracing;
     }
 
+    static void addProperty(Properties props, String key, String value) {
+        String previous = props.getProperty(key);
+        if (previous != null) {
+            props.setProperty(key, previous + "," + value);
+        } else {
+            props.setProperty(key, value);
+        }
+    }
+
     private static final class NoopTracing implements TracingHandle {
         @Override
         public String type() {
@@ -65,16 +73,15 @@ public class TracingUtil {
         }
 
         @Override
-        public void kafkaConsumerConfig(Properties props) {
+        public void addTracingPropsToConsumerConfig(Properties props) {
         }
 
         @Override
-        public void kafkaProducerConfig(Properties props) {
+        public void addTracingPropsToProducerConfig(Properties props) {
         }
 
         @Override
-        public KafkaClientSupplier clientSupplier() {
-            return null;
+        public void addTracingPropsToStreamsConfig(Properties props) {
         }
 
         @Override

@@ -7,7 +7,6 @@ import java.util.Properties;
 
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
@@ -37,10 +36,10 @@ public class Main {
             .to(config.getTargetTopic(), Produced.with(Serdes.String(), Serdes.String()));
 
         Topology topology = builder.build();
-        KafkaClientSupplier supplier = TracingUtil.initialize().clientSupplier();
-        KafkaStreams streams = supplier != null ?
-            new KafkaStreams(topology, props, supplier) :
-            new KafkaStreams(topology, props);
+
+        TracingUtil.initialize().addTracingPropsToStreamsConfig(props);
+
+        KafkaStreams streams = new KafkaStreams(topology, props);
 
         streams.start();
     }
