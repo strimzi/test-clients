@@ -31,7 +31,7 @@ public class TracingUtil {
     public static TracingHandle initialize() {
         String tracingSystem = System.getenv("TRACING_TYPE");
 
-        switch (tracingSystem) {
+        switch (tracingSystem == null ? "none" : tracingSystem) {
             case TracingConstants.OPEN_TRACING:
                 tracing = new OpenTracingHandle();
                 break;

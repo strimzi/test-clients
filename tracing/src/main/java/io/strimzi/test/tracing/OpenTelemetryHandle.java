@@ -46,6 +46,8 @@ public class OpenTelemetryHandle implements TracingHandle {
 
     @Override
     public void initialize() {
+        // disable metrics
+        System.setProperty("otel.metrics.exporter", "none");
         AutoConfiguredOpenTelemetrySdk.initialize();
     }
 
