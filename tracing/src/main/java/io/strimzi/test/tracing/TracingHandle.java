@@ -7,12 +7,11 @@ package io.strimzi.test.tracing;
 import java.util.Properties;
 
 /**
- * Tracing initialization
+ * Tracing handle interface
  */
 public interface TracingHandle {
-    String type();
-    String envName();
-    String serviceName();
+    String getType();
+    String getServiceName();
     void initialize();
 
     void addTracingPropsToConsumerConfig(Properties props);

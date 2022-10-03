@@ -23,21 +23,14 @@ import java.util.Map;
 import java.util.Properties;
 
 public class OpenTracingHandle implements TracingHandle {
-    private static final String OPEN_TRACING = "OpenTracing";
-
     @Override
-    public String type() {
-        return OPEN_TRACING;
+    public String getType() {
+        return TracingConstants.OPEN_TRACING;
     }
 
     @Override
-    public String envName() {
-        return Configuration.JAEGER_SERVICE_NAME;
-    }
-
-    @Override
-    public String serviceName() {
-        return System.getenv(envName());
+    public String getServiceName() {
+        return System.getenv(Configuration.JAEGER_SERVICE_NAME);
     }
 
     @Override

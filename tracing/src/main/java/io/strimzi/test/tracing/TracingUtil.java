@@ -7,39 +7,47 @@ package io.strimzi.test.tracing;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
 import java.util.Properties;
 
 /**
- * Tracing initialization
+ * Tracing related utilization class
  */
 public class TracingUtil {
     private static final Logger LOGGER = LogManager.getLogger(TracingUtil.class);
     private static TracingHandle tracing = new NoopTracing();
 
-    private static final List<TracingHandle> HANDLES = List.of(
-        new OpenTracingHandle(),
-        new OpenTelemetryHandle()
-    );
-
+    /**
+     * Method for getting instance of tracing handler
+     * @return TracingHandle instance of one of the handlers - OpenTracingHandle, OpenTelemetryHandle, NoopTracing
+     */
     public static TracingHandle getTracing() {
         return tracing;
     }
 
+    /**
+     * Method for initializing tracing based on `TRACING_TYPE` env variable
+     * @return TracingHandle instance of one of the handlers - OpenTracingHandle, OpenTelemetryHandle, NoopTracing
+     */
     public static TracingHandle initialize() {
-        for (TracingHandle instance : HANDLES) {
-            String serviceName = instance.serviceName();
-            if (serviceName != null) {
-                LOGGER.info(
-                    "Initializing {} tracingConfig with service name {}",
-                    instance.type(),
-                    serviceName
-                );
-                instance.initialize();
-                tracing = instance;
+        String tracingSystem = System.getenv("TRACING_TYPE");
+
+        switch (tracingSystem) {
+            case TracingConstants.OPEN_TRACING:
+                tracing = new OpenTracingHandle();
                 break;
-            }
+            case TracingConstants.OPEN_TELEMERTY:
+                tracing = new OpenTelemetryHandle();
+                break;
+            default:
+                tracing = new NoopTracing();
+                break;
         }
+
+        if (!(tracing instanceof NoopTracing)) {
+            LOGGER.info("Initializing {} with service name: {}", tracing.getType(), tracing.getServiceName());
+            tracing.initialize();
+        }
+
         return tracing;
     }
 
@@ -54,17 +62,12 @@ public class TracingUtil {
 
     private static final class NoopTracing implements TracingHandle {
         @Override
-        public String type() {
+        public String getType() {
             return null;
         }
 
         @Override
-        public String envName() {
-            return null;
-        }
-
-        @Override
-        public String serviceName() {
+        public String getServiceName() {
             return null;
         }
 
@@ -86,7 +89,7 @@ public class TracingUtil {
 
         @Override
         public <T> HttpHandle<T> createHttpHandle(String operationName) {
-            return new HttpHandle<T>();
+            return new HttpHandle<>();
         }
     }
 
