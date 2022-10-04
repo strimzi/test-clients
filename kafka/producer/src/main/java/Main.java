@@ -30,7 +30,7 @@ public class Main {
         Properties props = ProducerConfiguration.createProperties(config);
         List<Header> headers = null;
 
-        TracingUtil.initialize().kafkaProducerConfig(props);
+        TracingUtil.initialize().addTracingPropsToProducerConfig(props);
 
         if (config.getHeaders() != null) {
             headers = new ArrayList<>();

@@ -13,110 +13,63 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.context.propagation.TextMapPropagator;
-import io.opentelemetry.instrumentation.kafkaclients.KafkaTracing;
 import io.opentelemetry.instrumentation.kafkaclients.TracingConsumerInterceptor;
 import io.opentelemetry.instrumentation.kafkaclients.TracingProducerInterceptor;
-import io.opentelemetry.sdk.autoconfigure.OpenTelemetrySdkAutoConfiguration;
+import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
-import org.apache.kafka.clients.admin.Admin;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.streams.KafkaClientSupplier;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Map;
 import java.util.Properties;
 
 public class OpenTelemetryHandle implements TracingHandle {
-    private static final String OPEN_TELEMERTY = "OpenTelemetry";
-    private static final String OTEL_SERVICE_NAME = "OTEL_SERVICE_NAME";
-    private static final String OTEL_SERVICE_NAME_KEY = "otel.service.name";
-    private static final String OTEL_TRACES_EXPORTER = "OTEL_TRACES_EXPORTER";
-    private static final String OTEL_TRACES_EXPORTER_KEY = "otel.traces.exporter";
-    private static final String JAEGER = "jaeger";
-    private static final String TEST_CLIENTS = "test-clients";
-
     @Override
-    public String type() {
-        return OPEN_TELEMERTY;
+    public String getType() {
+        return TracingConstants.OPEN_TELEMERTY;
     }
 
     @Override
-    public String envName() {
-        return OTEL_SERVICE_NAME;
-    }
-
-    @Override
-    public String serviceName() {
-        String serviceName = System.getenv(envName());
+    public String getServiceName() {
+        String serviceName = System.getenv(TracingConstants.OTEL_SERVICE_NAME_ENV);
         if (serviceName == null) {
-            serviceName = System.getProperty(OTEL_SERVICE_NAME_KEY);
+            serviceName = System.getProperty(TracingConstants.OTEL_SERVICE_NAME_KEY);
         } else {
-            System.setProperty(OTEL_SERVICE_NAME_KEY, serviceName);
+            System.setProperty(TracingConstants.OTEL_SERVICE_NAME_KEY, serviceName);
         }
-        if (serviceName != null && System.getenv(OTEL_TRACES_EXPORTER) == null) {
-            System.setProperty(OTEL_TRACES_EXPORTER_KEY, JAEGER);
+        if (serviceName != null && System.getenv(TracingConstants.OTEL_TRACES_EXPORTER_ENV) == null) {
+            System.setProperty(TracingConstants.OTEL_TRACES_EXPORTER_KEY, TracingConstants.JAEGER);
         }
         return serviceName;
     }
 
     @Override
     public void initialize() {
-        OpenTelemetrySdkAutoConfiguration.initialize();
+        // disable metrics
+        System.setProperty("otel.metrics.exporter", "none");
+        AutoConfiguredOpenTelemetrySdk.initialize();
     }
 
     @Override
-    public void kafkaConsumerConfig(Properties props) {
-        props.put(ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingConsumerInterceptor.class.getName());
+    public void addTracingPropsToConsumerConfig(Properties props) {
+        TracingUtil.addProperty(props, ConsumerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingConsumerInterceptor.class.getName());
     }
 
     @Override
-    public void kafkaProducerConfig(Properties props) {
-        props.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingProducerInterceptor.class.getName());
+    public void addTracingPropsToProducerConfig(Properties props) {
+        TracingUtil.addProperty(props, ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingProducerInterceptor.class.getName());
     }
 
     @Override
-    public KafkaClientSupplier clientSupplier() {
-        return new TracingKafkaClientSupplier();
+    public void addTracingPropsToStreamsConfig(Properties props) {
+        addTracingPropsToConsumerConfig(props);
+        addTracingPropsToProducerConfig(props);
     }
 
     @Override
     public <T> HttpHandle<T> createHttpHandle(String operationName) {
         return new OpenTelemetryHttpHandle<>(operationName);
-    }
-
-    private static class TracingKafkaClientSupplier implements KafkaClientSupplier {
-        @Override
-        public Admin getAdmin(Map<String, Object> config) {
-            return Admin.create(config);
-        }
-
-        @Override
-        public Producer<byte[], byte[]> getProducer(Map<String, Object> config) {
-            KafkaTracing tracing = KafkaTracing.create(GlobalOpenTelemetry.get());
-            return tracing.wrap(new KafkaProducer<>(config));
-        }
-
-        @Override
-        public Consumer<byte[], byte[]> getConsumer(Map<String, Object> config) {
-            KafkaTracing tracing = KafkaTracing.create(GlobalOpenTelemetry.get());
-            return tracing.wrap(new KafkaConsumer<>(config));
-        }
-
-        @Override
-        public Consumer<byte[], byte[]> getRestoreConsumer(Map<String, Object> config) {
-            return getConsumer(config);
-        }
-
-        @Override
-        public Consumer<byte[], byte[]> getGlobalConsumer(Map<String, Object> config) {
-            return getConsumer(config);
-        }
     }
 
     private static class OpenTelemetryHttpHandle<T> extends HttpHandle<T> {
@@ -128,7 +81,7 @@ public class OpenTelemetryHandle implements TracingHandle {
         }
 
         private static Tracer get() {
-            return GlobalOpenTelemetry.getTracer(TEST_CLIENTS);
+            return GlobalOpenTelemetry.getTracer(TracingConstants.TEST_CLIENTS);
         }
 
         private static TextMapPropagator propagator() {

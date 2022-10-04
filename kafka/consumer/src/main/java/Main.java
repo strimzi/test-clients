@@ -26,7 +26,7 @@ public class Main {
         Properties props = ConsumerConfiguration.createProperties(config);
         int receivedMsgs = 0;
 
-        TracingUtil.initialize().kafkaConsumerConfig(props);
+        TracingUtil.initialize().addTracingPropsToConsumerConfig(props);
 
         boolean commit = !Boolean.parseBoolean(config.getEnableAutoCommit());
         KafkaConsumer consumer = new KafkaConsumer(props);
