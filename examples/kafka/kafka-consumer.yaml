@@ -30,7 +30,7 @@ spec:
               value: my-group
             - name: LOG_LEVEL
               value: DEBUG
-          image: quay.io/strimzi-test-clients/test-client-kafka-consumer:latest-kafka-3.3.1
+          image: quay.io/strimzi-test-clients/test-client-kafka-consumer:0.4.0-kafka-3.3.1
           imagePullPolicy: IfNotPresent
           name: kafka-consumer-client
       restartPolicy: "Never"
