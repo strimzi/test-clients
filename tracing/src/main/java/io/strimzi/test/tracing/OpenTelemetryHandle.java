@@ -42,7 +42,7 @@ public class OpenTelemetryHandle implements TracingHandle {
             System.setProperty(TracingConstants.OTEL_SERVICE_NAME_KEY, serviceName);
         }
         if (serviceName != null && System.getenv(TracingConstants.OTEL_TRACES_EXPORTER_ENV) == null) {
-            System.setProperty(TracingConstants.OTEL_TRACES_EXPORTER_KEY, TracingConstants.JAEGER);
+            System.setProperty(TracingConstants.OTEL_TRACES_EXPORTER_KEY, TracingConstants.OTLP_EXPORTER);
         }
         return serviceName;
     }
