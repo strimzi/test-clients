@@ -37,9 +37,7 @@ public class Main {
 
         Topology topology = builder.build();
 
-        TracingUtil.initialize().addTracingPropsToStreamsConfig(props);
-
-        KafkaStreams streams = new KafkaStreams(topology, props);
+        KafkaStreams streams = TracingUtil.initialize().getStreamsWithTracing(topology, props);
 
         streams.start();
     }
