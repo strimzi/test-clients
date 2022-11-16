@@ -19,6 +19,9 @@ import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk;
 import io.opentelemetry.semconv.trace.attributes.SemanticAttributes;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.streams.KafkaClientSupplier;
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.Topology;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -62,9 +65,9 @@ public class OpenTelemetryHandle implements TracingHandle {
     }
 
     @Override
-    public void addTracingPropsToStreamsConfig(Properties props) {
-        addTracingPropsToConsumerConfig(props);
-        addTracingPropsToProducerConfig(props);
+    public KafkaStreams getStreamsWithTracing(Topology topology, Properties props) {
+        KafkaClientSupplier supplier = new TracingKafkaClientSupplier();
+        return new KafkaStreams(topology, props, supplier);
     }
 
     @Override
