@@ -4,6 +4,8 @@
  */
 package io.strimzi.test.tracing;
 
+import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.Topology;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -84,7 +86,8 @@ public class TracingUtil {
         }
 
         @Override
-        public void addTracingPropsToStreamsConfig(Properties props) {
+        public KafkaStreams getStreamsWithTracing(Topology topology, Properties props) {
+            return null;
         }
 
         @Override
