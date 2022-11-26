@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 
+@Deprecated
 public class OpenTracingHandle implements TracingHandle {
     @Override
     public String getType() {

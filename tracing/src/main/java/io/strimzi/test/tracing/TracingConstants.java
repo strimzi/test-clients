@@ -21,7 +21,7 @@ public final class TracingConstants {
     public static final String TEST_CLIENTS = "test-clients";
 
     /**
-     * Common constants for Jaeger etc.
+     * Exporter related constants
      */
-    public static final String JAEGER = "jaeger";
+    public static final String OTLP_EXPORTER = "otlp";
 }
