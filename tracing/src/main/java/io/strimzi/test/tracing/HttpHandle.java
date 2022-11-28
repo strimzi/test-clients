@@ -6,6 +6,7 @@ package io.strimzi.test.tracing;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
@@ -18,7 +19,8 @@ public class HttpHandle<T> {
         try {
             HttpRequest.Builder builder = HttpRequest.newBuilder()
                 .uri(new URI(context.getUri()))
-                .setHeader(context.getHeaderKey(), context.getHeaderValue());
+                .setHeader(context.getHeaderKey(), context.getHeaderValue())
+                .version(HttpClient.Version.HTTP_1_1);
 
             if (context.getRecord() == null) {
                 builder.GET();

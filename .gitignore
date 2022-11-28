@@ -5,4 +5,8 @@
 .idea/
 *.iml
 
+# VS Code
+.factorypath
+.vscode
+
 **/dependency-reduced-pom.xml
