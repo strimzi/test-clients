@@ -7,8 +7,18 @@ package io.strimzi.common.configuration.http;
 import java.security.InvalidParameterException;
 import java.util.Map;
 
-import static io.strimzi.common.configuration.ClientsConfigurationUtils.*;
-import static io.strimzi.common.configuration.Constants.*;
+import static io.strimzi.common.configuration.ClientsConfigurationUtils.parseIntOrDefault;
+import static io.strimzi.common.configuration.ClientsConfigurationUtils.parseLongOrDefault;
+import static io.strimzi.common.configuration.ClientsConfigurationUtils.parseStringOrDefault;
+import static io.strimzi.common.configuration.Constants.DEFAULT_DELAY_MS;
+import static io.strimzi.common.configuration.Constants.DEFAULT_ENDPOINT_PREFIX;
+import static io.strimzi.common.configuration.Constants.DEFAULT_MESSAGES_COUNT;
+import static io.strimzi.common.configuration.Constants.DELAY_MS_ENV;
+import static io.strimzi.common.configuration.Constants.ENDPOINT_PREFIX_ENV;
+import static io.strimzi.common.configuration.Constants.HOSTNAME_ENV;
+import static io.strimzi.common.configuration.Constants.MESSAGE_COUNT_ENV;
+import static io.strimzi.common.configuration.Constants.PORT_ENV;
+import static io.strimzi.common.configuration.Constants.TOPIC_ENV;
 
 public class HttpClientsConfiguration {
     private final String hostname;

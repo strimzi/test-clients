@@ -12,6 +12,7 @@ public interface Constants {
     String DEFAULT_CLIENT_ID = "my-consumer";
     int DEFAULT_POLL_INTERVAL = 1000;
     int DEFAULT_POLL_TIMEOUT = 100;
+    long DEFAULT_TASK_COMPLETION_TIMEOUT = 60000;
 
     /**
      * HTTP constants

@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.common.configuration.Constants;
 import io.strimzi.common.configuration.http.HttpProducerConfiguration;
 import io.strimzi.test.tracing.HttpContext;
 import io.strimzi.test.tracing.HttpHandle;
@@ -20,11 +21,9 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 public class HttpProducerClient implements ClientsInterface {
@@ -48,30 +47,41 @@ public class HttpProducerClient implements ClientsInterface {
     }
 
     @Override
-    public void run() throws Exception {
+    public void run() {
         LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
-        ScheduledFuture<?> future = scheduledExecutor.scheduleAtFixedRate(this::sendMessage, 0,  configuration.getDelay(), TimeUnit.MILLISECONDS);
 
-        scheduledExecutor.submit(() -> checkForCompletion(future));
+        scheduledExecutor.scheduleAtFixedRate(this::sendMessages, 0,  configuration.getDelay(), TimeUnit.MILLISECONDS);
+        awaitCompletion();
+    }
 
-        latch.await();
-        scheduledExecutor.shutdown();
+    @Override
+    public void awaitCompletion() {
+        try {
+            latch.await();
+            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
 
-        if (messageIndex == configuration.getMessageCount() - 1) {
             if (messageSuccessfullySent == configuration.getMessageCount() - 1) {
                 LOGGER.info("All messages successfully sent");
             } else {
                 LOGGER.error("Unable to correctly send all messages");
                 throw new RuntimeException("Failed to send all messages");
             }
+        } catch (InterruptedException e) {
+            LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (!scheduledExecutor.isShutdown()) {
+                scheduledExecutor.shutdownNow();
+            }
         }
     }
 
-    @Override
-    public void checkForCompletion(ScheduledFuture<?> future) {
+    public void sendMessages() {
         if (messageIndex == configuration.getMessageCount() - 1) {
-            future.cancel(false);
+            scheduledExecutor.shutdown();
             latch.countDown();
+        } else {
+            this.sendMessage();
         }
     }
 
@@ -88,16 +98,15 @@ public class HttpProducerClient implements ClientsInterface {
         return new ProducerRecord(record, context);
     }
 
-    public CompletableFuture<Void> sendMessage() {
+    public void sendMessage() {
         ProducerRecord producerRecord = generateMessage(messageIndex);
-        CompletableFuture<Void> future = new CompletableFuture<>();
 
         try {
             HttpResponse httpResponse = httpHandle.finish(client.send(httpHandle.build(producerRecord.context()), HttpResponse.BodyHandlers.ofString()));
 
             if (httpResponse.statusCode() != HttpResponseStatus.OK.code()) {
                 LOGGER.error("Error while sending message {} : {}", producerRecord.message(), httpResponse.body());
-                future.completeExceptionally(new RuntimeException("Failed to send message due to: " + httpResponse.body()));
+                throw new RuntimeException("Failed to send message due to: " + httpResponse.body());
             } else if (httpResponse.body().equals("[]") && httpResponse.statusCode() == HttpResponseStatus.OK.code()) {
                 LOGGER.info("Array with messages is empty, no messages were received!");
             }
@@ -105,14 +114,11 @@ public class HttpProducerClient implements ClientsInterface {
             OffsetRecordSent[] offsetRecordSent = parseOffsetRecordsSent(httpResponse.body().toString());
             logOffsetRecordsSent(offsetRecordSent);
             messageSuccessfullySent++;
-            future.complete(null);
         } catch (Exception e) {
             LOGGER.error("Caught exception during message send");
             e.printStackTrace();
-            future.completeExceptionally(new RuntimeException("Failed to send message due to: " + e.getMessage()));
+            throw new RuntimeException("Failed to send message due to: " + e.getMessage());
         }
-
-        return future;
     }
 
     private void logOffsetRecordsSent(OffsetRecordSent[] offsetRecordsSent) {

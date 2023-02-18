@@ -4,9 +4,7 @@
  */
 package io.strimzi.common;
 
-import java.util.concurrent.ScheduledFuture;
-
 public interface ClientsInterface {
-    void run() throws Exception;
-    void checkForCompletion(ScheduledFuture<?> future);
+    void run();
+    void awaitCompletion();
 }

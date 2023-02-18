@@ -20,7 +20,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <maven.checkstyle.version>3.1.2</maven.checkstyle.version>
+        <maven.checkstyle.version>3.2.1</maven.checkstyle.version>
         <log4j.version>2.19.0</log4j.version>
         <slf4j-simple.version>1.6.2</slf4j-simple.version>
         <kafka.version>3.3.1</kafka.version>
@@ -56,7 +56,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.29</version>
+                        <version>9.2.1</version>
                     </dependency>
                 </dependencies>
                 <executions>

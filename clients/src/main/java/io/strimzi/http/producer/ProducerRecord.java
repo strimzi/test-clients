@@ -9,4 +9,6 @@ import io.strimzi.test.tracing.HttpContext;
 /**
  * Represents information about a message that will be send
  */
-public record ProducerRecord(String message, HttpContext context) {}
+public record ProducerRecord(String message, HttpContext context) {
+
+}
