@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
-import java.util.concurrent.CountDownLatch;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -35,10 +35,9 @@ public class HttpProducerClient implements ClientsInterface {
     private TracingHandle tracingHandle;
     private HttpHandle httpHandle;
     private final ScheduledExecutorService scheduledExecutor;
-    private CountDownLatch latch = new CountDownLatch(1);
 
-    public HttpProducerClient() {
-        this.configuration = new HttpProducerConfiguration(System.getenv());
+    public HttpProducerClient(Map<String, String> configuration) {
+        this.configuration = new HttpProducerConfiguration(configuration);
         this.messageIndex = 0;
         this.client = HttpClient.newHttpClient();
         this.tracingHandle = TracingUtil.getTracing();
@@ -50,15 +49,15 @@ public class HttpProducerClient implements ClientsInterface {
     public void run() {
         LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
 
-        scheduledExecutor.scheduleAtFixedRate(this::sendMessages, 0,  configuration.getDelay(), TimeUnit.MILLISECONDS);
+        scheduledExecutor.scheduleAtFixedRate(this::sendMessages, 0, configuration.getDelay() == 0 ? 1 : configuration.getDelay(), TimeUnit.MILLISECONDS);
         awaitCompletion();
     }
 
     @Override
     public void awaitCompletion() {
         try {
-            latch.await();
-            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
+            long timeoutForOperations = configuration.getMessageCount() * configuration.getDelay() + Constants.DEFAULT_TASK_COMPLETION_TIMEOUT;
+            scheduledExecutor.awaitTermination(timeoutForOperations, TimeUnit.MILLISECONDS);
 
             if (messageSuccessfullySent == configuration.getMessageCount() - 1) {
                 LOGGER.info("All messages successfully sent");
@@ -79,13 +78,12 @@ public class HttpProducerClient implements ClientsInterface {
     public void sendMessages() {
         if (messageIndex == configuration.getMessageCount() - 1) {
             scheduledExecutor.shutdown();
-            latch.countDown();
         } else {
             this.sendMessage();
         }
     }
 
-    private ProducerRecord generateMessage(int numOfMessage) {
+    public ProducerRecord generateMessage(int numOfMessage) {
         String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":\"" + configuration.getMessage() + "-" + numOfMessage + "\"}]}";
 
         HttpContext context = HttpContext.post(
@@ -131,7 +129,7 @@ public class HttpProducerClient implements ClientsInterface {
         ObjectMapper objectMapper = new ObjectMapper();
 
         JsonNode json = objectMapper.readTree(response);
-        String offsets = json.get("offset").toString();
+        String offsets = json.get("offsets").toString();
 
         objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
 

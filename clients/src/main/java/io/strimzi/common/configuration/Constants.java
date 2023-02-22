@@ -5,13 +5,14 @@
 package io.strimzi.common.configuration;
 
 public interface Constants {
-    long DEFAULT_MESSAGES_COUNT = 10;
-    int DEFAULT_DELAY_MS = 0;
+    int DEFAULT_MESSAGES_COUNT = 10;
+    // delay cannot be 0, as the task in scheduledExecutor would overlap
+    long DEFAULT_DELAY_MS = 1;
     String DEFAULT_MESSAGE = "Hello world";
     String DEFAULT_GROUP_ID = "my-group";
     String DEFAULT_CLIENT_ID = "my-consumer";
-    int DEFAULT_POLL_INTERVAL = 1000;
-    int DEFAULT_POLL_TIMEOUT = 100;
+    long DEFAULT_POLL_INTERVAL = 1000;
+    long DEFAULT_POLL_TIMEOUT = 100;
     long DEFAULT_TASK_COMPLETION_TIMEOUT = 60000;
 
     /**

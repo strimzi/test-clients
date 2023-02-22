@@ -24,16 +24,16 @@ public class HttpClientsConfiguration {
     private final String hostname;
     private final String port;
     private final String topic;
-    private final int delay;
-    private final Long messageCount;
+    private final long delay;
+    private final int messageCount;
     private final String endpointPrefix;
 
     public HttpClientsConfiguration(Map<String, String> map) {
         String hostname = parseStringOrDefault(map.get(HOSTNAME_ENV), "");
         String port = parseStringOrDefault(map.get(PORT_ENV), "");
         String topic = parseStringOrDefault(map.get(TOPIC_ENV), "");
-        int delay = parseIntOrDefault(map.get(DELAY_MS_ENV), DEFAULT_DELAY_MS);
-        Long messageCount = parseLongOrDefault(map.get(MESSAGE_COUNT_ENV), DEFAULT_MESSAGES_COUNT);
+        long delay = parseLongOrDefault(map.get(DELAY_MS_ENV), DEFAULT_DELAY_MS);
+        int messageCount = parseIntOrDefault(map.get(MESSAGE_COUNT_ENV), DEFAULT_MESSAGES_COUNT);
         String endpointPrefix = parseStringOrDefault(map.get(ENDPOINT_PREFIX_ENV), DEFAULT_ENDPOINT_PREFIX);
 
         if (hostname == null || hostname.isEmpty()) throw new InvalidParameterException("Hostname is not set.");
@@ -41,6 +41,9 @@ public class HttpClientsConfiguration {
         if (port == null || port.isEmpty()) throw new InvalidParameterException("Port is not set.");
 
         if (topic == null || topic.isEmpty()) throw new InvalidParameterException("Topic is not set.");
+
+        // delay cannot be 0 (or less) -> tasks would overlap in scheduled executor
+        if (delay <= 0) delay = DEFAULT_DELAY_MS;
 
         this.hostname = hostname;
         this.port = port;
@@ -62,11 +65,11 @@ public class HttpClientsConfiguration {
         return topic;
     }
 
-    public int getDelay() {
+    public long getDelay() {
         return delay;
     }
 
-    public Long getMessageCount() {
+    public int getMessageCount() {
         return messageCount;
     }
 

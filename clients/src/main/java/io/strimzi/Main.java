@@ -11,7 +11,7 @@ import io.strimzi.test.tracing.TracingUtil;
 public class Main {
     public static void main(String[] args) throws Exception {
         TracingUtil.initialize();
-        HttpProducerClient producerClient = new HttpProducerClient();
+        HttpProducerClient producerClient = new HttpProducerClient(System.getenv());
         producerClient.run();
     }
 }

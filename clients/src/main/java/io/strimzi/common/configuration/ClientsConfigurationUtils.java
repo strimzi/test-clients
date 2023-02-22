@@ -4,9 +4,15 @@
  */
 package io.strimzi.common.configuration;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.function.Function;
 
 public class ClientsConfigurationUtils {
+
+    private static final Logger LOGGER = LogManager.getLogger(ClientsConfigurationUtils.class);
+
     public static long parseLongOrDefault(String value, long defaultValue) {
         return parseOrDefault(value, Long::parseLong, defaultValue);
     }
@@ -22,8 +28,13 @@ public class ClientsConfigurationUtils {
     private static <T> T parseOrDefault(String value, Function<String, T> converter, T defaultValue) {
         T returnValue = defaultValue;
 
-        if (value != null) {
-            returnValue = converter.apply(value);
+        try {
+            if (value != null) {
+                returnValue = converter.apply(value);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to parse value from: {}, using default", value);
+            returnValue = defaultValue;
         }
         return returnValue;
     }
