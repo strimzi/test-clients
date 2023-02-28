@@ -42,9 +42,6 @@ public class HttpClientsConfiguration {
 
         if (topic == null || topic.isEmpty()) throw new InvalidParameterException("Topic is not set.");
 
-        // delay cannot be 0 (or less) -> tasks would overlap in scheduled executor
-        if (delay <= 0) delay = DEFAULT_DELAY_MS;
-
         this.hostname = hostname;
         this.port = port;
         this.topic = topic;

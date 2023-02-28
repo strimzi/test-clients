@@ -49,7 +49,14 @@ public class HttpProducerClient implements ClientsInterface {
     public void run() {
         LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
 
-        scheduledExecutor.scheduleAtFixedRate(this::sendMessages, 0, configuration.getDelay() == 0 ? 1 : configuration.getDelay(), TimeUnit.MILLISECONDS);
+        // in case we want to send all messages immediately, we have to schedule just one task
+        if (configuration.getDelay() == 0) {
+            scheduledExecutor.schedule(this::sendMessages, Constants.DEFAULT_DELAY_MS, TimeUnit.MILLISECONDS);
+            scheduledExecutor.shutdown();
+        } else {
+            scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, Constants.DEFAULT_DELAY_MS, configuration.getDelay(), TimeUnit.MILLISECONDS);
+        }
+
         awaitCompletion();
     }
 
@@ -59,7 +66,7 @@ public class HttpProducerClient implements ClientsInterface {
             long timeoutForOperations = configuration.getMessageCount() * configuration.getDelay() + Constants.DEFAULT_TASK_COMPLETION_TIMEOUT;
             scheduledExecutor.awaitTermination(timeoutForOperations, TimeUnit.MILLISECONDS);
 
-            if (messageSuccessfullySent == configuration.getMessageCount() - 1) {
+            if (messageSuccessfullySent == configuration.getMessageCount()) {
                 LOGGER.info("All messages successfully sent");
             } else {
                 LOGGER.error("Unable to correctly send all messages");
@@ -75,11 +82,11 @@ public class HttpProducerClient implements ClientsInterface {
         }
     }
 
-    public void sendMessages() {
-        if (messageIndex == configuration.getMessageCount() - 1) {
+    public void checkAndSendMessages() {
+        if (messageIndex == configuration.getMessageCount()) {
             scheduledExecutor.shutdown();
         } else {
-            this.sendMessage();
+            this.sendMessages();
         }
     }
 
@@ -96,8 +103,29 @@ public class HttpProducerClient implements ClientsInterface {
         return new ProducerRecord(record, context);
     }
 
-    public void sendMessage() {
-        ProducerRecord producerRecord = generateMessage(messageIndex);
+    public ProducerRecord generateMessages() {
+        String record = "{\"records\":[";
+
+        for (int i = 0; i < configuration.getMessageCount(); i++) {
+            record += "{\"key\":\"key-" + i + "\",\"value\":\"" + configuration.getMessage() + "-" + i + "\"}";
+            if (i != configuration.getMessageCount() - 1) {
+                record += ",";
+            }
+        }
+
+        record += "]}";
+
+        HttpContext context = HttpContext.post(
+            configuration.getUri(),
+            "application/vnd.kafka.json.v2+json",
+            record);
+
+        messageIndex = configuration.getMessageCount() - 1;
+        return new ProducerRecord(record, context);
+    }
+
+    public void sendMessages() {
+        ProducerRecord producerRecord = configuration.getDelay() == 0 ? generateMessages() : generateMessage(messageIndex);
 
         try {
             HttpResponse httpResponse = httpHandle.finish(client.send(httpHandle.build(producerRecord.context()), HttpResponse.BodyHandlers.ofString()));
@@ -111,7 +139,7 @@ public class HttpProducerClient implements ClientsInterface {
 
             OffsetRecordSent[] offsetRecordSent = parseOffsetRecordsSent(httpResponse.body().toString());
             logOffsetRecordsSent(offsetRecordSent);
-            messageSuccessfullySent++;
+            messageSuccessfullySent += offsetRecordSent.length;
         } catch (Exception e) {
             LOGGER.error("Caught exception during message send");
             e.printStackTrace();
