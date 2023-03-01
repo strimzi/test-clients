@@ -22,6 +22,9 @@ public class HttpConsumerConfiguration extends HttpClientsConfiguration {
     private final String groupId;
     private final long pollInterval;
     private final long pollTimeout;
+    private final String consumerCreationURI;
+    private final String subscriptionURI;
+    private final String consumeMessagesURI;
 
     public HttpConsumerConfiguration(Map<String, String> map) {
         super(map);
@@ -29,6 +32,12 @@ public class HttpConsumerConfiguration extends HttpClientsConfiguration {
         this.groupId = parseStringOrDefault(map.get(GROUP_ID_ENV), DEFAULT_GROUP_ID);
         this.pollInterval = parseLongOrDefault(map.get(POLL_INTERVAL_ENV), DEFAULT_POLL_INTERVAL);
         this.pollTimeout = parseLongOrDefault(map.get(POLL_TIMEOUT_ENV), DEFAULT_POLL_TIMEOUT);
+
+        String baseUri = "http://" + this.getHostname() + ":" + this.getPort() + "/consumers/" + this.groupId;
+
+        this.consumerCreationURI =  baseUri;
+        this.subscriptionURI = baseUri + "/instances/" + this.clientId + "/subscription";
+        this.consumeMessagesURI = baseUri + "/instances/" + this.clientId + "/records?timeout=" + this.pollTimeout;
     }
 
     public String getClientId() {
@@ -45,6 +54,18 @@ public class HttpConsumerConfiguration extends HttpClientsConfiguration {
 
     public long getPollTimeout() {
         return pollTimeout;
+    }
+
+    public String getConsumerCreationURI() {
+        return consumerCreationURI;
+    }
+
+    public String getSubscriptionURI() {
+        return subscriptionURI;
+    }
+
+    public String getConsumeMessagesURI() {
+        return consumeMessagesURI;
     }
 
     @Override
