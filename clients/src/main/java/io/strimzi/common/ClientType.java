@@ -11,4 +11,14 @@ public enum ClientType {
     KafkaStreams,
     HttpProducer,
     HttpConsumer,
+    Unknown;
+
+    public static ClientType getFromString(String value) {
+        for (ClientType type : values()) {
+            if (type.toString().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        return Unknown;
+    }
 }

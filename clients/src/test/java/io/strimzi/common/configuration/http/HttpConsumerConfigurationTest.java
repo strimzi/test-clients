@@ -25,10 +25,17 @@ public class HttpConsumerConfigurationTest {
     void testDefaultConfiguration() {
         HttpConsumerConfiguration consumerConfiguration = new HttpConsumerConfiguration(defaultConfiguration);
 
+        String baseUri = "http://localhost:8080/consumers/" + Constants.DEFAULT_GROUP_ID;
+        String subscriptionUri = baseUri + "/instances/" + Constants.DEFAULT_CLIENT_ID + "/subscription";
+        String consumeUri = baseUri + "/instances/" + Constants.DEFAULT_CLIENT_ID + "/records?timeout=" + Constants.DEFAULT_POLL_TIMEOUT;
+
         assertThat(consumerConfiguration.getClientId(), is(Constants.DEFAULT_CLIENT_ID));
         assertThat(consumerConfiguration.getGroupId(), is(Constants.DEFAULT_GROUP_ID));
         assertThat(consumerConfiguration.getPollInterval(), is(Constants.DEFAULT_POLL_INTERVAL));
         assertThat(consumerConfiguration.getPollTimeout(), is(Constants.DEFAULT_POLL_TIMEOUT));
+        assertThat(consumerConfiguration.getConsumerCreationURI(), is(baseUri));
+        assertThat(consumerConfiguration.getSubscriptionURI(), is(subscriptionUri));
+        assertThat(consumerConfiguration.getConsumeMessagesURI(), is(consumeUri));
     }
 
     @Test
@@ -46,9 +53,16 @@ public class HttpConsumerConfigurationTest {
 
         HttpConsumerConfiguration consumerConfiguration = new HttpConsumerConfiguration(configuration);
 
+        String baseUri = "http://localhost:8080/consumers/" + groupId;
+        String subscriptionUri = baseUri + "/instances/" + clientId + "/subscription";
+        String consumeUri = baseUri + "/instances/" + clientId + "/records?timeout=" + pollTimeout;
+
         assertThat(consumerConfiguration.getClientId(), is(clientId));
         assertThat(consumerConfiguration.getGroupId(), is(groupId));
         assertThat(consumerConfiguration.getPollInterval(), is(pollInterval));
         assertThat(consumerConfiguration.getPollTimeout(), is(pollTimeout));
+        assertThat(consumerConfiguration.getConsumerCreationURI(), is(baseUri));
+        assertThat(consumerConfiguration.getSubscriptionURI(), is(subscriptionUri));
+        assertThat(consumerConfiguration.getConsumeMessagesURI(), is(consumeUri));
     }
 }

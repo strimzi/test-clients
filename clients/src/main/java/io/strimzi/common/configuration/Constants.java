@@ -37,4 +37,5 @@ public interface Constants {
      */
     String CLIENT_TYPE_ENV = "CLIENT_TYPE";
 
+    String HTTP_JSON_CONTENT_TYPE = "application/vnd.kafka.json.v2+json";
 }
