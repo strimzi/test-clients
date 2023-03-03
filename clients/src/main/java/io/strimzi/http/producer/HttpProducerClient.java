@@ -4,14 +4,13 @@
  */
 package io.strimzi.http.producer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
 import io.strimzi.common.ClientsInterface;
 import io.strimzi.common.configuration.Constants;
 import io.strimzi.common.configuration.http.HttpProducerConfiguration;
+import io.strimzi.common.records.http.producer.OffsetRecordSent;
+import io.strimzi.common.records.http.producer.OffsetRecordSentUtils;
+import io.strimzi.common.records.http.producer.ProducerRecord;
 import io.strimzi.test.tracing.HttpContext;
 import io.strimzi.test.tracing.HttpHandle;
 import io.strimzi.test.tracing.TracingHandle;
@@ -137,30 +136,13 @@ public class HttpProducerClient implements ClientsInterface {
                 LOGGER.info("Array with messages is empty, no messages were received!");
             }
 
-            OffsetRecordSent[] offsetRecordSent = parseOffsetRecordsSent(httpResponse.body().toString());
-            logOffsetRecordsSent(offsetRecordSent);
+            OffsetRecordSent[] offsetRecordSent = OffsetRecordSentUtils.parseOffsetRecordsSent(httpResponse.body().toString());
+            OffsetRecordSentUtils.logOffsetRecordsSent(offsetRecordSent);
             messageSuccessfullySent += offsetRecordSent.length;
         } catch (Exception e) {
             LOGGER.error("Caught exception during message send");
             e.printStackTrace();
             throw new RuntimeException("Failed to send message due to: " + e.getMessage());
         }
-    }
-
-    private void logOffsetRecordsSent(OffsetRecordSent[] offsetRecordsSent) {
-        for (OffsetRecordSent offsetRecordSent : offsetRecordsSent) {
-            LOGGER.info(offsetRecordSent.toString());
-        }
-    }
-
-    public OffsetRecordSent[] parseOffsetRecordsSent(String response) throws JsonProcessingException {
-        ObjectMapper objectMapper = new ObjectMapper();
-
-        JsonNode json = objectMapper.readTree(response);
-        String offsets = json.get("offsets").toString();
-
-        objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
-
-        return objectMapper.readValue(offsets, OffsetRecordSent[].class);
     }
 }

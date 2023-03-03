@@ -4,8 +4,8 @@
  */
 package io.strimzi.http.producer;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.strimzi.common.configuration.Constants;
+import io.strimzi.common.records.http.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -30,20 +30,6 @@ public class HttpProducerClientTest {
         ProducerRecord result = producerClient.generateMessage(numberOfMessage);
 
         assertThat(result.message(), is(desiredJsonMessage));
-    }
-
-    @Test
-    void testParseOffsetRecordsSent() throws JsonProcessingException {
-        String responseExample = "{\"offsets\":[{\"partition\":0,\"offset\":16}]}";
-
-        OffsetRecordSent expectedResult = new OffsetRecordSent();
-        expectedResult.setOffset(16);
-        expectedResult.setPartition(0);
-
-        OffsetRecordSent[] result = producerClient.parseOffsetRecordsSent(responseExample);
-
-        assertThat(result.length, is(1));
-        assertThat(result[0], is(expectedResult));
     }
 
     @BeforeAll
