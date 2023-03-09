@@ -35,7 +35,7 @@ public class KafkaProducerClient implements ClientsInterface {
 
     public KafkaProducerClient(Map<String, String> configuration) {
         this.configuration = new KafkaProducerConfiguration(configuration);
-        this.properties =  KafkaProperties.producerProperties(this.configuration);
+        this.properties = KafkaProperties.producerProperties(this.configuration);
         TracingUtil.initialize().addTracingPropsToProducerConfig(properties);
 
         this.producer = new KafkaProducer<>(this.properties);
