@@ -4,6 +4,7 @@
  */
 package io.strimzi.common.configuration.kafka;
 
+import java.security.InvalidParameterException;
 import java.util.Map;
 
 import static io.strimzi.common.configuration.ClientsConfigurationUtils.parseLongOrDefault;
@@ -25,6 +26,12 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
         this.sourceTopic = map.get(SOURCE_TOPIC_ENV);
         this.targetTopic = map.get(TARGET_TOPIC_ENV);
         this.commitIntervalMs = parseLongOrDefault(map.get(COMMIT_INTERVAL_MS_ENV), DEFAULT_COMMIT_INTERVAL_MS);
+
+        if (applicationId == null || applicationId.isEmpty()) throw new InvalidParameterException("Application ID is not set");
+
+        if (sourceTopic == null || sourceTopic.isEmpty()) throw new InvalidParameterException("Source topic is not set");
+
+        if (targetTopic == null || targetTopic.isEmpty()) throw new InvalidParameterException("Target topic is not set");
     }
 
     public String getApplicationId() {

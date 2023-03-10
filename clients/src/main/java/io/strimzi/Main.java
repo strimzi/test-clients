@@ -9,6 +9,9 @@ import io.strimzi.common.ClientsInterface;
 import io.strimzi.common.configuration.Constants;
 import io.strimzi.http.consumer.HttpConsumerClient;
 import io.strimzi.http.producer.HttpProducerClient;
+import io.strimzi.kafka.KafkaConsumerClient;
+import io.strimzi.kafka.KafkaProducerClient;
+import io.strimzi.kafka.KafkaStreamsClient;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +34,15 @@ public class Main {
                 break;
             case HttpConsumer:
                 client = new HttpConsumerClient(envConfiguration);
+                break;
+            case KafkaProducer:
+                client = new KafkaProducerClient(envConfiguration);
+                break;
+            case KafkaConsumer:
+                client = new KafkaConsumerClient(envConfiguration);
+                break;
+            case KafkaStreams:
+                client = new KafkaStreamsClient(envConfiguration);
                 break;
             default:
                 LOGGER.error("Unknown client type specified, exiting");

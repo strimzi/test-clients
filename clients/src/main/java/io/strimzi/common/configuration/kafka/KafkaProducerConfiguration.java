@@ -7,6 +7,7 @@ package io.strimzi.common.configuration.kafka;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.header.Header;
 
+import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +21,14 @@ import static io.strimzi.common.configuration.Constants.HEADERS_ENV;
 import static io.strimzi.common.configuration.Constants.MESSAGES_PER_TRANSACTION_ENV;
 import static io.strimzi.common.configuration.Constants.MESSAGE_ENV;
 import static io.strimzi.common.configuration.Constants.PRODUCER_ACKS_ENV;
+import static io.strimzi.common.configuration.Constants.TOPIC_ENV;
 
 public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
 
     private final String acks;
     private final List<Header> headers;
     private final int messagesPerTransaction;
+    private final String topicName;
     private final boolean transactionalProducer;
     private final String message;
     public KafkaProducerConfiguration(Map<String, String> map) {
@@ -33,9 +36,11 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.acks = parseStringOrDefault(map.get(PRODUCER_ACKS_ENV), DEFAULT_PRODUCER_ACKS);
         this.headers = parseHeadersFromConfiguration(parseStringOrDefault(map.get(HEADERS_ENV), null));
         this.messagesPerTransaction = parseIntOrDefault(map.get(MESSAGES_PER_TRANSACTION_ENV), DEFAULT_MESSAGES_PER_TRANSACTION);
-        this.transactionalProducer = getAdditionalConfig().contains(ProducerConfig.TRANSACTIONAL_ID_CONFIG);
+        this.transactionalProducer = getAdditionalConfig().toString().contains(ProducerConfig.TRANSACTIONAL_ID_CONFIG);
         this.message = parseStringOrDefault(map.get(MESSAGE_ENV), DEFAULT_MESSAGE);
+        this.topicName = map.get(TOPIC_ENV);
 
+        if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
     }
 
     public String getAcks() {
@@ -48,6 +53,10 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
 
     public int getMessagesPerTransaction() {
         return messagesPerTransaction;
+    }
+
+    public String getTopicName() {
+        return topicName;
     }
 
     public boolean isTransactionalProducer() {
@@ -64,6 +73,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
             super.toString() + ",\n" +
             "acks='" + this.getAcks() + "',\n" +
             "headers='" + this.getHeaders() + "',\n" +
+            "topicName='" + this.getTopicName() + "',\n" +
             "message='" + this.getMessage() + "'";
     }
 }

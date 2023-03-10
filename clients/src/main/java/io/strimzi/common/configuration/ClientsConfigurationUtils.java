@@ -73,6 +73,9 @@ public class ClientsConfigurationUtils {
 
             String[] headersArray = headers.split(", [\t\n\r]?");
             for (String header : headersArray) {
+                if (header.indexOf('=') == -1) {
+                    throw new RuntimeException("Failed to parse Headers from String");
+                }
                 headersList.add(new RecordHeader(header.split("=")[0], header.split("=")[1].getBytes()));
             }
         }

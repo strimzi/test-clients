@@ -4,6 +4,7 @@
  */
 package io.strimzi.common.configuration.kafka;
 
+import java.security.InvalidParameterException;
 import java.util.Map;
 import java.util.Properties;
 
@@ -25,7 +26,6 @@ import static io.strimzi.common.configuration.Constants.OAUTH_REFRESH_TOKEN_ENV;
 import static io.strimzi.common.configuration.Constants.OAUTH_TOKEN_ENDPOINT_URI_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_JAAS_CONFIG_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_MECHANISM_ENV;
-import static io.strimzi.common.configuration.Constants.TOPIC_ENV;
 import static io.strimzi.common.configuration.Constants.USER_CERT_ENV;
 import static io.strimzi.common.configuration.Constants.USER_KEY_ENV;
 import static io.strimzi.common.configuration.Constants.USER_NAME_ENV;
@@ -34,7 +34,6 @@ import static io.strimzi.common.configuration.Constants.USER_PASSWORD_ENV;
 public class KafkaClientsConfiguration {
     private final String bootstrapServers;
     private final long delayMs;
-    private final String topicName;
     private final int messageCount;
     private final String sslTruststoreCertificate;
     private final String sslKeystoreKey;
@@ -54,7 +53,6 @@ public class KafkaClientsConfiguration {
     public KafkaClientsConfiguration(Map<String, String> map) {
         this.bootstrapServers = map.get(BOOTSTRAP_SERVERS_ENV);
         this.delayMs = parseLongOrDefault(map.get(DELAY_MS_ENV), DEFAULT_DELAY_MS);
-        this.topicName = map.get(TOPIC_ENV);
         this.messageCount = parseIntOrDefault(map.get(MESSAGE_COUNT_ENV), DEFAULT_MESSAGES_COUNT);
         this.sslTruststoreCertificate = map.get(CA_CRT_ENV);
         this.sslKeystoreKey = map.get(USER_KEY_ENV);
@@ -69,6 +67,8 @@ public class KafkaClientsConfiguration {
         this.saslUserName = map.get(USER_NAME_ENV);
         this.saslPassword = map.get(USER_PASSWORD_ENV);
         this.additionalConfig = parseMapOfProperties(parseStringOrDefault(map.get(ADDITIONAL_CONFIG_ENV), ""));
+
+        if (bootstrapServers == null || bootstrapServers.isEmpty()) throw new InvalidParameterException("Bootstrap servers are not set");
     }
 
     public String getBootstrapServers() {
@@ -77,10 +77,6 @@ public class KafkaClientsConfiguration {
 
     public long getDelayMs() {
         return delayMs;
-    }
-
-    public String getTopicName() {
-        return topicName;
     }
 
     public int getMessageCount() {
@@ -171,7 +167,6 @@ public class KafkaClientsConfiguration {
 
         return "bootstrapServers='" + this.getBootstrapServers() + "',\n" +
             "delayMs='" + this.getDelayMs() + "',\n" +
-            "topicName='" + this.getTopicName() + "',\n" +
             "messageCount='" + this.getMessageCount() + "',\n" +
             "sslTruststoreCertificate='" + sslTruststoreCertificate + "',\n" +
             "sslKeystoreKey='" + sslKeystoreKey + "',\n" +

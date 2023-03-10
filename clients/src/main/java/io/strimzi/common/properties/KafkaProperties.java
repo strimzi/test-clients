@@ -46,6 +46,10 @@ public class KafkaProperties {
         properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false");
 
+        if (configuration.getClientRack() != null) {
+            properties.put(ConsumerConfig.CLIENT_RACK_CONFIG, configuration.getClientRack());
+        }
+
         return properties;
     }
 
@@ -53,7 +57,6 @@ public class KafkaProperties {
         Properties properties = clientProperties(configuration);
 
         properties.put(StreamsConfig.APPLICATION_ID_CONFIG, configuration.getApplicationId());
-        properties.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, configuration.getBootstrapServers());
         properties.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, configuration.getCommitIntervalMs());
         properties.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         properties.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
@@ -61,7 +64,7 @@ public class KafkaProperties {
         return properties;
     }
 
-    private static Properties clientProperties(KafkaClientsConfiguration configuration) {
+    public static Properties clientProperties(KafkaClientsConfiguration configuration) {
         Properties properties = new Properties();
 
         // Kubernetes Config Provider
@@ -74,21 +77,21 @@ public class KafkaProperties {
         return updatePropertiesWithSecurityConfiguration(properties, configuration);
     }
 
-    private static Properties updatePropertiesWithSecurityConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
+    public static Properties updatePropertiesWithSecurityConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
         if (shouldUpdatePropertiesWithTlsConfig(configuration)) {
             properties = updatePropertiesWithTlsConfiguration(properties, configuration);
         }
         if (shouldUpdatePropertiesWithSaslConfig(configuration)) {
             properties = updatePropertiesWithSaslConfiguration(properties, configuration);
         }
-        if (shouldUpdateWithOauthConfig(configuration)) {
+        if (shouldUpdatePropertiesWithOauthConfig(configuration)) {
             properties = updatePropertiesWithOauthConfig(properties, configuration);
         }
 
         return properties;
     }
 
-    private static Properties updatePropertiesWithTlsConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
+    public static Properties updatePropertiesWithTlsConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
         properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL);
         properties.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
         properties.put(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, configuration.getSslTruststoreCertificate());
@@ -97,11 +100,11 @@ public class KafkaProperties {
         properties.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, configuration.getSslKeystoreCertificateChain());
         properties.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, configuration.getSslKeystoreKey());
 
-        return null;
+        return properties;
     }
 
-    private static Properties updatePropertiesWithSaslConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
-        SaslType saslType = SaslType.valueOf(configuration.getSaslMechanism());
+    public static Properties updatePropertiesWithSaslConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
+        SaslType saslType = SaslType.getFromString(configuration.getSaslMechanism());
         properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SASL_SSL);
         properties.put(SaslConfigs.SASL_MECHANISM, saslType.getKafkaProperty());
 
@@ -112,7 +115,7 @@ public class KafkaProperties {
             saslJaasConfig += String.format(" required username=%s password=%s", configuration.getSaslUserName(), configuration.getSaslPassword());
 
             if (saslType.equals(SaslType.SCRAM_SHA_512)) {
-                saslJaasConfig += "algorithm=SHA-512";
+                saslJaasConfig += " algorithm=SHA-512";
             }
 
             saslJaasConfig += ";";
@@ -123,7 +126,7 @@ public class KafkaProperties {
         return properties;
     }
 
-    private static Properties updatePropertiesWithOauthConfig(Properties properties, KafkaClientsConfiguration configuration) {
+    public static Properties updatePropertiesWithOauthConfig(Properties properties, KafkaClientsConfiguration configuration) {
         properties.put(SaslConfigs.SASL_JAAS_CONFIG, OAuthBearerLoginModule.class + " required;");
         properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(properties.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
         properties.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
@@ -134,20 +137,20 @@ public class KafkaProperties {
         return properties;
     }
 
-    private static boolean shouldUpdatePropertiesWithTlsConfig(KafkaClientsConfiguration configuration) {
+    public static boolean shouldUpdatePropertiesWithTlsConfig(KafkaClientsConfiguration configuration) {
         return configuration.getSslTruststoreCertificate() != null
             && configuration.getSslKeystoreCertificateChain() != null
             && configuration.getSslKeystoreKey() != null;
     }
 
-    private static boolean shouldUpdatePropertiesWithSaslConfig(KafkaClientsConfiguration configuration) {
+    public static boolean shouldUpdatePropertiesWithSaslConfig(KafkaClientsConfiguration configuration) {
         return configuration.getSaslMechanism() != null
             && !configuration.getSaslMechanism().isEmpty()
             && SaslType.getAllSaslTypes().contains(configuration.getSaslMechanism());
     }
 
     @SuppressWarnings({"BooleanExpressionComplexity", "checkstyle:UnnecessaryParentheses"})
-    private static boolean shouldUpdateWithOauthConfig(KafkaClientsConfiguration configuration) {
+    public static boolean shouldUpdatePropertiesWithOauthConfig(KafkaClientsConfiguration configuration) {
         return (configuration.getOauthAccessToken() != null)
             || (configuration.getOauthTokenEndpointUri() != null && configuration.getOauthClientId() != null && configuration.getOauthRefreshToken() != null)
             || (configuration.getOauthTokenEndpointUri() != null && configuration.getOauthClientId() != null && configuration.getOauthClientSecret() != null);

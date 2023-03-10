@@ -4,10 +4,18 @@
  */
 package io.strimzi.common.configuration;
 
+import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.header.internals.RecordHeader;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ClientsConfigurationUtilsTest {
 
@@ -76,5 +84,47 @@ public class ClientsConfigurationUtilsTest {
         result = ClientsConfigurationUtils.parseStringOrDefault(value, defaultValue);
 
         assertThat(result, is(defaultValue));
+    }
+
+    @Test
+    void testParseMapOfProperties() {
+        String properties = "my-key=my-value\nsecond-key=second-value";
+
+        Properties expectedProperties = new Properties();
+        expectedProperties.put("my-key", "my-value");
+        expectedProperties.put("second-key", "second-value");
+
+        Properties result = ClientsConfigurationUtils.parseMapOfProperties(properties);
+        assertThat(expectedProperties, is(result));
+    }
+
+    @Test
+    void testParseInvalidMapOfProperties() {
+        String invalidProperties = "my-key_my-value";
+
+        assertThrows(RuntimeException.class, () -> ClientsConfigurationUtils.parseMapOfProperties(invalidProperties));
+    }
+
+    @Test
+    void testParseHeadersFromConfiguration() {
+        String headers = "header_key_one=header_value_one, header_key_two=header_value_two";
+        List<Header> expectedList = new ArrayList<>();
+        expectedList.add(new RecordHeader("header_key_one", "header_value_one".getBytes()));
+        expectedList.add(new RecordHeader("header_key_two", "header_value_two".getBytes()));
+
+        List<Header> result = ClientsConfigurationUtils.parseHeadersFromConfiguration(headers);
+        assertThat(result, is(expectedList));
+    }
+
+    @Test
+    void testParseInvalidHeadersFromConfiguration() {
+        String headers = null;
+
+        List<Header> result = ClientsConfigurationUtils.parseHeadersFromConfiguration(headers);
+        assertThat(result, nullValue());
+
+        String anotherHeaders = "header_key_header_value";
+
+        assertThrows(RuntimeException.class, () -> ClientsConfigurationUtils.parseHeadersFromConfiguration(anotherHeaders));
     }
 }

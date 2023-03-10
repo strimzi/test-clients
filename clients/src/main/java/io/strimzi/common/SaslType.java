@@ -15,7 +15,7 @@ public enum SaslType {
     private final String name;
     private final String kafkaProperty;
 
-    private SaslType(String name, String kafkaProperty) {
+    SaslType(String name, String kafkaProperty) {
         this.name = name;
         this.kafkaProperty = kafkaProperty;
     }
@@ -26,6 +26,19 @@ public enum SaslType {
 
     public String getKafkaProperty() {
         return this.kafkaProperty;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public static SaslType getFromString(String value) {
+        for (SaslType type : values()) {
+            if (type.getName().equalsIgnoreCase(value)) {
+                return type;
+            }
+        }
+        return UNKNOWN;
     }
 }
 
