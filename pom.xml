@@ -22,15 +22,15 @@
 
         <jackson.version>2.13.1</jackson.version>
         <junit.version>4.13.2</junit.version>
-        <junit.jupiter.version>5.2.0</junit.jupiter.version>
-        <junit.platform.runner.version>1.2.0</junit.platform.runner.version>
+        <junit.jupiter.version>5.9.2</junit.jupiter.version>
+        <junit.platform.runner.version>1.9.2</junit.platform.runner.version>
         <hamcrest.version>2.2</hamcrest.version>
 
         <maven.checkstyle.version>3.2.1</maven.checkstyle.version>
-        <log4j.version>2.19.0</log4j.version>
-        <slf4j-simple.version>1.6.2</slf4j-simple.version>
+        <log4j.version>2.20.0</log4j.version>
+        <slf4j-simple.version>2.0.6</slf4j-simple.version>
         <kafka.version>3.3.1</kafka.version>
-        <strimzi-oauth-callback.version>0.11.0</strimzi-oauth-callback.version>
+        <strimzi-oauth-callback.version>0.12.0</strimzi-oauth-callback.version>
         <vertx-core.version>4.2.3</vertx-core.version>
         <netty.version>4.1.72.Final</netty.version>
         <maven-shade.version>3.2.1</maven-shade.version>
@@ -38,9 +38,10 @@
         <jaeger.version>1.8.1</jaeger.version>
         <opentracing.version>0.33.0</opentracing.version>
         <opentracing-kafka-client.version>0.1.15</opentracing-kafka-client.version>
-        <opentelemetry.alpha-version>1.18.0-alpha</opentelemetry.alpha-version>
-        <opentelemetry.version>1.18.0</opentelemetry.version>
-        <grpc.version>1.41.0</grpc.version>
+        <opentelemetry.alpha-version>1.19.0-alpha</opentelemetry.alpha-version>
+        <opentelemetry.version>1.19.0</opentelemetry.version>
+        <grpc.version>1.53.0</grpc.version>
+        <checkstyle.version>10.8.1</checkstyle.version>
     </properties>
 
     <dependencyManagement>
@@ -93,7 +94,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>9.2.1</version>
+                        <version>${checkstyle.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>
