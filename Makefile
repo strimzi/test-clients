@@ -1,27 +1,26 @@
 RELEASE_VERSION ?= latest
+VERSION ?= `cat clients.version`
+PROJECT_NAME = test-clients
 
 include ./Makefile.os
+include ./Makefile.docker
 
-SUBDIRS=tracing kafka/consumer kafka/producer kafka/streams kafka/admin http/http-consumer http/http-producer
-DOCKER_DIRS=docker-images/
 DOCKER_TARGETS=docker_build docker_push docker_tag docker_amend_manifest docker_push_manifest docker_delete_manifest
-JAVA_TARGETS=java_build java_install java_clean
 
-all: $(SUBDIRS) $(DOCKER_DIRS)
-clean: $(SUBDIRS) $(DOCKER_DIRS)
-release: release_examples release_maven
-$(DOCKER_TARGETS): $(DOCKER_DIRS)
-$(JAVA_TARGETS): $(SUBDIRS)
+release: release_examples release_maven release_clients_version
 
-$(SUBDIRS):
-	$(MAKE) -C $@ $(MAKECMDGOALS)
+copy_files:
+	mkdir -p docker-images/tmp/
+	cp clients/src/main/resources/log4j2.properties docker-images/tmp/log4j2.properties
+	cp clients/target/clients-$(VERSION).jar docker-images/tmp/clients-$(VERSION).jar
 
-$(DOCKER_DIRS):
-	$(MAKE) -C $@ $(MAKECMDGOALS)
+clean_files:
+	rm -rf docker-images/tmp/*
 
 next_version:
 	mvn versions:set -DnewVersion=$(shell echo $(NEXT_VERSION) | tr a-z A-Z)
 	mvn versions:commit
+	echo -n "$(NEXT_VERSION)" > clients.version
 
 release_examples:
 	echo "Changing images in examples to: $(RELEASE_VERSION)"
@@ -32,4 +31,5 @@ release_maven:
 	mvn versions:set -DnewVersion=$(shell echo $(RELEASE_VERSION) | tr a-z A-Z)
 	mvn versions:commit
 
-.PHONY: all $(SUBDIRS) $(DOCKER_DIRS) $(DOCKER_TARGETS)
+release_clients_version:
+	echo -n "$(RELEASE_VERSION)" > clients.version

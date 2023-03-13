@@ -7,11 +7,11 @@
 # the registry where the image will be pushed (default is Docker Hub). DOCKER_VERSION_ARG
 # is passed to the image build (based on Git commit, default latest)
 
-DOCKERFILE_DIR     ?= ./
+DOCKERFILE_DIR     ?= docker-images/.
 DOCKER_REGISTRY    ?= quay.io
 DOCKER_ORG         ?= $(USER)
 DOCKER_TAG         ?= latest
-DOCKER_VERSION_ARG ?= latest
+DOCKER_VERSION_ARG ?= $(VERSION)
 
 ifdef DOCKER_ARCHITECTURE
   DOCKER_PLATFORM = --platform linux/$(DOCKER_ARCHITECTURE)
@@ -20,10 +20,8 @@ endif
 
 all: docker_build docker_push
 
-docker_build:
+docker_build: copy_files
 	echo "Building Docker image ..."
-	mkdir -p scripts
-	cp ../../scripts/run.sh ./scripts/run.sh
 	docker $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKERFILE_DIR)
 	rm -rf ./scripts
 
