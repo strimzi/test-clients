@@ -21,10 +21,8 @@ ENV VERSION ${version}
 COPY ./scripts/ /bin
 COPY ./tmp/log4j2.properties /bin/log4j2.properties
 
-ADD tmp/clients-${VERSION}.jar /
-
-ENV EXEC_FILE /clients-${VERSION}.jar
+COPY tmp/clients-${VERSION}.jar /clients.jar
 
 USER 1001
 
-CMD "/bin/run.sh", $EXEC_FILE
+CMD ["/bin/run.sh", "clients.jar"]
