@@ -58,7 +58,7 @@ public interface Constants {
     String CLIENT_RACK_ENV = "CLIENT_RACK";
     String CA_CRT_ENV = "CA_CRT";
     String USER_KEY_ENV = "USER_KEY";
-    String USER_CERT_ENV = "USER_CERT";
+    String USER_CRT_ENV = "USER_CRT";
     String OAUTH_CLIENT_ID_ENV = "OAUTH_CLIENT_ID";
     String OAUTH_CLIENT_SECRET_ENV = "OAUTH_CLIENT_SECRET";
     String OAUTH_ACCESS_TOKEN_ENV = "OAUTH_ACCESS_TOKEN";

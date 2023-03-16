@@ -15,7 +15,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule;
 import org.apache.kafka.common.security.plain.PlainLoginModule;
 import org.apache.kafka.common.security.scram.ScramLoginModule;
 import org.apache.kafka.common.serialization.Serdes;
@@ -73,14 +72,16 @@ public class KafkaProperties {
         properties.put("config.providers.configmaps.class", "io.strimzi.kafka.KubernetesConfigMapConfigProvider");
 
         properties.put(CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG, configuration.getBootstrapServers());
+        properties = updatePropertiesWithSecurityConfiguration(properties, configuration);
 
-        return updatePropertiesWithSecurityConfiguration(properties, configuration);
+        properties.putAll(configuration.getAdditionalConfig());
+
+        return properties;
     }
 
     public static Properties updatePropertiesWithSecurityConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
-        if (shouldUpdatePropertiesWithTlsConfig(configuration)) {
-            properties = updatePropertiesWithTlsConfiguration(properties, configuration);
-        }
+        properties = updatePropertiesWithTlsConfiguration(properties, configuration);
+
         if (shouldUpdatePropertiesWithSaslConfig(configuration)) {
             properties = updatePropertiesWithSaslConfiguration(properties, configuration);
         }
@@ -92,20 +93,24 @@ public class KafkaProperties {
     }
 
     public static Properties updatePropertiesWithTlsConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
-        properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL);
-        properties.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
-        properties.put(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, configuration.getSslTruststoreCertificate());
+        if (configuration.getSslTruststoreCertificate() != null) {
+            properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SSL.toString());
+            properties.put(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG, "PEM");
+            properties.put(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG, configuration.getSslTruststoreCertificate());
+        }
 
-        properties.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PEM");
-        properties.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, configuration.getSslKeystoreCertificateChain());
-        properties.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, configuration.getSslKeystoreKey());
+        if (configuration.getSslKeystoreCertificateChain() != null && configuration.getSslKeystoreKey() != null) {
+            properties.put(SslConfigs.SSL_KEYSTORE_TYPE_CONFIG, "PEM");
+            properties.put(SslConfigs.SSL_KEYSTORE_CERTIFICATE_CHAIN_CONFIG, configuration.getSslKeystoreCertificateChain());
+            properties.put(SslConfigs.SSL_KEYSTORE_KEY_CONFIG, configuration.getSslKeystoreKey());
+        }
 
         return properties;
     }
 
     public static Properties updatePropertiesWithSaslConfiguration(Properties properties, KafkaClientsConfiguration configuration) {
         SaslType saslType = SaslType.getFromString(configuration.getSaslMechanism());
-        properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SASL_SSL);
+        properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, SecurityProtocol.SASL_SSL.toString());
         properties.put(SaslConfigs.SASL_MECHANISM, saslType.getKafkaProperty());
 
         String saslJaasConfig = configuration.getSaslJaasConfig();
@@ -127,7 +132,7 @@ public class KafkaProperties {
     }
 
     public static Properties updatePropertiesWithOauthConfig(Properties properties, KafkaClientsConfiguration configuration) {
-        properties.put(SaslConfigs.SASL_JAAS_CONFIG, OAuthBearerLoginModule.class + " required;");
+        properties.put(SaslConfigs.SASL_JAAS_CONFIG, "org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;");
         properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SSL".equals(properties.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG)) ? "SASL_SSL" : "SASL_PLAINTEXT");
         properties.put(SaslConfigs.SASL_MECHANISM, "OAUTHBEARER");
         if (!(configuration.getAdditionalConfig().containsKey(SaslConfigs.SASL_MECHANISM) && configuration.getAdditionalConfig().getProperty(SaslConfigs.SASL_MECHANISM).equals("PLAIN"))) {
@@ -135,12 +140,6 @@ public class KafkaProperties {
         }
 
         return properties;
-    }
-
-    public static boolean shouldUpdatePropertiesWithTlsConfig(KafkaClientsConfiguration configuration) {
-        return configuration.getSslTruststoreCertificate() != null
-            && configuration.getSslKeystoreCertificateChain() != null
-            && configuration.getSslKeystoreKey() != null;
     }
 
     public static boolean shouldUpdatePropertiesWithSaslConfig(KafkaClientsConfiguration configuration) {

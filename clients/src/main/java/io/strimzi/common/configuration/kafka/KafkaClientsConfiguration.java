@@ -26,7 +26,7 @@ import static io.strimzi.common.configuration.Constants.OAUTH_REFRESH_TOKEN_ENV;
 import static io.strimzi.common.configuration.Constants.OAUTH_TOKEN_ENDPOINT_URI_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_JAAS_CONFIG_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_MECHANISM_ENV;
-import static io.strimzi.common.configuration.Constants.USER_CERT_ENV;
+import static io.strimzi.common.configuration.Constants.USER_CRT_ENV;
 import static io.strimzi.common.configuration.Constants.USER_KEY_ENV;
 import static io.strimzi.common.configuration.Constants.USER_NAME_ENV;
 import static io.strimzi.common.configuration.Constants.USER_PASSWORD_ENV;
@@ -56,7 +56,7 @@ public class KafkaClientsConfiguration {
         this.messageCount = parseIntOrDefault(map.get(MESSAGE_COUNT_ENV), DEFAULT_MESSAGES_COUNT);
         this.sslTruststoreCertificate = map.get(CA_CRT_ENV);
         this.sslKeystoreKey = map.get(USER_KEY_ENV);
-        this.sslKeystoreCertificateChain = map.get(USER_CERT_ENV);
+        this.sslKeystoreCertificateChain = map.get(USER_CRT_ENV);
         this.oauthClientId = map.get(OAUTH_CLIENT_ID_ENV);
         this.oauthClientSecret = map.get(OAUTH_CLIENT_SECRET_ENV);
         this.oauthAccessToken = map.get(OAUTH_ACCESS_TOKEN_ENV);

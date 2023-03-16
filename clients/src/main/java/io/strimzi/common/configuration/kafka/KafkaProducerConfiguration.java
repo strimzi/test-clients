@@ -74,6 +74,8 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
             "acks='" + this.getAcks() + "',\n" +
             "headers='" + this.getHeaders() + "',\n" +
             "topicName='" + this.getTopicName() + "',\n" +
+            "messagesPerTransaction='" + this.getMessagesPerTransaction() + "',\n" +
+            "transactionalProducer='" + this.isTransactionalProducer() + "',\n" +
             "message='" + this.getMessage() + "'";
     }
 }

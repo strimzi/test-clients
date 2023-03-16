@@ -25,7 +25,7 @@ import static io.strimzi.common.configuration.Constants.OAUTH_REFRESH_TOKEN_ENV;
 import static io.strimzi.common.configuration.Constants.OAUTH_TOKEN_ENDPOINT_URI_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_JAAS_CONFIG_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_MECHANISM_ENV;
-import static io.strimzi.common.configuration.Constants.USER_CERT_ENV;
+import static io.strimzi.common.configuration.Constants.USER_CRT_ENV;
 import static io.strimzi.common.configuration.Constants.USER_KEY_ENV;
 import static io.strimzi.common.configuration.Constants.USER_NAME_ENV;
 import static io.strimzi.common.configuration.Constants.USER_PASSWORD_ENV;
@@ -80,7 +80,7 @@ public class KafkaClientsConfigurationTest {
         configuration.put(OAUTH_REFRESH_TOKEN_ENV, refreshToken);
         configuration.put(OAUTH_CLIENT_SECRET_ENV, clientSecret);
         configuration.put(CA_CRT_ENV, sslTruststoreCert);
-        configuration.put(USER_CERT_ENV, sslKeystoreCert);
+        configuration.put(USER_CRT_ENV, sslKeystoreCert);
         configuration.put(USER_KEY_ENV, sslKeystoreKey);
         configuration.put(ADDITIONAL_CONFIG_ENV, additionalProperties);
         configuration.put(MESSAGE_COUNT_ENV, String.valueOf(messageCount));

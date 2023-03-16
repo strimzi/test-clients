@@ -21,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,7 @@ public class HttpProducerClient implements ClientsInterface {
     private TracingHandle tracingHandle;
     private HttpHandle httpHandle;
     private final ScheduledExecutorService scheduledExecutor;
+    private final CountDownLatch countDownLatch;
 
     public HttpProducerClient(Map<String, String> configuration) {
         this.configuration = new HttpProducerConfiguration(configuration);
@@ -42,6 +44,7 @@ public class HttpProducerClient implements ClientsInterface {
         this.tracingHandle = TracingUtil.getTracing();
         this.httpHandle = tracingHandle.createHttpHandle("send-messages");
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-producer"));
+        this.countDownLatch = new CountDownLatch(1);
     }
 
     @Override
@@ -52,6 +55,7 @@ public class HttpProducerClient implements ClientsInterface {
         if (configuration.getDelay() == 0) {
             scheduledExecutor.schedule(this::sendMessages, Constants.DEFAULT_DELAY_MS, TimeUnit.MILLISECONDS);
             scheduledExecutor.shutdown();
+            countDownLatch.countDown();
         } else {
             scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, Constants.DEFAULT_DELAY_MS, configuration.getDelay(), TimeUnit.MILLISECONDS);
         }
@@ -62,8 +66,8 @@ public class HttpProducerClient implements ClientsInterface {
     @Override
     public void awaitCompletion() {
         try {
-            long timeoutForOperations = configuration.getMessageCount() * configuration.getDelay() + Constants.DEFAULT_TASK_COMPLETION_TIMEOUT;
-            scheduledExecutor.awaitTermination(timeoutForOperations, TimeUnit.MILLISECONDS);
+            countDownLatch.await();
+            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
 
             if (messageSuccessfullySent == configuration.getMessageCount()) {
                 LOGGER.info("All messages successfully sent");
@@ -84,8 +88,16 @@ public class HttpProducerClient implements ClientsInterface {
     public void checkAndSendMessages() {
         if (messageIndex == configuration.getMessageCount()) {
             scheduledExecutor.shutdown();
+            countDownLatch.countDown();
         } else {
-            this.sendMessages();
+            try {
+                this.sendMessages();
+            } catch (Exception e) {
+                LOGGER.error("Caught exception: {}", e.getMessage());
+                e.printStackTrace();
+                scheduledExecutor.shutdown();
+                countDownLatch.countDown();
+            }
         }
     }
 
