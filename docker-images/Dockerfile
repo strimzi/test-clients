@@ -19,10 +19,10 @@ ARG version=latest
 ENV VERSION ${version}
 
 COPY ./scripts/ /bin
-COPY ./src/resources/log4j2.properties /bin/log4j2.properties
+COPY ./tmp/log4j2.properties /bin/log4j2.properties
 
-ADD target/test-client-kafka-producer.jar /
+COPY tmp/clients-${VERSION}.jar /clients.jar
 
 USER 1001
 
-CMD ["/bin/run.sh", "/test-client-kafka-producer.jar"]
+CMD ["/bin/run.sh", "clients.jar"]

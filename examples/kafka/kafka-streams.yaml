@@ -28,7 +28,9 @@ spec:
               value: my-topic
             - name: TARGET_TOPIC
               value: my-topic-reversed
-          image: quay.io/strimzi-test-clients/test-client-kafka-streams:latest-kafka-3.4.0
+            - name: CLIENT_TYPE
+              value: KafkaStreams
+          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.4.0
           imagePullPolicy: IfNotPresent
           name: kafka-streams-client
       restartPolicy: "Never"

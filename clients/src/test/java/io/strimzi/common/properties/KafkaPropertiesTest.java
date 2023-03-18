@@ -33,7 +33,7 @@ import static io.strimzi.common.configuration.Constants.SASL_MECHANISM_ENV;
 import static io.strimzi.common.configuration.Constants.SOURCE_TOPIC_ENV;
 import static io.strimzi.common.configuration.Constants.TARGET_TOPIC_ENV;
 import static io.strimzi.common.configuration.Constants.TOPIC_ENV;
-import static io.strimzi.common.configuration.Constants.USER_CERT_ENV;
+import static io.strimzi.common.configuration.Constants.USER_CRT_ENV;
 import static io.strimzi.common.configuration.Constants.USER_KEY_ENV;
 import static io.strimzi.common.configuration.Constants.USER_NAME_ENV;
 import static io.strimzi.common.configuration.Constants.USER_PASSWORD_ENV;
@@ -46,7 +46,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule;
 import org.apache.kafka.common.security.plain.PlainLoginModule;
 import org.apache.kafka.common.security.scram.ScramLoginModule;
 import org.apache.kafka.common.serialization.Serdes;
@@ -117,39 +116,6 @@ public class KafkaPropertiesTest {
 
         // check that properties without Oauth access token and with Oauth token endpoint uri + client id + client secret will configure oauth
         assertThat(KafkaProperties.shouldUpdatePropertiesWithOauthConfig(kafkaClientsConfiguration), is(true));
-    }
-
-    @Test
-    void testShouldConfigureTlsCheck() {
-        String bootstrapServer = "my-cluster-kafka:9092";
-        Map<String, String> configuration = new HashMap<>();
-        configuration.put(BOOTSTRAP_SERVERS_ENV, bootstrapServer);
-
-        KafkaClientsConfiguration kafkaClientsConfiguration = new KafkaClientsConfiguration(configuration);
-
-        // check that empty properties will not configure TLS
-        assertThat(KafkaProperties.shouldUpdatePropertiesWithTlsConfig(kafkaClientsConfiguration), is(false));
-
-        configuration.put(Constants.CA_CRT_ENV, "my-ca-cert");
-
-        kafkaClientsConfiguration = new KafkaClientsConfiguration(configuration);
-
-        // check that properties with just CA cert will not configure TLS
-        assertThat(KafkaProperties.shouldUpdatePropertiesWithTlsConfig(kafkaClientsConfiguration), is(false));
-
-        configuration.put(Constants.USER_CERT_ENV, "my-user-cert");
-
-        kafkaClientsConfiguration = new KafkaClientsConfiguration(configuration);
-
-        // check that properties with CA cert and user cert will not configure TLS
-        assertThat(KafkaProperties.shouldUpdatePropertiesWithTlsConfig(kafkaClientsConfiguration), is(false));
-
-        configuration.put(Constants.USER_KEY_ENV, "my-user-key");
-
-        kafkaClientsConfiguration = new KafkaClientsConfiguration(configuration);
-
-        // check that properties with CA cert, user cert and user key will configure TLS
-        assertThat(KafkaProperties.shouldUpdatePropertiesWithTlsConfig(kafkaClientsConfiguration), is(true));
     }
 
     @Test
@@ -304,14 +270,14 @@ public class KafkaPropertiesTest {
         Map<String, String> configuration = new HashMap<>();
         configuration.put(BOOTSTRAP_SERVERS_ENV, bootstrapServer);
         configuration.put(CA_CRT_ENV, sslTruststoreCert);
-        configuration.put(USER_CERT_ENV, sslKeystoreCert);
+        configuration.put(USER_CRT_ENV, sslKeystoreCert);
         configuration.put(USER_KEY_ENV, sslKeystoreKey);
 
         KafkaClientsConfiguration clientsConfiguration = new KafkaClientsConfiguration(configuration);
         Properties properties = new Properties();
         properties = KafkaProperties.updatePropertiesWithTlsConfiguration(properties, clientsConfiguration);
 
-        assertThat(properties.get(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG), is(SecurityProtocol.SSL));
+        assertThat(properties.get(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG), is(SecurityProtocol.SSL.toString()));
         assertThat(properties.getProperty(SslConfigs.SSL_TRUSTSTORE_TYPE_CONFIG), is("PEM"));
         assertThat(properties.getProperty(SslConfigs.SSL_TRUSTSTORE_CERTIFICATES_CONFIG), is(sslTruststoreCert));
 
@@ -337,7 +303,7 @@ public class KafkaPropertiesTest {
         Properties properties = new Properties();
         properties = KafkaProperties.updatePropertiesWithSaslConfiguration(properties, clientsConfiguration);
 
-        assertThat(properties.get(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG), is(SecurityProtocol.SASL_SSL));
+        assertThat(properties.get(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG), is(SecurityProtocol.SASL_SSL.toString()));
         assertThat(properties.getProperty(SaslConfigs.SASL_MECHANISM), is(SaslType.SCRAM_SHA_512.getKafkaProperty()));
         assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is(saslJaasConfig));
 
@@ -390,7 +356,7 @@ public class KafkaPropertiesTest {
         Properties properties = new Properties();
         properties = KafkaProperties.updatePropertiesWithOauthConfig(properties, clientsConfiguration);
 
-        assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is(OAuthBearerLoginModule.class + " required;"));
+        assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is("org.apache.kafka.common.security.oauthbearer.OAuthBearerLoginModule required;"));
         assertThat(properties.getProperty(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG), is("SASL_PLAINTEXT"));
         assertThat(properties.getProperty(SaslConfigs.SASL_MECHANISM), is("OAUTHBEARER"));
         assertThat(properties.getProperty(SaslConfigs.SASL_LOGIN_CALLBACK_HANDLER_CLASS), is("io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler"));

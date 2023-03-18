@@ -32,7 +32,9 @@ spec:
               value: "100"
             - name: LOG_LEVEL
               value: DEBUG
-          image: quay.io/strimzi-test-clients/test-client-http-producer:latest
+            - name: CLIENT_TYPE
+              value: HttpProducer
+          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.4.0
           imagePullPolicy: IfNotPresent
           name: http-producer
       restartPolicy: "Never"

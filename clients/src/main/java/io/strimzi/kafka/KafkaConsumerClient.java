@@ -20,6 +20,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -31,15 +32,17 @@ public class KafkaConsumerClient implements ClientsInterface {
     private final KafkaConsumer consumer;
     private int consumedMessages;
     private final ScheduledExecutorService scheduledExecutor;
+    private final CountDownLatch countDownLatch;
 
     public KafkaConsumerClient(Map<String, String> configuration) {
         this.configuration = new KafkaConsumerConfiguration(configuration);
         this.properties = KafkaProperties.consumerProperties(this.configuration);
-        TracingUtil.initialize().addTracingPropsToConsumerConfig(properties);
+        TracingUtil.getTracing().addTracingPropsToConsumerConfig(properties);
 
         this.consumer = new KafkaConsumer(this.properties);
         this.consumedMessages = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-consumer"));
+        this.countDownLatch  = new CountDownLatch(1);
     }
 
     @Override
@@ -48,12 +51,8 @@ public class KafkaConsumerClient implements ClientsInterface {
 
         consumer.subscribe(Collections.singletonList(configuration.getTopicName()));
 
-        if (configuration.getDelayMs() == 0) {
-            scheduledExecutor.schedule(this::consumeMessages, Constants.DEFAULT_DELAY_MS, TimeUnit.MILLISECONDS);
-            scheduledExecutor.shutdown();
-        } else {
-            scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, configuration.getDelayMs(), TimeUnit.MILLISECONDS);
-        }
+        long delayMs = configuration.getDelayMs() == 0 ? Constants.DEFAULT_POLL_INTERVAL : configuration.getDelayMs();
+        scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, delayMs, TimeUnit.MILLISECONDS);
 
         awaitCompletion();
     }
@@ -61,8 +60,8 @@ public class KafkaConsumerClient implements ClientsInterface {
     @Override
     public void awaitCompletion() {
         try {
-            long timeoutForOperations = configuration.getMessageCount() * configuration.getDelayMs() + Constants.DEFAULT_TASK_COMPLETION_TIMEOUT;
-            scheduledExecutor.awaitTermination(timeoutForOperations, TimeUnit.MILLISECONDS);
+            countDownLatch.await();
+            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
 
             if (consumedMessages >= configuration.getMessageCount()) {
                 LOGGER.info("All messages successfully received");
@@ -83,8 +82,16 @@ public class KafkaConsumerClient implements ClientsInterface {
     private void checkAndReceiveMessages() {
         if (consumedMessages >= configuration.getMessageCount()) {
             scheduledExecutor.shutdown();
+            countDownLatch.countDown();
         } else {
-            this.consumeMessages();
+            try {
+                this.consumeMessages();
+            } catch (Exception e) {
+                LOGGER.error("Caught exception: {}", e.getMessage());
+                e.printStackTrace();
+                scheduledExecutor.shutdown();
+                countDownLatch.countDown();
+            }
         }
     }
 

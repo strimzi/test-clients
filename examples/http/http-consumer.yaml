@@ -34,7 +34,9 @@ spec:
               value: "100"
             - name: LOG_LEVEL
               value: DEBUG
-          image: quay.io/strimzi-test-clients/test-client-http-consumer:latest
+            - name: CLIENT_TYPE
+              value: HttpConsumer
+          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.4.0
           imagePullPolicy: IfNotPresent
           name: http-consumer
       restartPolicy: "Never"

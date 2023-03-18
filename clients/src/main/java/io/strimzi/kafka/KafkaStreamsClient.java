@@ -46,7 +46,7 @@ public class KafkaStreamsClient implements ClientsInterface {
 
         Topology topology = builder.build();
 
-        KafkaStreams streams = TracingUtil.initialize().getStreamsWithTracing(topology, this.properties);
+        KafkaStreams streams = TracingUtil.getTracing().getStreamsWithTracing(topology, this.properties);
 
         streams.start();
     }

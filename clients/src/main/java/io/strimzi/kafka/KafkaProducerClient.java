@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -32,16 +33,18 @@ public class KafkaProducerClient implements ClientsInterface {
     private int messageIndex;
     private int messageSuccessfullySent;
     private final ScheduledExecutorService scheduledExecutor;
+    private final CountDownLatch countDownLatch;
 
     public KafkaProducerClient(Map<String, String> configuration) {
         this.configuration = new KafkaProducerConfiguration(configuration);
         this.properties = KafkaProperties.producerProperties(this.configuration);
-        TracingUtil.initialize().addTracingPropsToProducerConfig(properties);
+        TracingUtil.getTracing().addTracingPropsToProducerConfig(properties);
 
         this.producer = new KafkaProducer<>(this.properties);
         this.messageIndex = 0;
         this.messageSuccessfullySent = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-producer"));
+        this.countDownLatch  = new CountDownLatch(1);
     }
 
     @Override
@@ -57,6 +60,7 @@ public class KafkaProducerClient implements ClientsInterface {
         if (configuration.getDelayMs() == 0) {
             scheduledExecutor.schedule(this::sendMessages, Constants.DEFAULT_DELAY_MS, TimeUnit.MILLISECONDS);
             scheduledExecutor.shutdown();
+            countDownLatch.countDown();
         } else {
             scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, Constants.DEFAULT_DELAY_MS, configuration.getDelayMs(), TimeUnit.MILLISECONDS);
         }
@@ -67,8 +71,8 @@ public class KafkaProducerClient implements ClientsInterface {
     @Override
     public void awaitCompletion() {
         try {
-            long timeoutForOperations = configuration.getMessageCount() * configuration.getDelayMs() + Constants.DEFAULT_TASK_COMPLETION_TIMEOUT;
-            scheduledExecutor.awaitTermination(timeoutForOperations, TimeUnit.MILLISECONDS);
+            countDownLatch.await();
+            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
 
             if (messageSuccessfullySent == configuration.getMessageCount()) {
                 LOGGER.info("All messages successfully sent");
@@ -89,8 +93,16 @@ public class KafkaProducerClient implements ClientsInterface {
     public void checkAndSendMessages() {
         if (messageIndex == configuration.getMessageCount()) {
             scheduledExecutor.shutdown();
+            countDownLatch.countDown();
         } else {
-            this.sendMessages();
+            try {
+                this.sendMessages();
+            } catch (Exception e) {
+                LOGGER.error("Caught exception: {}", e.getMessage());
+                e.printStackTrace();
+                scheduledExecutor.shutdown();
+                countDownLatch.countDown();
+            }
         }
     }
 
@@ -110,9 +122,9 @@ public class KafkaProducerClient implements ClientsInterface {
 
     public void sendMessages() {
         List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages() : Collections.singletonList(generateMessage(messageIndex));
-        messageIndex += records.size();
 
         int currentMsgIndex = configuration.getDelayMs() == 0 ? 0 : messageIndex;
+        messageIndex += records.size();
 
         for (ProducerRecord record : records) {
 

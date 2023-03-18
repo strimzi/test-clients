@@ -10,8 +10,6 @@
     <version>0.5.0-SNAPSHOT</version>
 
     <modules>
-        <module>kafka</module>
-        <module>http</module>
         <module>tracing</module>
         <module>clients</module>
     </modules>
@@ -42,6 +40,7 @@
         <opentelemetry.version>1.19.0</opentelemetry.version>
         <grpc.version>1.53.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
+        <okhttp.version>4.10.0</okhttp.version>
     </properties>
 
     <dependencyManagement>
@@ -80,6 +79,26 @@
                 <groupId>org.hamcrest</groupId>
                 <artifactId>hamcrest</artifactId>
                 <version>${hamcrest.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.strimzi</groupId>
+                <artifactId>kafka-kubernetes-config-provider</artifactId>
+                <version>${kafka-kubernetes-config-provider.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.strimzi</groupId>
+                <artifactId>kafka-oauth-client</artifactId>
+                <version>${strimzi-oauth-callback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>kafka-clients</artifactId>
+                <version>${kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -21,6 +21,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +35,7 @@ public class HttpConsumerClient implements ClientsInterface {
     private TracingHandle tracingHandle;
     private HttpHandle httpHandle;
     private final ScheduledExecutorService scheduledExecutor;
+    private CountDownLatch countDownLatch;
 
     public HttpConsumerClient(Map<String, String> configuration) {
         this.configuration = new HttpConsumerConfiguration(configuration);
@@ -42,6 +44,7 @@ public class HttpConsumerClient implements ClientsInterface {
         this.tracingHandle = TracingUtil.getTracing();
         this.httpHandle = tracingHandle.createHttpHandle("receive-messages");
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-consumer"));
+        this.countDownLatch  = new CountDownLatch(1);
     }
 
     @Override
@@ -50,7 +53,9 @@ public class HttpConsumerClient implements ClientsInterface {
 
         createConsumer();
         subscribeToTopic();
-        scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, configuration.getPollInterval(), TimeUnit.MILLISECONDS);
+
+        long delayMs = configuration.getPollInterval() == 0 ? Constants.DEFAULT_POLL_INTERVAL : configuration.getPollInterval();
+        scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, delayMs, TimeUnit.MILLISECONDS);
 
         awaitCompletion();
     }
@@ -58,8 +63,8 @@ public class HttpConsumerClient implements ClientsInterface {
     @Override
     public void awaitCompletion() {
         try {
-            long timeoutForOperations = configuration.getMessageCount() * configuration.getPollInterval() + Constants.DEFAULT_TASK_COMPLETION_TIMEOUT;
-            scheduledExecutor.awaitTermination(timeoutForOperations, TimeUnit.MILLISECONDS);
+            countDownLatch.await();
+            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
 
             if (consumedMessages >= configuration.getMessageCount()) {
                 LOGGER.info("All messages successfully received");
@@ -80,8 +85,16 @@ public class HttpConsumerClient implements ClientsInterface {
     private void checkAndReceiveMessages() {
         if (consumedMessages >= configuration.getMessageCount()) {
             scheduledExecutor.shutdown();
+            countDownLatch.countDown();
         } else {
-            this.consumeMessages();
+            try {
+                this.consumeMessages();
+            } catch (Exception e) {
+                LOGGER.error("Caught exception: {}", e.getMessage());
+                e.printStackTrace();
+                scheduledExecutor.shutdown();
+                countDownLatch.countDown();
+            }
         }
     }
 
