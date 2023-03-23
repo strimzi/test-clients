@@ -124,7 +124,6 @@ public class KafkaProducerClient implements ClientsInterface {
         List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages() : Collections.singletonList(generateMessage(messageIndex));
 
         int currentMsgIndex = configuration.getDelayMs() == 0 ? 0 : messageIndex;
-        messageIndex += records.size();
 
         for (ProducerRecord record : records) {
 
@@ -139,6 +138,8 @@ public class KafkaProducerClient implements ClientsInterface {
                 messageSuccessfullySent++;
             } catch (Exception e) {
                 LOGGER.error("Failed to send messages: {} due to: \n{}", record.toString(), e.getMessage());
+            } finally {
+                messageIndex++;
             }
 
             if (configuration.isTransactionalProducer() && (currentMsgIndex + 1) % configuration.getMessagesPerTransaction() == 0) {
