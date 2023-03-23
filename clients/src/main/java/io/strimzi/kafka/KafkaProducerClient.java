@@ -124,7 +124,6 @@ public class KafkaProducerClient implements ClientsInterface {
         List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages() : Collections.singletonList(generateMessage(messageIndex));
 
         int currentMsgIndex = configuration.getDelayMs() == 0 ? 0 : messageIndex;
-        messageIndex += records.size();
 
         for (ProducerRecord record : records) {
 
@@ -134,11 +133,16 @@ public class KafkaProducerClient implements ClientsInterface {
             }
             LOGGER.info("Sending message: {}", record.toString());
 
+            // we are increasing the messageIndex on two places to remove race conditions with the acknowledgement
+            // where the messageIndex can be on the desired number of messages and all can be successful, but the
+            // messageSuccessfullySent will not have correct number (as it will wait for ack and it will not be increased) and the client will then fail
             try {
                 producer.send(record).get();
+                messageIndex++;
                 messageSuccessfullySent++;
             } catch (Exception e) {
                 LOGGER.error("Failed to send messages: {} due to: \n{}", record.toString(), e.getMessage());
+                messageIndex++;
             }
 
             if (configuration.isTransactionalProducer() && (currentMsgIndex + 1) % configuration.getMessagesPerTransaction() == 0) {
