@@ -58,6 +58,7 @@ public class HttpConsumerClient implements ClientsInterface {
         scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, delayMs, TimeUnit.MILLISECONDS);
 
         awaitCompletion();
+        checkFinalState();
     }
 
     @Override
@@ -65,13 +66,6 @@ public class HttpConsumerClient implements ClientsInterface {
         try {
             countDownLatch.await();
             scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            if (consumedMessages >= configuration.getMessageCount()) {
-                LOGGER.info("All messages successfully received");
-            } else {
-                LOGGER.error("Unable to correctly receive all messages");
-                throw new RuntimeException("Failed to receive all messages");
-            }
         } catch (InterruptedException e) {
             LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
             e.printStackTrace();
@@ -82,8 +76,19 @@ public class HttpConsumerClient implements ClientsInterface {
         }
     }
 
+    @Override
+    public void checkFinalState() {
+        if (consumedMessages >= configuration.getMessageCount()) {
+            LOGGER.info("All messages successfully received");
+        } else {
+            LOGGER.error("Unable to correctly receive all messages");
+            throw new RuntimeException("Failed to receive all messages");
+        }
+    }
+
     private void checkAndReceiveMessages() {
         if (consumedMessages >= configuration.getMessageCount()) {
+            LOGGER.info("Shutting down the executor");
             scheduledExecutor.shutdown();
             countDownLatch.countDown();
         } else {
