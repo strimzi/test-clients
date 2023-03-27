@@ -7,4 +7,5 @@ package io.strimzi.common;
 public interface ClientsInterface {
     void run();
     void awaitCompletion();
+    void checkFinalState();
 }

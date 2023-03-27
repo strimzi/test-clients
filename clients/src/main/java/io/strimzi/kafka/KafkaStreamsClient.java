@@ -55,4 +55,9 @@ public class KafkaStreamsClient implements ClientsInterface {
     public void awaitCompletion() {
 
     }
+
+    @Override
+    public void checkFinalState() {
+
+    }
 }

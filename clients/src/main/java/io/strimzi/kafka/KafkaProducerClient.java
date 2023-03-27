@@ -58,14 +58,13 @@ public class KafkaProducerClient implements ClientsInterface {
 
         // in case we want to send all messages immediately, we have to schedule just one task
         if (configuration.getDelayMs() == 0) {
-            scheduledExecutor.schedule(this::sendMessages, Constants.DEFAULT_DELAY_MS, TimeUnit.MILLISECONDS);
-            scheduledExecutor.shutdown();
-            countDownLatch.countDown();
+            sendMessages();
         } else {
             scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, Constants.DEFAULT_DELAY_MS, configuration.getDelayMs(), TimeUnit.MILLISECONDS);
+            awaitCompletion();
         }
 
-        awaitCompletion();
+        checkFinalState();
     }
 
     @Override
@@ -73,13 +72,6 @@ public class KafkaProducerClient implements ClientsInterface {
         try {
             countDownLatch.await();
             scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
-
-            if (messageSuccessfullySent == configuration.getMessageCount()) {
-                LOGGER.info("All messages successfully sent");
-            } else {
-                LOGGER.error("Unable to correctly send all messages");
-                throw new RuntimeException("Failed to send all messages");
-            }
         } catch (InterruptedException e) {
             LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
             e.printStackTrace();
@@ -90,8 +82,19 @@ public class KafkaProducerClient implements ClientsInterface {
         }
     }
 
+    @Override
+    public void checkFinalState() {
+        if (messageSuccessfullySent == configuration.getMessageCount()) {
+            LOGGER.info("All messages successfully sent");
+        } else {
+            LOGGER.error("Unable to correctly send all messages");
+            throw new RuntimeException("Failed to send all messages");
+        }
+    }
+
     public void checkAndSendMessages() {
         if (messageIndex == configuration.getMessageCount()) {
+            LOGGER.info("Shutting down the executor");
             scheduledExecutor.shutdown();
             countDownLatch.countDown();
         } else {
