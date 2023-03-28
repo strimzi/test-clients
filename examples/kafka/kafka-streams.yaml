@@ -30,7 +30,7 @@ spec:
               value: my-topic-reversed
             - name: CLIENT_TYPE
               value: KafkaStreams
-          image: quay.io/strimzi-test-clients/test-clients:0.5.0-kafka-3.4.0
+          image: quay.io/strimzi-test-clients/test-clients:0.5.2-kafka-3.4.0
           imagePullPolicy: IfNotPresent
           name: kafka-streams-client
       restartPolicy: "Never"
