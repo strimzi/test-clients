@@ -87,7 +87,8 @@ public class TracingUtil {
 
         @Override
         public KafkaStreams getStreamsWithTracing(Topology topology, Properties props) {
-            return null;
+            // because we are not using tracing, we can return KafkaStreams without any changes to properties
+            return new KafkaStreams(topology, props);
         }
 
         @Override
