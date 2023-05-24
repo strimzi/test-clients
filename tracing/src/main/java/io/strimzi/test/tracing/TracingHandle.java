@@ -4,8 +4,7 @@
  */
 package io.strimzi.test.tracing;
 
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.KafkaClientSupplier;
 
 import java.util.Properties;
 
@@ -20,7 +19,7 @@ public interface TracingHandle {
     void addTracingPropsToConsumerConfig(Properties props);
     void addTracingPropsToProducerConfig(Properties props);
 
-    KafkaStreams getStreamsWithTracing(Topology topology, Properties props);
+    KafkaClientSupplier getStreamsClientSupplier();
 
     <T> HttpHandle<T> createHttpHandle(String operationName);
 }

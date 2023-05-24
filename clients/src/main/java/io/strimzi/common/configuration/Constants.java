@@ -72,6 +72,7 @@ public interface Constants {
      * Common environment variables
      */
     String CLIENT_TYPE_ENV = "CLIENT_TYPE";
+    String TRACING_TYPE_ENV = "TRACING_TYPE";
 
     String HTTP_JSON_CONTENT_TYPE = "application/vnd.kafka.json.v2+json";
 }

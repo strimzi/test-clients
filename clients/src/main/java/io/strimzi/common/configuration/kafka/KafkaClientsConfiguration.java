@@ -26,6 +26,7 @@ import static io.strimzi.common.configuration.Constants.OAUTH_REFRESH_TOKEN_ENV;
 import static io.strimzi.common.configuration.Constants.OAUTH_TOKEN_ENDPOINT_URI_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_JAAS_CONFIG_ENV;
 import static io.strimzi.common.configuration.Constants.SASL_MECHANISM_ENV;
+import static io.strimzi.common.configuration.Constants.TRACING_TYPE_ENV;
 import static io.strimzi.common.configuration.Constants.USER_CRT_ENV;
 import static io.strimzi.common.configuration.Constants.USER_KEY_ENV;
 import static io.strimzi.common.configuration.Constants.USER_NAME_ENV;
@@ -48,6 +49,7 @@ public class KafkaClientsConfiguration {
     private final String saslJaasConfig;
     private final String saslUserName;
     private final String saslPassword;
+    private final boolean tracingEnabled;
     private final String saslLoginCallbackClass = "io.strimzi.kafka.oauth.client.JaasClientOauthLoginCallbackHandler";
 
     public KafkaClientsConfiguration(Map<String, String> map) {
@@ -67,6 +69,7 @@ public class KafkaClientsConfiguration {
         this.saslUserName = map.get(USER_NAME_ENV);
         this.saslPassword = map.get(USER_PASSWORD_ENV);
         this.additionalConfig = parseMapOfProperties(parseStringOrDefault(map.get(ADDITIONAL_CONFIG_ENV), ""));
+        this.tracingEnabled = map.get(TRACING_TYPE_ENV) != null;
 
         if (bootstrapServers == null || bootstrapServers.isEmpty()) throw new InvalidParameterException("Bootstrap servers are not set");
     }
@@ -139,6 +142,10 @@ public class KafkaClientsConfiguration {
         return saslLoginCallbackClass;
     }
 
+    public boolean isTracingEnabled() {
+        return tracingEnabled;
+    }
+
     @Override
     public String toString() {
         String sslTruststoreCertificate =
@@ -180,6 +187,7 @@ public class KafkaClientsConfiguration {
             "saslJaasConfig='" + saslJaasConfig + "',\n" +
             "saslUserName='" + this.getSaslUserName() + "',\n" +
             "saslPassword='" + saslPassword + "',\n" +
+            "tracingEnabled='" + this.isTracingEnabled() + "',\n" +
             "additionalConfig='" + this.getAdditionalConfig() + "'";
     }
 }
