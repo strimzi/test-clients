@@ -9,11 +9,13 @@ import io.strimzi.common.configuration.kafka.KafkaStreamsConfiguration;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.processor.internals.DefaultKafkaClientSupplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,8 +47,13 @@ public class KafkaStreamsClient implements ClientsInterface {
             .to(configuration.getTargetTopic(), Produced.with(Serdes.String(), Serdes.String()));
 
         Topology topology = builder.build();
+        KafkaClientSupplier clientSupplier = new DefaultKafkaClientSupplier();
 
-        KafkaStreams streams = TracingUtil.getTracing().getStreamsWithTracing(topology, this.properties);
+        if (this.configuration.isTracingEnabled()) {
+            clientSupplier = TracingUtil.getTracing().getStreamsClientSupplier();
+        }
+
+        KafkaStreams streams = new KafkaStreams(topology, this.properties, clientSupplier);
 
         streams.start();
     }

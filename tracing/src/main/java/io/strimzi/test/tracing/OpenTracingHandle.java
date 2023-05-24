@@ -15,8 +15,7 @@ import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.KafkaClientSupplier;
 
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -52,9 +51,9 @@ public class OpenTracingHandle implements TracingHandle {
         TracingUtil.addProperty(props, ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, TracingProducerInterceptor.class.getName());
     }
 
-    // KafkaStreams is not working with OpenTracing from Kafka 3.0.0
     @Override
-    public KafkaStreams getStreamsWithTracing(Topology topology, Properties props) {
+    // KafkaStreams is not working with OpenTracing from Kafka 3.0.0
+    public KafkaClientSupplier getStreamsClientSupplier() {
         return null;
     }
 

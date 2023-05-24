@@ -4,8 +4,7 @@
  */
 package io.strimzi.test.tracing;
 
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.Topology;
+import org.apache.kafka.streams.KafkaClientSupplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -86,9 +85,8 @@ public class TracingUtil {
         }
 
         @Override
-        public KafkaStreams getStreamsWithTracing(Topology topology, Properties props) {
-            // because we are not using tracing, we can return KafkaStreams without any changes to properties
-            return new KafkaStreams(topology, props);
+        public KafkaClientSupplier getStreamsClientSupplier() {
+            return null;
         }
 
         @Override
