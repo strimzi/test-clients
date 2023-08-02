@@ -41,6 +41,7 @@
         <grpc.version>1.53.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
         <okhttp.version>4.10.0</okhttp.version>
+        <jcommander.version>1.82</jcommander.version>
     </properties>
 
     <dependencyManagement>
@@ -99,6 +100,11 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.beust</groupId>
+                <artifactId>jcommander</artifactId>
+                <version>${jcommander.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
