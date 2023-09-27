@@ -50,7 +50,7 @@ docker_delete_manifest:
 
 .PHONY: docker_build_admin_cli
 docker_build_admin_cli:
-	docker run -it \
+	docker run \
 	    --user $(shell id -ur):$(shell id -gr) \
 	    -v $(shell pwd)/docker-images/tmp/admin-client:/admin-client \
 	    -w /admin-client \
