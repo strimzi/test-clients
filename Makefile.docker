@@ -47,3 +47,13 @@ docker_push_manifest:
 docker_delete_manifest:
 	# Delete the manifest to the registry, ignore the error if manifest doesn't exist
 	docker manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true
+
+.PHONY: docker_build_admin_cli
+docker_build_admin_cli:
+	docker run -it \
+	    --user $(shell id -ur):$(shell id -gr) \
+        -v $(shell pwd)/docker-images/tmp/admin-client:/admin-client \
+        -w /admin-client \
+	    --entrypoint /bin/sh \
+	    ghcr.io/graalvm/graalvm-community:$(GRAAL_VM_VERSION) \
+	    -c "native-image -jar admin.jar admin-client"

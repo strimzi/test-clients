@@ -1,11 +1,11 @@
-FROM registry.access.redhat.com/ubi8/ubi-minimal:latest
+FROM registry.access.redhat.com/ubi9/ubi-minimal:latest
 
 USER root
 
 ARG JAVA_VERSION=17
 
 RUN microdnf update \
-    && microdnf install java-${JAVA_VERSION}-openjdk-headless shadow-utils \
+    && microdnf install java-${JAVA_VERSION}-openjdk-headless shadow-utils -y \
     && microdnf clean all
 
 # Set JAVA_HOME env var
@@ -22,6 +22,9 @@ COPY ./scripts/ /bin
 COPY ./tmp/log4j2.properties /bin/log4j2.properties
 
 COPY tmp/clients-${VERSION}.jar /clients.jar
+COPY tmp/admin-client /admin-client
+
+ENV PATH="/admin-client/:$PATH"
 
 USER 1001
 

@@ -12,6 +12,7 @@
     <modules>
         <module>tracing</module>
         <module>clients</module>
+        <module>admin</module>
     </modules>
 
     <properties>
@@ -41,11 +42,21 @@
         <grpc.version>1.53.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
         <okhttp.version>4.10.0</okhttp.version>
-        <jcommander.version>1.82</jcommander.version>
+        <picocli.version>4.7.5</picocli.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-api</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j-impl</artifactId>
+                <version>${log4j.version}</version>
+            </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-core</artifactId>
@@ -102,9 +113,9 @@
                 <version>${okhttp.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.beust</groupId>
-                <artifactId>jcommander</artifactId>
-                <version>${jcommander.version}</version>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli</artifactId>
+                <version>${picocli.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
