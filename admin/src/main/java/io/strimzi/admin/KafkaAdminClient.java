@@ -7,6 +7,11 @@ package io.strimzi.admin;
 import io.strimzi.arguments.topic.TopicCommand;
 import picocli.CommandLine;
 
+/**
+ * Class for creation of the whole command - `admin-client`
+ * In `subcommands` field inside {@link CommandLine.Command} are specified all sub-commands that it should have
+ * Accessed using `admin-client`
+ */
 @CommandLine.Command(
     name = "admin-client",
     subcommands = {

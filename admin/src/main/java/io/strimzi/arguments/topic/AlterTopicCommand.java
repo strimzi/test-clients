@@ -12,6 +12,11 @@ import picocli.CommandLine;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Accessed using `admin-client topic alter`
+ * Currently, this command is implemented for creating new partitions for particular topic(s) with prefix
+ * It is not updating configuration of topic.
+ */
 @CommandLine.Command(name = "alter")
 public class AlterTopicCommand extends BasicTopicCommand {
 
@@ -28,14 +33,13 @@ public class AlterTopicCommand extends BasicTopicCommand {
      * @return return code of the operation - 0 success, 1 exception
      */
     private Integer alterTopic() {
-        Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer));
         Map<String, NewPartitions> alteredTopics = new HashMap<>();
 
         this.getListOfTopicNames().forEach(topic ->
             alteredTopics.put(topic, NewPartitions.increaseTo(this.topicPartitions))
         );
 
-        try {
+        try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
             admin.createPartitions(alteredTopics).all().get();
             System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully altered.");
             return 0;

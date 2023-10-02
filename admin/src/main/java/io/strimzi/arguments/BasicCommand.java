@@ -8,6 +8,10 @@ import picocli.CommandLine;
 
 import java.util.concurrent.Callable;
 
+/**
+ * Base for all commands - includes basic options for specifying bootstrap server of Kafka and
+ * also `help` flag
+ */
 public class BasicCommand implements Callable<Integer> {
 
     @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address", required = true)
@@ -18,6 +22,6 @@ public class BasicCommand implements Callable<Integer> {
 
     @Override
     public Integer call() {
-        return null;
+        throw new UnsupportedOperationException("Not supported");
     }
 }

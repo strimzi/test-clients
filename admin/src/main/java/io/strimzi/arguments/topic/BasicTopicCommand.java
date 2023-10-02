@@ -10,6 +10,11 @@ import picocli.CommandLine;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Base for topic command
+ * Contains common methods that are using in particular commands
+ * Also contains basic options -> topics count, topic name, and topic prefix
+ */
 public class BasicTopicCommand extends BasicCommand {
     @CommandLine.ArgGroup(multiplicity = "1")
     TopicName topicInfo;

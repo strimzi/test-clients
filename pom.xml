@@ -43,6 +43,7 @@
         <checkstyle.version>10.8.1</checkstyle.version>
         <okhttp.version>4.10.0</okhttp.version>
         <picocli.version>4.7.5</picocli.version>
+        <sl4j-nop.version>1.7.36</sl4j-nop.version>
     </properties>
 
     <dependencyManagement>
@@ -106,6 +107,11 @@
                 <groupId>info.picocli</groupId>
                 <artifactId>picocli</artifactId>
                 <version>${picocli.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${sl4j-nop.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

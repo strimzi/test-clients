@@ -12,6 +12,10 @@ import picocli.CommandLine;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Command for listing topic(s) in Kafka.
+ * Accessed using `admin-client topic list`
+ */
 @CommandLine.Command(name = "list")
 public class ListTopicCommand extends BasicCommand {
 
@@ -21,8 +25,7 @@ public class ListTopicCommand extends BasicCommand {
     }
 
     private Integer listTopics() {
-        Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer));
-        try {
+        try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
             admin.listTopics().names().get(Constants.CALL_TIMEOUT_MS, TimeUnit.MILLISECONDS).forEach(System.out::println);
             return 0;
         } catch (Exception e) {
