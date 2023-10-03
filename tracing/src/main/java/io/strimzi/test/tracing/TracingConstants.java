@@ -9,7 +9,6 @@ public final class TracingConstants {
      * Tracing type
      */
     public static final String OPEN_TELEMERTY = "OpenTelemetry";
-    public static final String OPEN_TRACING = "OpenTracing";
 
     /**
      * OpenTelemetry related constants

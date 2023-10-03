@@ -19,7 +19,7 @@ public class TracingUtil {
 
     /**
      * Method for getting instance of tracing handler
-     * @return TracingHandle instance of one of the handlers - OpenTracingHandle, OpenTelemetryHandle, NoopTracing
+     * @return TracingHandle instance of one of the handlers - OpenTelemetryHandle, NoopTracing
      */
     public static TracingHandle getTracing() {
         return tracing;
@@ -27,15 +27,12 @@ public class TracingUtil {
 
     /**
      * Method for initializing tracing based on `TRACING_TYPE` env variable
-     * @return TracingHandle instance of one of the handlers - OpenTracingHandle, OpenTelemetryHandle, NoopTracing
+     * @return TracingHandle instance of one of the handlers - OpenTelemetryHandle, NoopTracing
      */
     public static TracingHandle initialize() {
         String tracingSystem = System.getenv("TRACING_TYPE");
 
         switch (tracingSystem == null ? "none" : tracingSystem) {
-            case TracingConstants.OPEN_TRACING:
-                tracing = new OpenTracingHandle();
-                break;
             case TracingConstants.OPEN_TELEMERTY:
                 tracing = new OpenTelemetryHandle();
                 break;
