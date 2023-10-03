@@ -1,6 +1,7 @@
 RELEASE_VERSION ?= latest
 VERSION ?= `cat clients.version`
 PROJECT_NAME = test-clients
+GRAAL_VM_VERSION = 17.0.8
 
 include ./Makefile.os
 include ./Makefile.docker
@@ -16,6 +17,12 @@ copy_files:
 
 clean_files:
 	rm -rf docker-images/tmp/*
+
+build_admin_cli: prepare_admin_files docker_build_admin_cli
+
+prepare_admin_files:
+	mkdir -p docker-images/tmp/admin-client
+	cp admin/target/admin-$(VERSION).jar docker-images/tmp/admin-client/admin.jar
 
 next_version:
 	mvn versions:set -DnewVersion=$(shell echo $(NEXT_VERSION) | tr a-z A-Z)

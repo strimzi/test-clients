@@ -12,6 +12,7 @@
     <modules>
         <module>tracing</module>
         <module>clients</module>
+        <module>admin</module>
     </modules>
 
     <properties>
@@ -41,6 +42,8 @@
         <grpc.version>1.53.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
         <okhttp.version>4.10.0</okhttp.version>
+        <picocli.version>4.7.5</picocli.version>
+        <sl4j-nop.version>1.7.36</sl4j-nop.version>
     </properties>
 
     <dependencyManagement>
@@ -99,6 +102,17 @@
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
                 <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>info.picocli</groupId>
+                <artifactId>picocli</artifactId>
+                <version>${picocli.version}</version>
+            </dependency>
+            <!-- Needed as a dependency of Admin client to not log the SLF4J error -->
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-nop</artifactId>
+                <version>${sl4j-nop.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
