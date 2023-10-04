@@ -1,19 +1,14 @@
 # Tracing
 
-Currently this `tracing` module supports two different tracing abstractions
- * OpenTracing (deprecated)
+Currently this `tracing` module supports only one tracing abstraction:
  * OpenTelemetry 
  
-where both use `Jaeger` as the actual tracing implementation.
+that uses `Jaeger` as the actual tracing implementation.
 
 For specifying, which `tracing` type should be used, the `TRACING_TYPE` environment variable has to be specified.
-The value corresponds to abstraction names - `OpenTracing` or `OpenTelemetry`.
+The value corresponds to abstraction name - `OpenTelemetry`.
 
 List of env vars we need to set:
-
-#### OpenTracing
- * JAEGER_SERVICE_NAME -- this triggers OpenTracing tracing
- * JAEGER_AGENT_HOST -- host name where the Jaeger traces are sent
 
 #### OpenTelemetry
  * OTEL_SERVICE_NAME -- this triggers OpenTelemetry tracing
