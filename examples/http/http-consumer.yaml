@@ -36,7 +36,7 @@ spec:
               value: DEBUG
             - name: CLIENT_TYPE
               value: HttpConsumer
-          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.5.0
+          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.6.0
           imagePullPolicy: IfNotPresent
           name: http-consumer
       restartPolicy: "Never"
