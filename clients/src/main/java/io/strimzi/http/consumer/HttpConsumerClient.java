@@ -6,8 +6,8 @@ package io.strimzi.http.consumer;
 
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.configuration.Constants;
-import io.strimzi.common.configuration.http.HttpConsumerConfiguration;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.http.HttpConsumerConfiguration;
 import io.strimzi.common.records.http.consumer.ConsumerRecord;
 import io.strimzi.common.records.http.consumer.ConsumerRecordUtils;
 import io.strimzi.test.tracing.HttpContext;
@@ -54,7 +54,7 @@ public class HttpConsumerClient implements ClientsInterface {
         createConsumer();
         subscribeToTopic();
 
-        long delayMs = configuration.getPollInterval() == 0 ? Constants.DEFAULT_POLL_INTERVAL : configuration.getPollInterval();
+        long delayMs = configuration.getPollInterval() == 0 ? ConfigurationConstants.DEFAULT_POLL_INTERVAL : configuration.getPollInterval();
         scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, delayMs, TimeUnit.MILLISECONDS);
 
         awaitCompletion();
@@ -65,7 +65,7 @@ public class HttpConsumerClient implements ClientsInterface {
     public void awaitCompletion() {
         try {
             countDownLatch.await();
-            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
+            scheduledExecutor.awaitTermination(ConfigurationConstants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
             e.printStackTrace();
@@ -108,7 +108,7 @@ public class HttpConsumerClient implements ClientsInterface {
 
         LOGGER.info("Creating new consumer:\n{}", message);
 
-        HttpContext context = HttpContext.post(configuration.getConsumerCreationURI(), Constants.HTTP_JSON_CONTENT_TYPE, message);
+        HttpContext context = HttpContext.post(configuration.getConsumerCreationURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE, message);
 
         HttpHandle<String> httpHandle = TracingUtil.getTracing().createHttpHandle("create-consumer");
         HttpRequest creationRequest = httpHandle.build(context);
@@ -133,7 +133,7 @@ public class HttpConsumerClient implements ClientsInterface {
 
         LOGGER.info("Subscribing consumer: {} to topic: {} with message: {}", configuration.getClientId(), configuration.getTopic(), subscriptionMessage);
 
-        HttpContext context = HttpContext.post(configuration.getSubscriptionURI(), Constants.HTTP_JSON_CONTENT_TYPE, subscriptionMessage);
+        HttpContext context = HttpContext.post(configuration.getSubscriptionURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE, subscriptionMessage);
 
         HttpHandle<String> httpHandle = TracingUtil.getTracing().createHttpHandle("subscribe-topic");
         HttpRequest subscriptionRequest = httpHandle.build(context);
@@ -154,7 +154,7 @@ public class HttpConsumerClient implements ClientsInterface {
     }
 
     public void consumeMessages() {
-        HttpContext context = HttpContext.get(configuration.getConsumeMessagesURI(), Constants.HTTP_JSON_CONTENT_TYPE);
+        HttpContext context = HttpContext.get(configuration.getConsumeMessagesURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE);
         try {
             HttpResponse httpResponse = httpHandle.finish(client.send(httpHandle.build(context), HttpResponse.BodyHandlers.ofString()));
 

@@ -5,7 +5,7 @@
 package io.strimzi.kafka;
 
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.configuration.kafka.KafkaStreamsConfiguration;
+import io.strimzi.configuration.kafka.KafkaStreamsConfiguration;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.common.serialization.Serdes;

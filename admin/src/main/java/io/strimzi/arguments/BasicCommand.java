@@ -6,13 +6,11 @@ package io.strimzi.arguments;
 
 import picocli.CommandLine;
 
-import java.util.concurrent.Callable;
-
 /**
  * Base for all commands - includes basic options for specifying bootstrap server of Kafka and
  * also `help` flag
  */
-public class BasicCommand implements Callable<Integer> {
+public class BasicCommand implements CommandInterface {
 
     @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address", required = true)
     protected String bootstrapServer;

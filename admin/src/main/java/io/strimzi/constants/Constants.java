@@ -6,4 +6,8 @@ package io.strimzi.constants;
 
 public interface Constants {
     long CALL_TIMEOUT_MS = 30000;
+
+    String TRUSTSTORE_FILE_NAME = "truststore.crt";
+    String KEYSTORE_KEY_FILE_NAME = "keystore.key";
+    String KEYSTORE_CERT_FILE_NAME = "keystore.crt";
 }
