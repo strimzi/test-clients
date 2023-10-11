@@ -12,6 +12,10 @@ import picocli.CommandLine;
 
 import java.util.Properties;
 
+/**
+ * Sub-command for configuring SSL related configuration for admin-client
+ */
+@CommandLine.Command(name = "ssl")
 public class SslCommand implements CommandInterface {
 
     @CommandLine.Option(names = "--truststore", description = "File path to SSL truststore certificate")
@@ -28,6 +32,13 @@ public class SslCommand implements CommandInterface {
         return copyCertificates();
     }
 
+    /**
+     * Method that copies certificates from the file paths specified by users to the configuration folder
+     * The name of the certificates (files) are then prefixed with "@" in the properties file, so when
+     * the configuration file will be loaded by admin-client, it can load the certificates and pass it to the
+     * {@link io.strimzi.configuration.kafka.KafkaClientsConfiguration} instance
+     * @return status code of the operation
+     */
     private Integer copyCertificates() {
         Properties properties = new Properties();
 

@@ -21,13 +21,13 @@
             <artifactId>picocli</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-nop</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.strimzi</groupId>
             <artifactId>clients-common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.strimzi</groupId>
+            <artifactId>kafka-kubernetes-config-provider</artifactId>
         </dependency>
     </dependencies>
 

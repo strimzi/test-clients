@@ -29,7 +29,7 @@ public class ListTopicCommand extends BasicCommand {
             admin.listTopics().names().get(Constants.CALL_TIMEOUT_MS, TimeUnit.MILLISECONDS).forEach(System.out::println);
             return 0;
         } catch (Exception e) {
-            throw new RuntimeException("Unable to list topics due: " + e.getCause());
+            throw new RuntimeException("Unable to list topics due: " + e);
         }
     }
 }

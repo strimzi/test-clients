@@ -12,7 +12,7 @@ import picocli.CommandLine;
  */
 public class BasicCommand implements CommandInterface {
 
-    @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address", required = true)
+    @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address")
     protected String bootstrapServer;
 
     @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message")

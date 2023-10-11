@@ -6,6 +6,12 @@ package io.strimzi.arguments.configure;
 
 import picocli.CommandLine;
 
+/**
+ * Class for `configure` sub-command
+ * Its main and only purpose is to create "sub-path" for all configure sub-commands - oauth, ssl, sasl, common.
+ * Accessed using `admin-client configure`.
+ * In case of addition of new sub-command, it needs to be added into `subcommands` in {@link CommandLine.Command} field.
+ */
 @CommandLine.Command(
     name = "configure",
     subcommands = {

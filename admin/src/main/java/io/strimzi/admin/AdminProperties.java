@@ -49,7 +49,7 @@ public class AdminProperties {
 
         // in case that bootstrap server is not specified in the configuration file, add it from the variable
         // when the configuration file will not contain the field and variable will be null, exception will be thrown in the KafkaClientsConfiguration
-        if (!propertiesInMap.containsKey(bootstrapServer) || bootstrapServer != null) {
+        if (!propertiesInMap.containsKey(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV) || bootstrapServer != null) {
             propertiesInMap.put(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV, bootstrapServer);
         }
 
@@ -67,7 +67,7 @@ public class AdminProperties {
     private static Properties transformAllLoadedProperties(Properties properties) {
         Properties updatedProps = new Properties();
 
-        properties.putAll(
+        updatedProps.putAll(
             properties.entrySet().stream()
                 .collect(Collectors.toMap(entry -> ConfigurationUtils.transformPropertyToEnvFormat(String.valueOf(entry.getKey())), Map.Entry::getValue))
         );

@@ -11,6 +11,10 @@ import picocli.CommandLine;
 
 import java.util.Properties;
 
+/**
+ * Sub-command for configuring OAuth related configuration for admin-client
+ */
+@CommandLine.Command(name = "oauth")
 public class OauthCommand implements CommandInterface {
     @CommandLine.Option(names = {"--client-id", "-id"}, description = "ID of the client used in Oauth")
     String oauthClientId;

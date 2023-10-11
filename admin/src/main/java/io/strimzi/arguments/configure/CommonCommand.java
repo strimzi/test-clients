@@ -13,15 +13,25 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * Sub-command for handling common configuration of the admin-client
+ * Users can either:
+ *      - specify the bootstrap servers to not do --bootstrap-servers call in each execution
+ *      - specify file path where the configuration is stored (so it will be loaded and copied to the config folder)
+ *      - load the configuration from environment variables as it is done for other clients
+ * This is useful in cases that the admin-client CLI tool is in some container with specified environmental variables or with mounted
+ * configuration file, so users don't need to configure it using multiple calls
+ */
+@CommandLine.Command(name = "common")
 public class CommonCommand implements CommandInterface {
-
-    @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address")
-    String bootstrapServer;
 
     @CommandLine.ArgGroup(multiplicity = "1")
     Source source;
 
     static class Source {
+        @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address")
+        String bootstrapServer;
+
         @CommandLine.Option(names = "--from-file", description = "Load security configuration from file")
         String filePath;
 
@@ -35,33 +45,53 @@ public class CommonCommand implements CommandInterface {
             return loadConfigFromEnv();
         } else if (source.filePath != null) {
             return loadConfigFromFile();
-        } else if (bootstrapServer != null) {
+        } else if (source.bootstrapServer != null) {
             return setBootstrapServer();
         }
 
         return 0;
     }
 
+    /**
+     * Sets the bootstrap servers property inside config.properties file in admin-client's config folder
+     * @return status code of the operation
+     */
     private Integer setBootstrapServer() {
         Properties properties = new Properties();
 
-        properties.put(ConfigurationUtils.transformPropertyToPropertiesFormat(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), bootstrapServer);
+        properties.put(ConfigurationUtils.transformPropertyToPropertiesFormat(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), source.bootstrapServer);
         ConfigurationUtils.writeToConfigurationFile(properties);
         return 0;
     }
 
+    /**
+     * Loads configuration from environmental variables based on specified env vars in {@link ConfigurationConstants}
+     * Then it stores the configuration in config.properties file in admin-client's config folder
+     * @return status code of the operation
+     */
     private Integer loadConfigFromEnv() {
-        Properties properties = loadConfigurationToProperties(System.getenv());
+        Properties properties = transformAndFilterPropertiesFromSource(System.getenv());
         ConfigurationUtils.writeToConfigurationFile(properties);
         return 0;
     }
 
+    /**
+     * Loads configuration from file on the file path.
+     * Then it stores the configuration in config.properties file in admin-client's config folder
+     * @return status code of the operation
+     */
     private Integer loadConfigFromFile() {
         ConfigurationUtils.writeToConfigurationFile(ConfigurationUtils.getPropertiesFromConfigurationFile(source.filePath));
         return 0;
     }
 
-    private Properties loadConfigurationToProperties(Map<String, String> source) {
+    /**
+     * Method which transforms all keys to the "properties format" and filters those options, that are related to the
+     * admin-client
+     * @param source Map with the key x value pairs from the source (f.e. environment variables)
+     * @return filtered and transformed Properties
+     */
+    private Properties transformAndFilterPropertiesFromSource(Map<String, String> source) {
         Properties properties = new Properties();
 
         // transform all keys in source map to properties style

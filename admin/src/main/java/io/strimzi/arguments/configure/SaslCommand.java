@@ -4,6 +4,7 @@
  */
 package io.strimzi.arguments.configure;
 
+import io.strimzi.SaslType;
 import io.strimzi.arguments.CommandInterface;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.utils.ConfigurationUtils;
@@ -11,19 +12,34 @@ import picocli.CommandLine;
 
 import java.util.Properties;
 
+/**
+ * Sub-command for configuring SASL related configuration for admin-client
+ * Users can either set "SASL JAAS configuration" or "username & password" for the client
+ */
+@CommandLine.Command(name = "sasl")
 public class SaslCommand implements CommandInterface {
 
-    @CommandLine.Option(names = "--mechanism", description = "SASL mechanism", required = true)
-    String saslMechanism;
+    @CommandLine.Option(names = "--mechanism", description = "SASL mechanism", required = true, type = SaslType.class)
+    SaslType saslMechanism;
 
-    @CommandLine.Option(names = "--jaas-config", description = "SASL JAAS config that should be passed to the configuration", required = true)
-    String saslJaasConfig;
+    @CommandLine.ArgGroup(multiplicity = "1")
+    Configuration configuration;
 
-    @CommandLine.Option(names = "--user", description = "Username of the user", required = true)
-    String saslUserName;
+    static class Configuration {
+        @CommandLine.Option(names = "--jaas-config", description = "SASL JAAS config that should be passed to the configuration", required = true)
+        String saslJaasConfig;
 
-    @CommandLine.Option(names = "--password", description = "Password of the user", required = true)
-    String saslPassword;
+        @CommandLine.ArgGroup(exclusive = false, multiplicity = "1")
+        User user;
+    }
+
+    static class User {
+        @CommandLine.Option(names = "--user", description = "Username of the user", required = true)
+        String saslUserName;
+
+        @CommandLine.Option(names = "--password", description = "Password of the user", required = true)
+        String saslPassword;
+    }
 
     @Override
     public Integer call() {
@@ -33,10 +49,14 @@ public class SaslCommand implements CommandInterface {
     private Integer setProperties() {
         Properties properties = new Properties();
 
-        properties.put(ConfigurationConstants.SASL_MECHANISM_PROPERTY, saslMechanism);
-        properties.put(ConfigurationConstants.SASL_JAAS_CONFIG_PROPERTY, saslJaasConfig);
-        properties.put(ConfigurationConstants.USER_NAME_PROPERTY, saslUserName);
-        properties.put(ConfigurationConstants.USER_PASSWORD_PROPERTY, saslPassword);
+        properties.put(ConfigurationConstants.SASL_MECHANISM_PROPERTY, saslMechanism.toString());
+
+        if (configuration.saslJaasConfig != null) {
+            properties.put(ConfigurationConstants.SASL_JAAS_CONFIG_PROPERTY, configuration.saslJaasConfig);
+        } else {
+            properties.put(ConfigurationConstants.USER_NAME_PROPERTY, configuration.user.saslUserName);
+            properties.put(ConfigurationConstants.USER_PASSWORD_PROPERTY, configuration.user.saslPassword);
+        }
 
         ConfigurationUtils.writeToConfigurationFile(properties);
         return 0;

@@ -17,7 +17,7 @@ import java.util.Properties;
 public class ConfigurationUtils {
 
     private static final String HOME_DIR = System.getProperty("user.home");
-    private static final String CONFIG_FOLDER_PATH = HOME_DIR + ".admin_client/";
+    private static final String CONFIG_FOLDER_PATH = HOME_DIR + "/.admin_client/";
     private static final String CONFIG_FILE_NAME = "config.properties";
     private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + CONFIG_FILE_NAME;
 
@@ -45,17 +45,22 @@ public class ConfigurationUtils {
         return property.toUpperCase(Locale.ROOT).replaceAll("\\.", "_");
     }
 
+    /**
+     * Method for creating configuration folder and config.properties file in it
+     */
     public static void createConfigurationFolderAndFile() {
-        Path configurationFilePath = Paths.get(CONFIG_FILE_PATH);
-
         try {
-            Files.createDirectories(configurationFilePath);
-            Files.createFile(configurationFilePath);
+            Files.createDirectories(Paths.get(CONFIG_FOLDER_PATH));
+            Files.createFile(Paths.get(CONFIG_FILE_PATH));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to create folders and configuration file due to: ", e.getCause());
+            throw new RuntimeException("Failed to create folders and configuration file due to: " + e);
         }
     }
 
+    /**
+     * Check if configuration file exists
+     * @return boolean determining the existence of the config.properties file
+     */
     public static boolean configurationFileExists() {
         return configurationFileExists(CONFIG_FILE_PATH);
     }
@@ -66,6 +71,10 @@ public class ConfigurationUtils {
         return configFile.exists();
     }
 
+    /**
+     * Loads Properties from the config.properties file
+     * @return Properties loaded from the config.properties file
+     */
     public static Properties getPropertiesFromConfigurationFile() {
         return getPropertiesFromConfigurationFile(CONFIG_FILE_PATH);
     }
@@ -82,6 +91,13 @@ public class ConfigurationUtils {
         return configuration;
     }
 
+    /**
+     * If the configuration file doesn't exist, creates a new one (together with needed config folder)
+     * After that it loads the current Properties (may be empty if the config file didn't exist) and
+     * updates it with the new properties
+     * Finally it stores the Properties into the config.properties file
+     * @param properties new Properties that should be added to the config.properties file
+     */
     public static void writeToConfigurationFile(Properties properties) {
         if (!configurationFileExists()) {
             createConfigurationFolderAndFile();
@@ -92,10 +108,15 @@ public class ConfigurationUtils {
         try (FileOutputStream fileOutputStream = new FileOutputStream(CONFIG_FILE_PATH)) {
             currentConfiguration.store(fileOutputStream, "Store properties to config file");
         } catch (IOException e) {
-            throw new RuntimeException("Unable to store the properties to configuration file due to: ", e.getCause());
+            throw new RuntimeException("Unable to store the properties to configuration file due to: " + e);
         }
     }
 
+    /**
+     * Copies file from source destination to target destination with desired name
+     * @param filePath of source file
+     * @param fileNameInConfigFolder desired name of the target file
+     */
     public static void copyFileToConfigurationFolder(String filePath, String fileNameInConfigFolder) {
         Path sourceFilePath = Paths.get(filePath);
         Path targetFilePath = Paths.get(CONFIG_FOLDER_PATH + fileNameInConfigFolder);
@@ -107,6 +128,11 @@ public class ConfigurationUtils {
         }
     }
 
+    /**
+     * Loads all lines from the file in the configuration folder
+     * @param fileName name of the file in the configuration folder
+     * @return file contents in String
+     */
     public static String getContentsOfTheFileInConfigFolder(String fileName) {
         Path filePath = Paths.get(CONFIG_FOLDER_PATH + fileName);
 
