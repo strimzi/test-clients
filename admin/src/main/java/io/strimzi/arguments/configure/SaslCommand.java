@@ -13,7 +13,7 @@ import picocli.CommandLine;
 import java.util.Properties;
 
 /**
- * Sub-command for configuring SASL related configuration for admin-client
+ * Subcommand for setting up SASL related configuration of admin-client
  * Users can either set "SASL JAAS configuration" or "username & password" for the client
  */
 @CommandLine.Command(name = "sasl")
@@ -34,7 +34,7 @@ public class SaslCommand implements CommandInterface {
     }
 
     static class User {
-        @CommandLine.Option(names = "--user", description = "Username of the user", required = true)
+        @CommandLine.Option(names = "--username", description = "Name of the user", required = true)
         String saslUserName;
 
         @CommandLine.Option(names = "--password", description = "Password of the user", required = true)

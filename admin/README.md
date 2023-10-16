@@ -52,7 +52,7 @@ name.
 ## Configuring the Admin client
 
 You can configure the Admin client before any other operation.
-That can be done using `configure` sub-command:
+That can be done using `configure` subcommand:
 
 ```
 > admin-client configure
@@ -65,9 +65,9 @@ Commands:
   common
 ```
 
-There are in total 4 sub-commands that you can use for the configuration.
-All of the sub-commands have its own options with description what you can configure.
-The `common` sub-commands has options to load configuration from environment variables (env. variables are same as for the other clients)
+In total there are 4 subcommands that you can use for the configuration.
+All of the subcommands have their respective options with description what you can configure.
+The `common` subcommands has options that allow loading configuration from environment variables (env. variables are same as for the other clients)
 or from properties file (the properties' keys are same as the names of env. variables, only difference is that the keys are in lower case and with
 `.` instead of `_` -> `BOOTSTRAP_SERVERS` environment variable is `bootstrap.servers` property in the properties file).
 

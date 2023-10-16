@@ -14,7 +14,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
- * Sub-command for handling common configuration of the admin-client
+ * Subcommand for handling common configuration of the admin-client
  * Users can either:
  *      - specify the bootstrap servers to not do --bootstrap-servers call in each execution
  *      - specify file path where the configuration is stored (so it will be loaded and copied to the config folder)

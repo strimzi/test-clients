@@ -13,7 +13,7 @@ import picocli.CommandLine;
 import java.util.Properties;
 
 /**
- * Sub-command for configuring SSL related configuration for admin-client
+ * Subcommand for setting up SSL related configuration of admin-client
  */
 @CommandLine.Command(name = "ssl")
 public class SslCommand implements CommandInterface {

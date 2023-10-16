@@ -105,6 +105,7 @@ public interface ConfigurationConstants {
     String OAUTH_ACCESS_TOKEN_PROPERTY = "oauth.access.token";
     String OAUTH_REFRESH_TOKEN_PROPERTY = "oauth.refresh.token";
     String OAUTH_TOKEN_ENDPOINT_URI_PROPERTY = "oauth.token.endpoint.uri";
+    String ADDITIONAL_CONFIG_PROPERTY = "additional.config";
 
     List<String> BASIC_PROPERTY_LIST = List.of(
         BOOTSTRAP_SERVERS_PROPERTY,
@@ -119,7 +120,8 @@ public interface ConfigurationConstants {
         OAUTH_CLIENT_SECRET_PROPERTY,
         OAUTH_ACCESS_TOKEN_PROPERTY,
         OAUTH_REFRESH_TOKEN_PROPERTY,
-        OAUTH_TOKEN_ENDPOINT_URI_PROPERTY
+        OAUTH_TOKEN_ENDPOINT_URI_PROPERTY,
+        ADDITIONAL_CONFIG_PROPERTY
     );
 
     /**

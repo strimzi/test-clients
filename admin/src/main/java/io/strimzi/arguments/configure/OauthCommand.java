@@ -12,7 +12,7 @@ import picocli.CommandLine;
 import java.util.Properties;
 
 /**
- * Sub-command for configuring OAuth related configuration for admin-client
+ * Subcommand for setting up OAuth related configuration of admin-client
  */
 @CommandLine.Command(name = "oauth")
 public class OauthCommand implements CommandInterface {
@@ -28,7 +28,7 @@ public class OauthCommand implements CommandInterface {
     @CommandLine.Option(names = {"--refresh-token", "-rt"}, description = "Oauth refresh token")
     String oauthRefreshToken;
 
-    @CommandLine.Option(names = {"--token-endpoint", "-teu"}, description = "Oauth token endpoint URI for obtaining new token")
+    @CommandLine.Option(names = {"--token-endpoint", "-te"}, description = "Oauth token endpoint URI for obtaining new token")
     String oauthTokenEndpointUri;
 
 
