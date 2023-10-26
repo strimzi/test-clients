@@ -13,6 +13,7 @@
         <module>tracing</module>
         <module>clients</module>
         <module>admin</module>
+        <module>clients-common</module>
     </modules>
 
     <properties>

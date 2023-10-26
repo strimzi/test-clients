@@ -5,8 +5,8 @@
 package io.strimzi.kafka;
 
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.configuration.Constants;
-import io.strimzi.common.configuration.kafka.KafkaConsumerConfiguration;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.kafka.KafkaConsumerConfiguration;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -51,7 +51,7 @@ public class KafkaConsumerClient implements ClientsInterface {
 
         consumer.subscribe(Collections.singletonList(configuration.getTopicName()));
 
-        long delayMs = configuration.getDelayMs() == 0 ? Constants.DEFAULT_POLL_INTERVAL : configuration.getDelayMs();
+        long delayMs = configuration.getDelayMs() == 0 ? ConfigurationConstants.DEFAULT_POLL_INTERVAL : configuration.getDelayMs();
         scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, delayMs, TimeUnit.MILLISECONDS);
 
         awaitCompletion();
@@ -62,7 +62,7 @@ public class KafkaConsumerClient implements ClientsInterface {
     public void awaitCompletion() {
         try {
             countDownLatch.await();
-            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
+            scheduledExecutor.awaitTermination(ConfigurationConstants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
             e.printStackTrace();

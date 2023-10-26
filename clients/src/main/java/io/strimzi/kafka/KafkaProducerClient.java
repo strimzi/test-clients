@@ -5,8 +5,8 @@
 package io.strimzi.kafka;
 
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.configuration.Constants;
-import io.strimzi.common.configuration.kafka.KafkaProducerConfiguration;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -60,7 +60,7 @@ public class KafkaProducerClient implements ClientsInterface {
         if (configuration.getDelayMs() == 0) {
             sendMessages();
         } else {
-            scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, Constants.DEFAULT_DELAY_MS, configuration.getDelayMs(), TimeUnit.MILLISECONDS);
+            scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, ConfigurationConstants.DEFAULT_DELAY_MS, configuration.getDelayMs(), TimeUnit.MILLISECONDS);
             awaitCompletion();
         }
 
@@ -71,7 +71,7 @@ public class KafkaProducerClient implements ClientsInterface {
     public void awaitCompletion() {
         try {
             countDownLatch.await();
-            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
+            scheduledExecutor.awaitTermination(ConfigurationConstants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
             e.printStackTrace();

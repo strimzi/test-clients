@@ -4,8 +4,8 @@
  */
 package io.strimzi.http.producer;
 
-import io.strimzi.common.configuration.Constants;
 import io.strimzi.common.records.http.producer.ProducerRecord;
+import io.strimzi.configuration.ConfigurationConstants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -25,7 +25,7 @@ public class HttpProducerClientTest {
     void testGenerateMessage() {
         int numberOfMessage = 6;
 
-        String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":\"" + Constants.DEFAULT_MESSAGE + "-" + numberOfMessage + "\"}]}";
+        String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":\"" + ConfigurationConstants.DEFAULT_MESSAGE + "-" + numberOfMessage + "\"}]}";
 
         ProducerRecord result = producerClient.generateMessage(numberOfMessage);
 

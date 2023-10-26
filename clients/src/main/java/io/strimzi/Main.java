@@ -6,7 +6,7 @@ package io.strimzi;
 
 import io.strimzi.common.ClientType;
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.configuration.Constants;
+import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.http.consumer.HttpConsumerClient;
 import io.strimzi.http.producer.HttpProducerClient;
 import io.strimzi.kafka.KafkaConsumerClient;
@@ -24,7 +24,7 @@ public class Main {
     public static void main(String[] args) {
         TracingUtil.initialize();
         Map<String, String> envConfiguration = System.getenv();
-        ClientType clientType = ClientType.getFromString(envConfiguration.get(Constants.CLIENT_TYPE_ENV));
+        ClientType clientType = ClientType.getFromString(envConfiguration.get(ConfigurationConstants.CLIENT_TYPE_ENV));
 
         ClientsInterface client = null;
 

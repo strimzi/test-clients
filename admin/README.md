@@ -27,7 +27,8 @@ Missing required subcommand
 Usage: admin-client [COMMAND]
 Commands:
   topic
-  
+  configure
+
 > admin-client topic
 Usage: admin-client topic [COMMAND]
 Commands:
@@ -47,6 +48,33 @@ Usage: admin-client topic list [-h] --bootstrap-server=<bootstrapServer>
 `create`, `delete`, `describe`, `alter` can be used with one topic, or multiple topics matching prefix
 (with specified topics count). `list` will show all topics present in Kafka, there is no filtering of topics based on
 name.
+
+## Configuring the Admin client
+
+You can configure the Admin client before any other operation.
+That can be done using `configure` subcommand:
+
+```
+> admin-client configure
+Missing required subcommand
+Usage: admin-client configure [COMMAND]
+Commands:
+  oauth
+  sasl
+  ssl
+  common
+```
+
+In total there are 4 subcommands that you can use for the configuration.
+All of the subcommands have their respective options with description what you can configure.
+The `common` subcommands has options that allow loading configuration from environment variables (env. variables are same as for the other clients)
+or from properties file (the properties' keys are same as the names of env. variables, only difference is that the keys are in lower case and with
+`.` instead of `_` -> `BOOTSTRAP_SERVERS` environment variable is `bootstrap.servers` property in the properties file).
+
+The configuration of the Admin client is then stored in `~/.admin-client/config.properties` file.
+
+In case you want to store the configuration file in different location, you can specify the `CONFIG_FOLDER_PATH` where the `.admin-client`
+folder with the `config.properties` file will be created.
 
 ## Local development & testing
 

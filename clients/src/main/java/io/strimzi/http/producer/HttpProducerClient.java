@@ -6,8 +6,8 @@ package io.strimzi.http.producer;
 
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.configuration.Constants;
-import io.strimzi.common.configuration.http.HttpProducerConfiguration;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.http.HttpProducerConfiguration;
 import io.strimzi.common.records.http.producer.OffsetRecordSent;
 import io.strimzi.common.records.http.producer.OffsetRecordSentUtils;
 import io.strimzi.common.records.http.producer.ProducerRecord;
@@ -54,7 +54,7 @@ public class HttpProducerClient implements ClientsInterface {
         if (configuration.getDelay() == 0) {
             sendMessages();
         } else {
-            scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, Constants.DEFAULT_DELAY_MS, configuration.getDelay(), TimeUnit.MILLISECONDS);
+            scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, ConfigurationConstants.DEFAULT_DELAY_MS, configuration.getDelay(), TimeUnit.MILLISECONDS);
             awaitCompletion();
         }
 
@@ -65,7 +65,7 @@ public class HttpProducerClient implements ClientsInterface {
     public void awaitCompletion() {
         try {
             countDownLatch.await();
-            scheduledExecutor.awaitTermination(Constants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
+            scheduledExecutor.awaitTermination(ConfigurationConstants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
             e.printStackTrace();
