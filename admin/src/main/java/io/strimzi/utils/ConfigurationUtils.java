@@ -4,6 +4,8 @@
  */
 package io.strimzi.utils;
 
+import io.strimzi.constants.Constants;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -17,9 +19,9 @@ import java.util.Properties;
 public class ConfigurationUtils {
 
     private static final String HOME_DIR = System.getProperty("user.home");
-    private static final String CONFIG_FOLDER_PATH = HOME_DIR + "/.admin_client/";
+    private static final String CONFIG_FOLDER_NAME = ".admin_client/";
+    private static final String CONFIG_FOLDER_PATH_DEFAULT = HOME_DIR + "/" + CONFIG_FOLDER_NAME;
     private static final String CONFIG_FILE_NAME = "config.properties";
-    private static final String CONFIG_FILE_PATH = CONFIG_FOLDER_PATH + CONFIG_FILE_NAME;
 
     /**
      * Method that takes {@param property} and transforms it to "properties file format"
@@ -50,8 +52,8 @@ public class ConfigurationUtils {
      */
     public static void createConfigurationFolderAndFile() {
         try {
-            Files.createDirectories(Paths.get(CONFIG_FOLDER_PATH));
-            Files.createFile(Paths.get(CONFIG_FILE_PATH));
+            Files.createDirectories(Paths.get(getConfigFolderPath()));
+            Files.createFile(Paths.get(getConfigFilePath()));
         } catch (IOException e) {
             throw new RuntimeException("Failed to create folders and configuration file due to: " + e);
         }
@@ -62,7 +64,7 @@ public class ConfigurationUtils {
      * @return boolean determining the existence of the config.properties file
      */
     public static boolean configurationFileExists() {
-        return configurationFileExists(CONFIG_FILE_PATH);
+        return configurationFileExists(getConfigFilePath());
     }
 
     public static boolean configurationFileExists(String configFilePath) {
@@ -76,7 +78,7 @@ public class ConfigurationUtils {
      * @return Properties loaded from the config.properties file
      */
     public static Properties getPropertiesFromConfigurationFile() {
-        return getPropertiesFromConfigurationFile(CONFIG_FILE_PATH);
+        return getPropertiesFromConfigurationFile(getConfigFilePath());
     }
 
     public static Properties getPropertiesFromConfigurationFile(String configFilePath) {
@@ -105,7 +107,7 @@ public class ConfigurationUtils {
         Properties currentConfiguration = getPropertiesFromConfigurationFile();
         currentConfiguration.putAll(properties);
 
-        try (FileOutputStream fileOutputStream = new FileOutputStream(CONFIG_FILE_PATH)) {
+        try (FileOutputStream fileOutputStream = new FileOutputStream(getConfigFilePath())) {
             currentConfiguration.store(fileOutputStream, "Store properties to config file");
         } catch (IOException e) {
             throw new RuntimeException("Unable to store the properties to configuration file due to: " + e);
@@ -119,7 +121,7 @@ public class ConfigurationUtils {
      */
     public static void copyFileToConfigurationFolder(String filePath, String fileNameInConfigFolder) {
         Path sourceFilePath = Paths.get(filePath);
-        Path targetFilePath = Paths.get(CONFIG_FOLDER_PATH + fileNameInConfigFolder);
+        Path targetFilePath = Paths.get(getConfigFilePath() + fileNameInConfigFolder);
 
         try {
             Files.copy(sourceFilePath, targetFilePath);
@@ -134,7 +136,7 @@ public class ConfigurationUtils {
      * @return file contents in String
      */
     public static String getContentsOfTheFileInConfigFolder(String fileName) {
-        Path filePath = Paths.get(CONFIG_FOLDER_PATH + fileName);
+        Path filePath = Paths.get(getConfigFilePath() + fileName);
 
         try {
             return String.join("\n", Files.readAllLines(filePath));
@@ -142,4 +144,14 @@ public class ConfigurationUtils {
             throw new RuntimeException("No file with name: " + fileName + " exists in the configuration folder");
         }
     }
+
+    private static String getConfigFolderPath() {
+        String specificFolderPath = System.getenv(Constants.CONFIG_FOLDER_PATH_ENV);
+        return specificFolderPath == null || specificFolderPath.isEmpty() ? CONFIG_FOLDER_PATH_DEFAULT : specificFolderPath + "/" + CONFIG_FOLDER_NAME;
+    }
+
+    private static String getConfigFilePath() {
+        return getConfigFolderPath() + CONFIG_FILE_NAME;
+    }
+
 }

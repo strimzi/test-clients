@@ -73,6 +73,9 @@ or from properties file (the properties' keys are same as the names of env. vari
 
 The configuration of the Admin client is then stored in `~/.admin-client/config.properties` file.
 
+In case you want to store the configuration file in different location, you can specify the `CONFIG_FOLDER_PATH` where the `.admin-client`
+folder with the `config.properties` file will be created.
+
 ## Local development & testing
 
 In case you want to build the CLI tool locally, I recommend to install GraalVM and run

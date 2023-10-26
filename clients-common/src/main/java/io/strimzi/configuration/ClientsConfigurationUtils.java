@@ -6,8 +6,6 @@ package io.strimzi.configuration;
 
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +14,6 @@ import java.util.StringTokenizer;
 import java.util.function.Function;
 
 public class ClientsConfigurationUtils {
-
-    private static final Logger LOGGER = LogManager.getLogger(ClientsConfigurationUtils.class);
 
     public static long parseLongOrDefault(String value, long defaultValue) {
         return parseOrDefault(value, Long::parseLong, defaultValue);
@@ -39,7 +35,6 @@ public class ClientsConfigurationUtils {
                 returnValue = converter.apply(value);
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to parse value from: {}, using default", value);
             returnValue = defaultValue;
         }
         return returnValue;
