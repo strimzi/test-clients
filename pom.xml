@@ -22,23 +22,23 @@
 
         <jackson.version>2.13.1</jackson.version>
         <junit.version>4.13.2</junit.version>
-        <junit.jupiter.version>5.9.2</junit.jupiter.version>
-        <junit.platform.runner.version>1.9.2</junit.platform.runner.version>
+        <junit.jupiter.version>5.10.0</junit.jupiter.version>
+        <junit.platform.runner.version>1.10.0</junit.platform.runner.version>
         <hamcrest.version>2.2</hamcrest.version>
 
         <maven.checkstyle.version>3.2.1</maven.checkstyle.version>
         <log4j.version>2.20.0</log4j.version>
         <slf4j-simple.version>2.0.6</slf4j-simple.version>
         <kafka.version>3.6.0</kafka.version>
-        <strimzi-oauth-callback.version>0.12.0</strimzi-oauth-callback.version>
+        <strimzi-oauth-callback.version>0.14.0</strimzi-oauth-callback.version>
         <vertx-core.version>4.2.3</vertx-core.version>
         <netty.version>4.1.72.Final</netty.version>
         <maven-shade.version>3.2.1</maven-shade.version>
-        <kafka-kubernetes-config-provider.version>1.1.0</kafka-kubernetes-config-provider.version>
+        <kafka-kubernetes-config-provider.version>1.1.2</kafka-kubernetes-config-provider.version>
         <jaeger.version>1.8.1</jaeger.version>
-        <opentelemetry.alpha-version>1.19.0-alpha</opentelemetry.alpha-version>
-        <opentelemetry.version>1.19.0</opentelemetry.version>
-        <grpc.version>1.53.0</grpc.version>
+        <opentelemetry.alpha-version>1.31.0-alpha</opentelemetry.alpha-version>
+        <opentelemetry.version>1.31.0</opentelemetry.version>
+        <grpc.version>1.59.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
         <okhttp.version>4.10.0</okhttp.version>
         <picocli.version>4.7.5</picocli.version>
