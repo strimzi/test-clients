@@ -22,10 +22,10 @@ COPY ./scripts/ /bin
 COPY ./tmp/log4j2.properties /bin/log4j2.properties
 
 COPY tmp/clients-${VERSION}.jar /clients.jar
-COPY tmp/admin-client /admin-client
-
-ENV PATH="/admin-client/:$PATH"
+COPY tmp/admin-${VERSION}.jar /admin.jar
 
 USER 1001
+
+RUN echo 'alias admin-client="java -jar /admin.jar"' >> ~/.bashrc
 
 CMD ["/bin/run.sh", "clients.jar"]
