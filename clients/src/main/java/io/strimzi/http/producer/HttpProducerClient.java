@@ -141,6 +141,8 @@ public class HttpProducerClient implements ClientsInterface {
         ProducerRecord producerRecord = configuration.getDelay() == 0 ? generateMessages() : generateMessage(messageIndex);
 
         try {
+            LOGGER.info("Sending message(s): {}", producerRecord.message());
+
             HttpResponse httpResponse = httpHandle.finish(client.send(httpHandle.build(producerRecord.context()), HttpResponse.BodyHandlers.ofString()));
 
             if (httpResponse.statusCode() != HttpResponseStatus.OK.code()) {
