@@ -156,6 +156,8 @@ public class HttpConsumerClient implements ClientsInterface {
     public void consumeMessages() {
         HttpContext context = HttpContext.get(configuration.getConsumeMessagesURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE);
         try {
+            LOGGER.info("Receiving messages - sending HTTP request to {}", configuration.getConsumeMessagesURI());
+
             HttpResponse httpResponse = httpHandle.finish(client.send(httpHandle.build(context), HttpResponse.BodyHandlers.ofString()));
 
             if (httpResponse.statusCode() != HttpResponseStatus.OK.code()) {
