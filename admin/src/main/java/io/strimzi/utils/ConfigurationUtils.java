@@ -14,7 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 public class ConfigurationUtils {
 
@@ -91,6 +93,15 @@ public class ConfigurationUtils {
             System.out.println("Failed to load configuration file - no such file exist");
         }
         return configuration;
+    }
+
+    public static Map<String, String> getMapOfPropertiesFromConfigurationFile(String configFilePath) {
+        return getPropertiesFromConfigurationFile(configFilePath).entrySet().stream().collect(
+            Collectors.toMap(
+                e -> e.getKey().toString(),
+                e -> e.getValue().toString()
+            )
+        );
     }
 
     /**

@@ -5,12 +5,15 @@
 package io.strimzi.arguments.topic;
 
 import io.strimzi.admin.AdminProperties;
+import io.strimzi.utils.ConfigurationUtils;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.NewTopic;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Command for topic(s) creation.
@@ -27,6 +30,12 @@ public class CreateTopicCommand extends BasicTopicCommand {
 
     @CommandLine.Option(names = {"--topic-rep-factor", "-trf"}, description = "Topic's replication factor", required = true)
     int topicRepFactor;
+
+    @CommandLine.Option(names = {"--topic-config", "-tc"}, description = "Comma-separated list of additional configuration of the topic")
+    String topicConfig = "";
+
+    @CommandLine.Option(names = {"--topic-config-file", "-tcf"}, description = "File path to configuration file for the topic")
+    String topicConfigFilePath = "";
 
     @Override
     public Integer call() {
@@ -55,8 +64,29 @@ public class CreateTopicCommand extends BasicTopicCommand {
         List<NewTopic> topics = new ArrayList<>();
 
         this.getListOfTopicNames().forEach(topicName ->
-            topics.add(new NewTopic(topicName, topicPartitions, (short) topicRepFactor)));
+            topics.add(new NewTopic(topicName, topicPartitions, (short) topicRepFactor)
+                .configs(buildTopicConfigurationFromParameter()))
+        );
 
         return topics;
+    }
+
+    private Map<String, String> buildTopicConfigurationFromParameter() {
+        Map<String, String> topicConfigMap = new HashMap<>();
+
+        if (!topicConfig.isEmpty()) {
+            for (String config : topicConfig.split(",")) {
+                String[] keyValue = config.split("=");
+
+                // sanity check that we have really key and value
+                if (keyValue.length == 2) {
+                    topicConfigMap.put(keyValue[0], keyValue[1]);
+                }
+            }
+        } else if (!topicConfigFilePath.isEmpty()) {
+            topicConfigMap = ConfigurationUtils.getMapOfPropertiesFromConfigurationFile(topicConfigFilePath);
+        }
+
+        return topicConfigMap;
     }
 }
