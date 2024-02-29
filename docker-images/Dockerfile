@@ -4,7 +4,7 @@ USER root
 
 ARG JAVA_VERSION=17
 
-RUN microdnf update -y \
+RUN microdnf update \
     && microdnf install java-${JAVA_VERSION}-openjdk-headless shadow-utils -y \
     && microdnf clean all
 
