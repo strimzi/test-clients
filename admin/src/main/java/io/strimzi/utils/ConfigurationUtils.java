@@ -95,6 +95,12 @@ public class ConfigurationUtils {
         return configuration;
     }
 
+    /**
+     * Loads Properties from the configuration file specified by {@code configFilePath}
+     * and builds {@link Map} based on it.
+     * @param configFilePath file path to the configuration file
+     * @return {@link Map} with configuration from file
+     */
     public static Map<String, String> getMapOfPropertiesFromConfigurationFile(String configFilePath) {
         return getPropertiesFromConfigurationFile(configFilePath).entrySet().stream().collect(
             Collectors.toMap(

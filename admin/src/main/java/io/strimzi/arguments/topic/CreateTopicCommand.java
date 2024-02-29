@@ -71,6 +71,11 @@ public class CreateTopicCommand extends BasicTopicCommand {
         return topics;
     }
 
+    /**
+     * Based on {@link #topicConfig} and {@link #topicConfigFilePath} builds configuration of topic that should
+     * be applied during creation.
+     * @return {@link Map} of configuration based on {@link #topicConfig} and {@link #topicConfigFilePath}
+     */
     private Map<String, String> buildTopicConfigurationFromParameter() {
         Map<String, String> topicConfigMap = new HashMap<>();
 
@@ -84,7 +89,7 @@ public class CreateTopicCommand extends BasicTopicCommand {
                 }
             }
         } else if (!topicConfigFilePath.isEmpty()) {
-            topicConfigMap = ConfigurationUtils.getMapOfPropertiesFromConfigurationFile(topicConfigFilePath);
+            return ConfigurationUtils.getMapOfPropertiesFromConfigurationFile(topicConfigFilePath);
         }
 
         return topicConfigMap;
