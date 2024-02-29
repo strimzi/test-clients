@@ -31,10 +31,10 @@ public class CreateTopicCommand extends BasicTopicCommand {
     @CommandLine.Option(names = {"--topic-rep-factor", "-trf"}, description = "Topic's replication factor", required = true)
     int topicRepFactor;
 
-    @CommandLine.Option(names = {"--topic-config", "-tc"}, description = "Comma-separated list of additional configuration of the topic")
+    @CommandLine.Option(names = {"--topic-config"}, description = "Comma-separated list of additional configuration of the topic")
     String topicConfig = "";
 
-    @CommandLine.Option(names = {"--topic-config-file", "-tcf"}, description = "File path to configuration file for the topic")
+    @CommandLine.Option(names = {"--topic-config-file"}, description = "File path to configuration file for the topic")
     String topicConfigFilePath = "";
 
     @Override
