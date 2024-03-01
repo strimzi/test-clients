@@ -78,17 +78,14 @@ folder with the `config.properties` file will be created.
 
 ## Local development & testing
 
-In case you want to build the CLI tool locally, I recommend to install GraalVM and run
-```bash
-make prepare_admin_files
-cd docker-images/tmp/admin-client
-native-image -jar admin.jar admin-client
+As other clients, the admin client is build using Maven:
+
+```
+mvn clean install -pl admin
 ```
 
-You can use the `make` target:
-```bash
-make build_admin_cli
+and then you can run the client using (replace PROJECT_VERSION with current version of the project, found in root pom.xml):
+
 ```
-that build the application using `ghcr.io/graalvm/graalvm-community` image in Docker container, 
-but you can experience issues with platform dependencies etc., that's why I recommend installing GraalVM on your
-machine and building it completely locally.
+java -jar admin/target/admin-PROJECT_VERSION.jar
+```

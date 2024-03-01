@@ -14,15 +14,10 @@ copy_files:
 	mkdir -p docker-images/tmp/
 	cp clients/src/main/resources/log4j2.properties docker-images/tmp/log4j2.properties
 	cp clients/target/clients-$(VERSION).jar docker-images/tmp/clients-$(VERSION).jar
+	cp admin/target/admin-$(VERSION).jar docker-images/tmp/admin-$(VERSION).jar
 
 clean_files:
 	rm -rf docker-images/tmp/*
-
-build_admin_cli: prepare_admin_files docker_build_admin_cli
-
-prepare_admin_files:
-	mkdir -p docker-images/tmp/admin-client
-	cp admin/target/admin-$(VERSION).jar docker-images/tmp/admin-client/admin.jar
 
 next_version:
 	mvn versions:set -DnewVersion=$(shell echo $(NEXT_VERSION) | tr a-z A-Z)

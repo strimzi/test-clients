@@ -18,13 +18,14 @@ RUN useradd -r -m -u 1001 -g 0 strimzi
 ARG version=latest
 ENV VERSION ${version}
 
-COPY ./scripts/ /bin
+COPY ./scripts/run.sh /bin/run.sh
+COPY ./scripts/admin-client.sh /usr/bin/admin-client
 COPY ./tmp/log4j2.properties /bin/log4j2.properties
 
 COPY tmp/clients-${VERSION}.jar /clients.jar
-COPY tmp/admin-client /admin-client
+COPY tmp/admin-${VERSION}.jar /admin.jar
 
-ENV PATH="/admin-client/:$PATH"
+RUN chmod +x /usr/bin/admin-client
 
 USER 1001
 
