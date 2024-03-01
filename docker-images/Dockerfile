@@ -18,14 +18,15 @@ RUN useradd -r -m -u 1001 -g 0 strimzi
 ARG version=latest
 ENV VERSION ${version}
 
-COPY ./scripts/ /bin
+COPY ./scripts/run.sh /bin/run.sh
+COPY ./scripts/admin-client.sh /usr/bin/admin-client
 COPY ./tmp/log4j2.properties /bin/log4j2.properties
 
 COPY tmp/clients-${VERSION}.jar /clients.jar
 COPY tmp/admin-${VERSION}.jar /admin.jar
 
-USER 1001
+RUN chmod +x /usr/bin/admin-client
 
-RUN echo 'alias admin-client="java -jar /admin.jar"' >> ~/.bashrc
+USER 1001
 
 CMD ["/bin/run.sh", "clients.jar"]
