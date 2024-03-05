@@ -43,7 +43,6 @@
 
         <grpc.version>1.59.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
-        <okhttp.version>4.10.0</okhttp.version>
         <picocli.version>4.7.5</picocli.version>
         <sl4j-nop.version>1.7.36</sl4j-nop.version>
     </properties>
