@@ -49,6 +49,8 @@ public class OpenTelemetryHandle implements TracingHandle {
     public void initialize() {
         // disable metrics
         System.setProperty("otel.metrics.exporter", "none");
+        // disable otel logs exporter
+        System.setProperty("otel.logs.exporter", "none");
         AutoConfiguredOpenTelemetrySdk.initialize();
     }
 
@@ -93,8 +95,8 @@ public class OpenTelemetryHandle implements TracingHandle {
         public HttpRequest build(HttpContext context) {
             SpanBuilder spanBuilder = get().spanBuilder(operationName);
             spanBuilder.setSpanKind(SpanKind.CLIENT);
-            spanBuilder.setAttribute(SemanticAttributes.HTTP_METHOD, context.getRecord() == null ? "GET" : "POST");
-            spanBuilder.setAttribute(SemanticAttributes.HTTP_URL, context.getUri());
+            spanBuilder.setAttribute(SemanticAttributes.HTTP_REQUEST_METHOD, context.getRecord() == null ? "GET" : "POST");
+            spanBuilder.setAttribute(SemanticAttributes.URL_FULL, context.getUri());
             span = spanBuilder.startSpan();
             HttpRequest.Builder builder = builder(context);
             try (Scope ignored = span.makeCurrent()) {
@@ -107,7 +109,7 @@ public class OpenTelemetryHandle implements TracingHandle {
         public HttpResponse<T> finish(HttpResponse<T> response) {
             try (Scope ignored = span.makeCurrent()) {
                 int code = response.statusCode();
-                span.setAttribute(SemanticAttributes.HTTP_STATUS_CODE, code);
+                span.setAttribute(SemanticAttributes.HTTP_RESPONSE_STATUS_CODE, code);
                 span.setStatus(code == 200 ? StatusCode.OK : StatusCode.ERROR);
             } finally {
                 span.end();
