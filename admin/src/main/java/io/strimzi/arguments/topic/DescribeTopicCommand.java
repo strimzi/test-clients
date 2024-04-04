@@ -4,15 +4,15 @@
  */
 package io.strimzi.arguments.topic;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.strimzi.admin.AdminProperties;
+import io.strimzi.models.KafkaTopicDescription;
+import io.strimzi.utils.OutputFormat;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.TopicDescription;
 import picocli.CommandLine;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,8 +23,8 @@ import java.util.List;
 @CommandLine.Command(name = "describe")
 public class DescribeTopicCommand extends BasicTopicCommand {
 
-    @CommandLine.Option(names = {"--output", "-o"}, description = "Output format with supported json or plain (default) values")
-    private String outputFormat = "plain";
+    @CommandLine.Option(names = {"--output", "-o"}, defaultValue = "plain", description = "Output format with supported json or plain (default) values")
+    private OutputFormat outputFormat;
 
     @Override
     public Integer call() {
@@ -37,37 +37,38 @@ public class DescribeTopicCommand extends BasicTopicCommand {
      */
     private Integer describeTopics() {
         try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
-            ObjectMapper mapper = new ObjectMapper();
-            ArrayNode topicsArray = mapper.createArrayNode();
+            List<KafkaTopicDescription> kafkaTopicDescriptionList = new LinkedList<>();
 
-            admin.describeTopics(List.of(this.getTopicPrefixOrName())).topicNameValues().forEach((key, value) -> {
+            // parse kafka response
+            admin.describeTopics(this.getListOfTopicNames()).topicNameValues().forEach((key, value) -> {
                 try {
                     final TopicDescription description = value.get();
-                    final String topicName = description.name();
                     final int partitionCount = description.partitions().size();
+                    // as each partition has the same size, replica count is deduced from first partition
                     final int replicaCount = description.partitions().get(0).replicas().size();
-
-                    if ("plain".equals(outputFormat)) {
-                        System.out.println("name: " + topicName + ", partitions: " + partitionCount + ", replicas: " + replicaCount);
-                    } else {
-                        ObjectNode topicObject = topicsArray.addObject();
-                        topicObject.put("name", topicName);
-                        topicObject.put("partitions", partitionCount);
-                        topicObject.put("replicas", replicaCount);
-                    }
-
+                    KafkaTopicDescription kafkaTopicDescription = new KafkaTopicDescription(key, partitionCount, replicaCount);
+                    kafkaTopicDescriptionList.add(kafkaTopicDescription);
                 } catch (Exception e) {
-                    throw new RuntimeException("Unable to describe topic: " + this.getTopicPrefixOrName() + " due: " + e.getCause());
+                    throw new RuntimeException("Unable to describe topic: " + key + " due: " + e.getCause());
                 }
             });
 
-            if (!"plain".equals(outputFormat)) {
-                try {
-                    System.out.println(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(topicsArray));
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException("Unable to produce JSON object while describing topics: " + this.getTopicPrefixOrName() + " due: " + e.getCause());
-                }
+            // provide admin response
+            switch (outputFormat) {
+                case PLAIN:
+                    for (KafkaTopicDescription topic : kafkaTopicDescriptionList) {
+                        System.out.println("name:" + topic.name() + ", partitions:" + topic.partitionCount() + ", replicas:" + topic.replicaCount());
+                    }
+                    break;
+                case JSON:
+                    ObjectMapper mapper = new ObjectMapper();
+                    System.out.println(mapper.writeValueAsString(kafkaTopicDescriptionList));
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unsupported output format: " + outputFormat);
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Unable to describe topics due: " + e);
         }
         return 0;
     }
