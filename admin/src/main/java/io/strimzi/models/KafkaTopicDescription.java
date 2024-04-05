@@ -4,6 +4,36 @@
  */
 package io.strimzi.models;
 
+import org.apache.kafka.clients.admin.TopicDescription;
 
-public record KafkaTopicDescription(String name, int partitionCount, int replicaCount) {
+public class KafkaTopicDescription {
+    private String name;
+    private int partitionCount;
+    private int replicaCount;
+
+    private KafkaTopicDescription(String name, int partitionCount, int replicaCount) {
+        this.name = name;
+        this.partitionCount = partitionCount;
+        this.replicaCount = replicaCount;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPartitionCount() {
+        return partitionCount;
+    }
+
+    public int getReplicaCount() {
+        return replicaCount;
+    }
+
+    public static KafkaTopicDescription parseKafkaTopicDescription(final TopicDescription adminClientTopicDescription) {
+        final int partitionCount = adminClientTopicDescription.partitions().size();
+        // as each partition has the same size, replica count is deduced from first partition
+        final int replicaCount = adminClientTopicDescription.partitions().get(0).replicas().size();
+        final String name = adminClientTopicDescription.name();
+        return new KafkaTopicDescription(name, partitionCount, replicaCount);
+    }
 }

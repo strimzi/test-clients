@@ -11,6 +11,7 @@ public class Main {
 
     public static void main(String[] args) {
         CommandLine commandLine = new CommandLine(new KafkaAdminClient());
+        commandLine.setCaseInsensitiveEnumValuesAllowed(true);
 
         CommandLine.Help.ColorScheme colorScheme = new CommandLine.Help.ColorScheme.Builder()
             .commands(CommandLine.Help.Ansi.Style.bold, CommandLine.Help.Ansi.Style.italic, CommandLine.Help.Ansi.Style.fg_magenta)
