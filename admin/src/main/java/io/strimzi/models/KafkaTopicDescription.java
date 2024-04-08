@@ -6,16 +6,7 @@ package io.strimzi.models;
 
 import org.apache.kafka.clients.admin.TopicDescription;
 
-public class KafkaTopicDescription {
-    private String name;
-    private int partitionCount;
-    private int replicaCount;
-
-    private KafkaTopicDescription(String name, int partitionCount, int replicaCount) {
-        this.name = name;
-        this.partitionCount = partitionCount;
-        this.replicaCount = replicaCount;
-    }
+public record KafkaTopicDescription(String name, int partitionCount, int replicaCount) {
 
     public String getName() {
         return name;

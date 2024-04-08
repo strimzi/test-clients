@@ -33,6 +33,4 @@ public class DescribeTopicsUtils {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(kafkaTopicDescriptionList);
     }
-
-
 }

@@ -48,8 +48,7 @@ public class DescribeTopicCommand extends BasicTopicCommand {
             });
 
             // provide response
-            final String cmdOutput = DescribeTopicsUtils.getOutput(outputFormat, kafkaTopicDescriptionList);
-            System.out.println(cmdOutput);
+            System.out.println(DescribeTopicsUtils.getOutput(outputFormat, kafkaTopicDescriptionList));
 
         } catch (Exception e) {
             throw new RuntimeException("Unable to describe topics due: " + e);
