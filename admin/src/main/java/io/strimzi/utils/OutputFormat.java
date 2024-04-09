@@ -4,6 +4,10 @@
  */
 package io.strimzi.utils;
 
+/**
+ * This enumeration specifies the different types of formats
+ * that can be used to represent and output data.
+ */
 public enum OutputFormat {
     JSON("json"),
     PLAIN("plain");
