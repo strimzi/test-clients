@@ -22,4 +22,7 @@ import picocli.CommandLine;
     }
 )
 public class ConfigureCommand {
+
+    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message", scope = CommandLine.ScopeType.INHERIT)
+    boolean usageHelpRequested;
 }

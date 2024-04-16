@@ -5,10 +5,15 @@
 package io.strimzi.arguments.topic;
 
 import io.strimzi.arguments.BasicCommand;
+import io.strimzi.constants.Constants;
+import org.apache.kafka.clients.admin.Admin;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Base for topic command
@@ -49,5 +54,31 @@ public class BasicTopicCommand extends BasicCommand {
         }
 
         return topicNames;
+    }
+
+    /**
+     * From provided list of topics (present in Kafka) it filters the topics with specified prefix.
+     *
+     * @param topicsInKafka     list of topics present in Kafka
+     *
+     * @return  list of topics filtered by prefix
+     */
+    List<String> filterTopicsPresentInKafkaByPrefix(List<String> topicsInKafka) {
+        return topicsInKafka.stream().filter(name -> name.contains(this.getTopicPrefixOrName())).toList();
+    }
+
+    /**
+     * Lists topics that are present in Kafka.
+     *
+     * @param admin     Admin client object configured by user specified configuration
+     *
+     * @return      list of topics present in Kafka
+     *
+     * @throws ExecutionException       execution exception
+     * @throws InterruptedException     interrupted exception
+     * @throws TimeoutException         timeout exception
+     */
+    List<String> getListOfTopicsInKafka(Admin admin) throws ExecutionException, InterruptedException, TimeoutException {
+        return admin.listTopics().names().get(Constants.CALL_TIMEOUT_MS, TimeUnit.MILLISECONDS).stream().toList();
     }
 }
