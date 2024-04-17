@@ -76,13 +76,24 @@ public class ConfigurationUtils {
     }
 
     /**
+     * Checks whether properties for the admin-client exists.
+     * If yes, this properties file is loaded and returned.
+     * Otherwise, empty {@link Properties} object is returned.
+     *
+     * @return  {@link Properties} object with configuration of admin-client
+     */
+    public static Properties getAdminClientPropertiesIfExists() {
+        if (Files.exists(Paths.get(getConfigFilePath()))) {
+            return getPropertiesFromConfigurationFile(getConfigFilePath());
+        }
+
+        return new Properties();
+    }
+
+    /**
      * Loads Properties from the config.properties file
      * @return Properties loaded from the config.properties file
      */
-    public static Properties getPropertiesFromConfigurationFile() {
-        return getPropertiesFromConfigurationFile(getConfigFilePath());
-    }
-
     public static Properties getPropertiesFromConfigurationFile(String configFilePath) {
         File configFile = new File(configFilePath);
         Properties configuration = new Properties();
@@ -121,7 +132,7 @@ public class ConfigurationUtils {
         if (!configurationFileExists()) {
             createConfigurationFolderAndFile();
         }
-        Properties currentConfiguration = getPropertiesFromConfigurationFile();
+        Properties currentConfiguration = getAdminClientPropertiesIfExists();
         currentConfiguration.putAll(properties);
 
         try (FileOutputStream fileOutputStream = new FileOutputStream(getConfigFilePath())) {

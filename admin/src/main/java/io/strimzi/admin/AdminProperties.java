@@ -24,7 +24,7 @@ public class AdminProperties {
      * @return Kafka Properties
      */
     public static Properties adminProperties(String bootstrapServer) {
-        Properties properties = transformAllLoadedProperties(ConfigurationUtils.getPropertiesFromConfigurationFile());
+        Properties properties = transformAllLoadedProperties(ConfigurationUtils.getAdminClientPropertiesIfExists());
 
         // list of fields that can contain reference to file
         List<String> sslFields = List.of(
