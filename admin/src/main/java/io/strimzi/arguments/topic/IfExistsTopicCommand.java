@@ -6,6 +6,7 @@ package io.strimzi.arguments.topic;
 
 import picocli.CommandLine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +30,10 @@ public class IfExistsTopicCommand extends BasicTopicCommand {
      *
      * @return  list of topics that should be managed
      */
-    List<String> checkIfTopicExists(List<String> topicsInKafka, List<String> expectedTopics) {
+    List<String> checkIfTopicsExistAndReturnUpdatedList(List<String> topicsInKafka, List<String> expectedTopics) {
+        // we need to clone it to not catch the ConcurrentModificationException
+        List<String> finalTopics = new ArrayList<>(expectedTopics);
+
         expectedTopics.forEach(expectedTopic -> {
             if (topicsInKafka.stream().noneMatch(expectedTopic::equals)) {
                 if (!ifExists) {
@@ -38,11 +42,11 @@ public class IfExistsTopicCommand extends BasicTopicCommand {
                     System.out.println("Topic: " + expectedTopic + " is not present in Kafka and will be ignored in the following operation.");
                     // in case that the topic is not present in Kafka, and we don't want to report the error if it doesn't exist (specified by --if-exists)
                     // we want to remove this topic from the list
-                    expectedTopics.remove(expectedTopic);
+                    finalTopics.remove(expectedTopic);
                 }
             }
         });
 
-        return expectedTopics;
+        return finalTopics;
     }
 }

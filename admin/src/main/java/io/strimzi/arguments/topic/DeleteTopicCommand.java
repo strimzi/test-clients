@@ -36,10 +36,12 @@ public class DeleteTopicCommand extends IfExistsTopicCommand {
 
             List<String> listOfTopics = all ? filterTopicsPresentInKafkaByPrefix(topicsInKafka) : this.getListOfTopicNames();
 
-            listOfTopics = checkIfTopicExists(topicsInKafka, listOfTopics);
-            admin.deleteTopics(listOfTopics).all().get();
+            listOfTopics = checkIfTopicsExistAndReturnUpdatedList(topicsInKafka, listOfTopics);
 
-            System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully deleted");
+            if (!listOfTopics.isEmpty()) {
+                admin.deleteTopics(listOfTopics).all().get();
+                System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully deleted");
+            }
             return 0;
         } catch (Exception e) {
             throw new RuntimeException("Unable to delete topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " due: " + e.getCause());

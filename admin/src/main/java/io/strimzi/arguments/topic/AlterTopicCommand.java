@@ -36,16 +36,18 @@ public class AlterTopicCommand extends IfExistsTopicCommand {
     private Integer alterTopic() {
         try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
             List<String> topicsInKafka = getListOfTopicsInKafka(admin);
-            checkIfTopicExists(topicsInKafka, this.getListOfTopicNames());
 
             Map<String, NewPartitions> alteredTopics = new HashMap<>();
+            List<String> listOfTopics = checkIfTopicsExistAndReturnUpdatedList(topicsInKafka, this.getListOfTopicNames());
 
-            this.getListOfTopicNames().forEach(topic ->
-                alteredTopics.put(topic, NewPartitions.increaseTo(this.topicPartitions))
-            );
+            if (!listOfTopics.isEmpty()) {
+                listOfTopics.forEach(topic ->
+                    alteredTopics.put(topic, NewPartitions.increaseTo(this.topicPartitions))
+                );
 
-            admin.createPartitions(alteredTopics).all().get();
-            System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully altered.");
+                admin.createPartitions(alteredTopics).all().get();
+                System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully altered.");
+            }
             return 0;
         } catch (Exception e) {
             throw new RuntimeException("Unable to alter topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " due: " + e.getCause());
