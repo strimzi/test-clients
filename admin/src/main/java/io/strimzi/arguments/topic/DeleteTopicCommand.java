@@ -9,8 +9,6 @@ import org.apache.kafka.clients.admin.Admin;
 import picocli.CommandLine;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
 
 /**
  * Command for topic(s) deletion.
@@ -18,7 +16,7 @@ import java.util.stream.Collectors;
  * Accessed using `admin-client topic delete`
  */
 @CommandLine.Command(name = "delete")
-public class DeleteTopicCommand extends BasicTopicCommand {
+public class DeleteTopicCommand extends IfExistsTopicCommand {
 
     @CommandLine.Option(names = "--all", description = "Flag for deleting all topics with specified prefix, defaults to false")
     boolean all = false;
@@ -34,18 +32,19 @@ public class DeleteTopicCommand extends BasicTopicCommand {
      */
     private Integer deleteTopic() {
         try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
-            List<String> listOfTopics = all ? getListOfTopicsWithPrefix(admin) : this.getListOfTopicNames();
+            List<String> topicsInKafka = getListOfTopicsInKafka(admin);
 
-            admin.deleteTopics(listOfTopics).all().get();
+            List<String> listOfTopics = all ? filterTopicsPresentInKafkaByPrefix(topicsInKafka) : this.getListOfTopicNames();
 
-            System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully deleted");
+            listOfTopics = checkIfTopicsExistAndReturnUpdatedList(topicsInKafka, listOfTopics);
+
+            if (!listOfTopics.isEmpty()) {
+                admin.deleteTopics(listOfTopics).all().get();
+                System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully deleted");
+            }
             return 0;
         } catch (Exception e) {
             throw new RuntimeException("Unable to delete topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " due: " + e.getCause());
         }
-    }
-
-    private List<String> getListOfTopicsWithPrefix(Admin admin) throws ExecutionException, InterruptedException {
-        return admin.listTopics().names().get().stream().filter(name -> name.contains(this.getTopicPrefixOrName())).collect(Collectors.toList());
     }
 }

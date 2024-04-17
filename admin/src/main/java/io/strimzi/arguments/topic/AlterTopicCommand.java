@@ -10,6 +10,7 @@ import org.apache.kafka.clients.admin.NewPartitions;
 import picocli.CommandLine;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,7 +19,7 @@ import java.util.Map;
  * It is not updating configuration of topic.
  */
 @CommandLine.Command(name = "alter")
-public class AlterTopicCommand extends BasicTopicCommand {
+public class AlterTopicCommand extends IfExistsTopicCommand {
 
     @CommandLine.Option(names = {"--topic-partitions", "-tp"}, description = "Number of topic partitions", required = true)
     int topicPartitions;
@@ -33,15 +34,20 @@ public class AlterTopicCommand extends BasicTopicCommand {
      * @return return code of the operation - 0 success, 1 exception
      */
     private Integer alterTopic() {
-        Map<String, NewPartitions> alteredTopics = new HashMap<>();
-
-        this.getListOfTopicNames().forEach(topic ->
-            alteredTopics.put(topic, NewPartitions.increaseTo(this.topicPartitions))
-        );
-
         try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
-            admin.createPartitions(alteredTopics).all().get();
-            System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully altered.");
+            List<String> topicsInKafka = getListOfTopicsInKafka(admin);
+
+            Map<String, NewPartitions> alteredTopics = new HashMap<>();
+            List<String> listOfTopics = checkIfTopicsExistAndReturnUpdatedList(topicsInKafka, this.getListOfTopicNames());
+
+            if (!listOfTopics.isEmpty()) {
+                listOfTopics.forEach(topic ->
+                    alteredTopics.put(topic, NewPartitions.increaseTo(this.topicPartitions))
+                );
+
+                admin.createPartitions(alteredTopics).all().get();
+                System.out.println("Topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " successfully altered.");
+            }
             return 0;
         } catch (Exception e) {
             throw new RuntimeException("Unable to alter topic(s) with name/prefix: " + this.getTopicPrefixOrName() + " due: " + e.getCause());

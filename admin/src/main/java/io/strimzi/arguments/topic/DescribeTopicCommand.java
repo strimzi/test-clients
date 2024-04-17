@@ -20,7 +20,7 @@ import java.util.List;
  * Accessed using `admin-client topic describe`
  */
 @CommandLine.Command(name = "describe")
-public class DescribeTopicCommand extends BasicTopicCommand {
+public class DescribeTopicCommand extends IfExistsTopicCommand {
 
     @CommandLine.Option(names = {"--output", "-o"}, defaultValue = "plain", description = "Output format supports: ${COMPLETION-CANDIDATES}")
     private OutputFormat outputFormat;
@@ -36,10 +36,13 @@ public class DescribeTopicCommand extends BasicTopicCommand {
      */
     private Integer describeTopics() {
         try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
+            List<String> topicsInKafka = getListOfTopicsInKafka(admin);
+            List<String> desiredTopics = checkIfTopicsExistAndReturnUpdatedList(topicsInKafka, this.getListOfTopicNames());
+
             List<KafkaTopicDescription> kafkaTopicDescriptionList = new LinkedList<>();
 
             // parse response from java admin
-            admin.describeTopics(this.getListOfTopicNames()).topicNameValues().forEach((key, value) -> {
+            admin.describeTopics(desiredTopics).topicNameValues().forEach((key, value) -> {
                 try {
                     kafkaTopicDescriptionList.add(KafkaTopicDescription.parseKafkaTopicDescription(value.get()));
                 } catch (Exception e) {

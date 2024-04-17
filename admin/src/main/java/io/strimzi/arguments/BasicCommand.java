@@ -15,9 +15,6 @@ public class BasicCommand implements CommandInterface {
     @CommandLine.Option(names = "--bootstrap-server", description = "Bootstrap server address")
     protected String bootstrapServer;
 
-    @CommandLine.Option(names = {"-h", "--help"}, usageHelp = true, description = "Display this help message")
-    boolean usageHelpRequested;
-
     @Override
     public Integer call() {
         throw new UnsupportedOperationException("Not supported");
