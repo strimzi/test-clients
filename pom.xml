@@ -41,7 +41,7 @@
         <opentelemetry-semconv.version>1.21.0-alpha</opentelemetry-semconv.version>
         <opentelemetry.instrumentation.version>1.32.0-alpha</opentelemetry.instrumentation.version>
 
-        <grpc.version>1.59.0</grpc.version>
+        <grpc.version>1.61.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
         <picocli.version>4.7.5</picocli.version>
         <sl4j-nop.version>1.7.36</sl4j-nop.version>
@@ -135,6 +135,12 @@
                         <artifactId>opentelemetry-exporter-sender-okhttp</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-exporter-sender-grpc-managed-channel</artifactId>
+                <version>${opentelemetry.version}</version>
+                <scope>runtime</scope>
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
