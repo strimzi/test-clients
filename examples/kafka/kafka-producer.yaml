@@ -36,7 +36,7 @@ spec:
               value: DEBUG
             - name: CLIENT_TYPE
               value: KafkaProducer
-          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.7.0
+          image: quay.io/strimzi-test-clients/test-clients:0.8.0-kafka-3.7.0
           imagePullPolicy: IfNotPresent
           name: kafka-producer-client
       restartPolicy: "Never"
