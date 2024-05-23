@@ -16,6 +16,7 @@ public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
     private final String clientId;
     private final String clientRack;
     private final String topicName;
+    private final String outputFormat;
 
     public KafkaConsumerConfiguration(Map<String, String> map) {
         super(map);
@@ -23,6 +24,7 @@ public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
         this.clientId = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.CLIENT_ID_ENV), ConfigurationConstants.DEFAULT_CLIENT_ID);
         this.clientRack = map.get(ConfigurationConstants.CLIENT_RACK_ENV);
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
+        this.outputFormat = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.OUTPUT_FORMAT_ENV), ConfigurationConstants.DEFAULT_OUTPUT_FORMAT);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
     }
@@ -43,6 +45,8 @@ public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
         return topicName;
     }
 
+    public String getOutputFormat() { return outputFormat; }
+
     @Override
     public String toString() {
         return "KafkaConsumerConfiguration:\n" +
@@ -50,6 +54,7 @@ public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
             "groupId='" + this.getGroupId() + "',\n" +
             "clientId='" + this.getClientId() + "',\n" +
             "clientRack='" + this.getClientRack() + "',\n" +
-            "topicName='" + this.getTopicName() + "'";
+            "topicName='" + this.getTopicName() + "',\n" +
+            "outputFormat='" + this.getOutputFormat() + "'";
     }
 }

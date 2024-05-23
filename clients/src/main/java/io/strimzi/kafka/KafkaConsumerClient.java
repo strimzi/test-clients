@@ -104,7 +104,7 @@ public class KafkaConsumerClient implements ClientsInterface {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 
         for (ConsumerRecord<String, String> record : records) {
-            if (requiresJsonFormat()) {
+            if (configuration.getOutputFormat().equalsIgnoreCase("json")) {
                 LOGGER.info("Received message: {}", getJsonRecord(record));
             } else {
                 LOGGER.info("Received message:");
@@ -122,11 +122,6 @@ public class KafkaConsumerClient implements ClientsInterface {
         }
 
         consumer.commitSync();
-    }
-
-    private boolean requiresJsonFormat() {
-        return configuration.getAdditionalConfig().containsKey("output") &&
-                configuration.getAdditionalConfig().get("output").toString().equalsIgnoreCase("json");
     }
 
     private String getJsonRecord(ConsumerRecord<String, String> consumerRecord) {

@@ -74,6 +74,7 @@ Kafka Consumer
 * `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
+* `OUTPUT_FORMAT` - the output format for received messages: `plain` (default value) or `json`
 * `ADDITIONAL_CONFIG` - additional configuration for a consumer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
 
 Kafka Streams
