@@ -106,8 +106,7 @@ public class KafkaConsumerClient implements ClientsInterface {
         for (ConsumerRecord<String, String> record : records) {
             if (requiresJsonFormat()) {
                 LOGGER.info("Received message: {}", getJsonRecord(record));
-            }
-            else {
+            } else {
                 LOGGER.info("Received message:");
                 LOGGER.info("\tpartition: {}", record.partition());
                 LOGGER.info("\toffset: {}", record.offset());
