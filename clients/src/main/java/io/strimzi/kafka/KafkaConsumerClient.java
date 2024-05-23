@@ -8,6 +8,7 @@ import io.strimzi.common.ClientsInterface;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.kafka.KafkaConsumerConfiguration;
 import io.strimzi.common.properties.KafkaProperties;
+import io.strimzi.models.KafkaConsumerRecord;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -28,7 +29,6 @@ import java.util.concurrent.TimeUnit;
 public class KafkaConsumerClient implements ClientsInterface {
     private static final Logger LOGGER = LogManager.getLogger(KafkaConsumerClient.class);
     private final KafkaConsumerConfiguration configuration;
-    private final Properties properties;
     private final KafkaConsumer consumer;
     private int consumedMessages;
     private final ScheduledExecutorService scheduledExecutor;
@@ -36,10 +36,10 @@ public class KafkaConsumerClient implements ClientsInterface {
 
     public KafkaConsumerClient(Map<String, String> configuration) {
         this.configuration = new KafkaConsumerConfiguration(configuration);
-        this.properties = KafkaProperties.consumerProperties(this.configuration);
+        Properties properties = KafkaProperties.consumerProperties(this.configuration);
         TracingUtil.getTracing().addTracingPropsToConsumerConfig(properties);
 
-        this.consumer = new KafkaConsumer(this.properties);
+        this.consumer = new KafkaConsumer(properties);
         this.consumedMessages = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-consumer"));
         this.countDownLatch  = new CountDownLatch(1);
@@ -47,7 +47,7 @@ public class KafkaConsumerClient implements ClientsInterface {
 
     @Override
     public void run() {
-        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
+        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration);
 
         consumer.subscribe(Collections.singletonList(configuration.getTopicName()));
 
@@ -103,17 +103,18 @@ public class KafkaConsumerClient implements ClientsInterface {
     public void consumeMessages() {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 
-        for (ConsumerRecord<String, String> record : records) {
+        for (ConsumerRecord<String, String> consumerRecord : records) {
             if (configuration.getOutputFormat().equalsIgnoreCase("json")) {
-                LOGGER.info("Received message: {}", getJsonRecord(record));
+                String jsonLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).toJsonString();
+                LOGGER.info("Received message: {}", jsonLog);
             } else {
                 LOGGER.info("Received message:");
-                LOGGER.info("\tpartition: {}", record.partition());
-                LOGGER.info("\toffset: {}", record.offset());
-                LOGGER.info("\tvalue: {}", record.value());
-                if (record.headers() != null) {
+                LOGGER.info("\tpartition: {}", consumerRecord.partition());
+                LOGGER.info("\toffset: {}", consumerRecord.offset());
+                LOGGER.info("\tvalue: {}", consumerRecord.value());
+                if (consumerRecord.headers() != null) {
                     LOGGER.info("\theaders: ");
-                    for (Header header : record.headers()) {
+                    for (Header header : consumerRecord.headers()) {
                         LOGGER.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
                     }
                 }
@@ -122,27 +123,5 @@ public class KafkaConsumerClient implements ClientsInterface {
         }
 
         consumer.commitSync();
-    }
-
-    private String getJsonRecord(ConsumerRecord<String, String> consumerRecord) {
-        StringBuilder result = new StringBuilder(
-                String.format("{\"timestamp\":%s,\"timestampType\":\"%s\",\"topic\":\"%s\",\"partition\":%s,\"offset\":%s,\"key\":%s,\"payload\":%s",
-                        consumerRecord.timestamp(),
-                        consumerRecord.timestampType(),
-                        consumerRecord.topic(),
-                        consumerRecord.partition(),
-                        consumerRecord.offset(),
-                        consumerRecord.key(),
-                        consumerRecord.value()));
-        if (consumerRecord.headers() != null) {
-            result.append(",\"headers\":[");
-            for (Header header : consumerRecord.headers()) {
-                result.append(String.format("{\"key\":\"%s\",\"value\":\"%s\"},", header.key(), new String(header.value())));
-            }
-            result.deleteCharAt(result.lastIndexOf(","));
-            result.append("]");
-        }
-        result.append("}");
-        return result.toString();
     }
 }

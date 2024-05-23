@@ -2,9 +2,11 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.common.records.http.consumer;
+package io.strimzi.common.records.consumer.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.strimzi.common.records.http.consumer.ConsumerRecord;
+import io.strimzi.common.records.http.consumer.ConsumerRecordUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
