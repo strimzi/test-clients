@@ -98,7 +98,7 @@ public record KafkaConsumerRecord(long timestamp, TimestampType timestampType, S
      * @param consumerRecord the consumer record
      * @return the kafka consumer record
      */
-    public static KafkaConsumerRecord parseKafkaConsumerRecord(final ConsumerRecord<String,String> consumerRecord) {
+    public static KafkaConsumerRecord parseKafkaConsumerRecord(final ConsumerRecord<String, String> consumerRecord) {
         List<Map<String, String>> headers = new ArrayList<>();
         consumerRecord.headers().forEach(h -> headers.add(Map.of(h.key(), new String(h.value(), StandardCharsets.UTF_8))));
         return new KafkaConsumerRecord(
@@ -121,8 +121,7 @@ public record KafkaConsumerRecord(long timestamp, TimestampType timestampType, S
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);
-        }
-        catch (JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             throw new IllegalArgumentException(e);
         }
     }
