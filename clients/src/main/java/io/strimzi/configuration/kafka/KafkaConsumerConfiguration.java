@@ -45,7 +45,9 @@ public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
         return topicName;
     }
 
-    public String getOutputFormat() { return outputFormat; }
+    public String getOutputFormat() {
+        return outputFormat;
+    }
 
     @Override
     public String toString() {
