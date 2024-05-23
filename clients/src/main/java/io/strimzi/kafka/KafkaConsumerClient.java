@@ -104,19 +104,51 @@ public class KafkaConsumerClient implements ClientsInterface {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 
         for (ConsumerRecord<String, String> record : records) {
-            LOGGER.info("Received message:");
-            LOGGER.info("\tpartition: {}", record.partition());
-            LOGGER.info("\toffset: {}", record.offset());
-            LOGGER.info("\tvalue: {}", record.value());
-            if (record.headers() != null) {
-                LOGGER.info("\theaders: ");
-                for (Header header : record.headers()) {
-                    LOGGER.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
+            if (requiresJsonFormat()) {
+                LOGGER.info("Received message: {}", getJsonRecord(record));
+            }
+            else {
+                LOGGER.info("Received message:");
+                LOGGER.info("\tpartition: {}", record.partition());
+                LOGGER.info("\toffset: {}", record.offset());
+                LOGGER.info("\tvalue: {}", record.value());
+                if (record.headers() != null) {
+                    LOGGER.info("\theaders: ");
+                    for (Header header : record.headers()) {
+                        LOGGER.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
+                    }
                 }
             }
             consumedMessages++;
         }
 
         consumer.commitSync();
+    }
+
+    private boolean requiresJsonFormat() {
+        return configuration.getAdditionalConfig().containsKey("output") &&
+                configuration.getAdditionalConfig().get("output").toString().equalsIgnoreCase("json");
+    }
+
+    private String getJsonRecord(ConsumerRecord<String, String> consumerRecord) {
+        StringBuilder result = new StringBuilder(
+                String.format("{\"timestamp\":%s,\"timestampType\":\"%s\",\"topic\":\"%s\",\"partition\":%s,\"offset\":%s,\"key\":%s,\"payload\":%s",
+                        consumerRecord.timestamp(),
+                        consumerRecord.timestampType(),
+                        consumerRecord.topic(),
+                        consumerRecord.partition(),
+                        consumerRecord.offset(),
+                        consumerRecord.key(),
+                        consumerRecord.value()));
+        if (consumerRecord.headers() != null) {
+            result.append(",\"headers\":[");
+            for (Header header : consumerRecord.headers()) {
+                result.append(String.format("{\"key\":\"%s\",\"value\":\"%s\"},", header.key(), new String(header.value())));
+            }
+            result.deleteCharAt(result.lastIndexOf(","));
+            result.append("]");
+        }
+        result.append("}");
+        return result.toString();
     }
 }

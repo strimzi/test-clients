@@ -32,6 +32,20 @@ public class KafkaConsumerConfigurationTest {
     }
 
     @Test
+    void testAdditionalConfiguration() {
+        String key = "output";
+        String value = "json";
+        Map<String, String> configuration = new HashMap<>();
+        configuration.put(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV, "my-cluster-kafka:9092");
+        configuration.put(ConfigurationConstants.TOPIC_ENV, "my-topic");
+        configuration.put(ConfigurationConstants.ADDITIONAL_CONFIG_ENV, key + "=" + value);
+
+        KafkaConsumerConfiguration kafkaConsumerConfiguration = new KafkaConsumerConfiguration(configuration);
+
+        assertThat(kafkaConsumerConfiguration.getAdditionalConfig().getProperty(key), is(value));
+    }
+
+    @Test
     void testCustomConfiguration() {
         String clientId = "random-client-id";
         String groupId = "random-group-id";
