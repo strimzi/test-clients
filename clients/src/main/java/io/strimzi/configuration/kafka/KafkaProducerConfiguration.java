@@ -21,6 +21,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
     private final String topicName;
     private final boolean transactionalProducer;
     private final String message;
+    private final String messageKey;
     public KafkaProducerConfiguration(Map<String, String> map) {
         super(map);
         this.acks = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.PRODUCER_ACKS_ENV), ConfigurationConstants.DEFAULT_PRODUCER_ACKS);
@@ -28,6 +29,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.messagesPerTransaction = ClientsConfigurationUtils.parseIntOrDefault(map.get(ConfigurationConstants.MESSAGES_PER_TRANSACTION_ENV), ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION);
         this.transactionalProducer = getAdditionalConfig().toString().contains(ProducerConfig.TRANSACTIONAL_ID_CONFIG);
         this.message = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_ENV), ConfigurationConstants.DEFAULT_MESSAGE);
+        this.messageKey = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_KEY_ENV), null);
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
@@ -57,6 +59,10 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         return message;
     }
 
+    public String getMessageKey() {
+        return messageKey;
+    }
+
     @Override
     public String toString() {
         return "KafkaProducerConfiguration:\n" +
@@ -66,6 +72,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
             "topicName='" + this.getTopicName() + "',\n" +
             "messagesPerTransaction='" + this.getMessagesPerTransaction() + "',\n" +
             "transactionalProducer='" + this.isTransactionalProducer() + "',\n" +
+            "messageKey='" + this.getMessageKey() + "',\n" +
             "message='" + this.getMessage() + "'";
     }
 }

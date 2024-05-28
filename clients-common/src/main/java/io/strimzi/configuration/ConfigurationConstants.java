@@ -36,6 +36,11 @@ public interface ConfigurationConstants {
     String POLL_TIMEOUT_ENV = "POLL_TIMEOUT";
 
     /**
+     * Producer environment variables
+     */
+    String MESSAGE_KEY_ENV = "MESSAGE_KEY";
+
+    /**
      * Common environment variables
      */
     String GROUP_ID_ENV = "GROUP_ID";

@@ -14,6 +14,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,6 @@ public class KafkaProducerClient implements ClientsInterface {
 
     private static final Logger LOGGER = LogManager.getLogger(KafkaProducerClient.class);
     private final KafkaProducerConfiguration configuration;
-    private final Properties properties;
     private final KafkaProducer producer;
     private int messageIndex;
     private int messageSuccessfullySent;
@@ -37,10 +37,10 @@ public class KafkaProducerClient implements ClientsInterface {
 
     public KafkaProducerClient(Map<String, String> configuration) {
         this.configuration = new KafkaProducerConfiguration(configuration);
-        this.properties = KafkaProperties.producerProperties(this.configuration);
+        Properties properties = KafkaProperties.producerProperties(this.configuration);
         TracingUtil.getTracing().addTracingPropsToProducerConfig(properties);
 
-        this.producer = new KafkaProducer<>(this.properties);
+        this.producer = new KafkaProducer<>(properties);
         this.messageIndex = 0;
         this.messageSuccessfullySent = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-producer"));
@@ -49,7 +49,7 @@ public class KafkaProducerClient implements ClientsInterface {
 
     @Override
     public void run() {
-        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
+        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration);
 
         if (configuration.isTransactionalProducer()) {
             LOGGER.info("Using transactional producer. Initializing the transactions.");
@@ -109,22 +109,23 @@ public class KafkaProducerClient implements ClientsInterface {
         }
     }
 
-    public ProducerRecord generateMessage(int numOfMessage) {
-        return new ProducerRecord(configuration.getTopicName(), null, null, null,
+    public ProducerRecord generateMessage(int numOfMessage, @Nullable String messageKey) {
+        return new ProducerRecord(configuration.getTopicName(), null, null, messageKey,
             "\"" + configuration.getMessage() + " - " + numOfMessage + "\"", configuration.getHeaders());
     }
 
-    public List<ProducerRecord> generateMessages() {
+    public List<ProducerRecord> generateMessages(@Nullable String messageKey) {
         List<ProducerRecord> records = new ArrayList<>();
         for (int i = 0; i < configuration.getMessageCount(); i++) {
-            records.add(generateMessage(i));
+            records.add(generateMessage(i, messageKey));
         }
 
         return records;
     }
 
     public void sendMessages() {
-        List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages() : Collections.singletonList(generateMessage(messageIndex));
+        String messageKey = configuration.getMessageKey();
+        List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages(messageKey) : Collections.singletonList(generateMessage(messageIndex, messageKey));
 
         int currentMsgIndex = configuration.getDelayMs() == 0 ? 0 : messageIndex;
 
@@ -134,13 +135,13 @@ public class KafkaProducerClient implements ClientsInterface {
                 LOGGER.info("Beginning new transaction. Messages sent: {}", currentMsgIndex);
                 producer.beginTransaction();
             }
-            LOGGER.info("Sending message: {}", record.toString());
+            LOGGER.info("Sending message: {}", record);
 
             try {
                 producer.send(record).get();
                 messageSuccessfullySent++;
             } catch (Exception e) {
-                LOGGER.error("Failed to send messages: {} due to: \n{}", record.toString(), e.getMessage());
+                LOGGER.error("Failed to send messages: {} due to: \n{}", record, e.getMessage());
             } finally {
                 messageIndex++;
             }

@@ -20,8 +20,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
-public class KafkaProducerConfigurationTest {
+class KafkaProducerConfigurationTest {
 
     @Test
     void testDefaultConfiguration() {
@@ -31,12 +32,15 @@ public class KafkaProducerConfigurationTest {
 
         KafkaProducerConfiguration kafkaProducerConfiguration = new KafkaProducerConfiguration(configuration);
 
-        assertThat(kafkaProducerConfiguration.getAcks(), is(ConfigurationConstants.DEFAULT_PRODUCER_ACKS));
-        assertThat(kafkaProducerConfiguration.getHeaders(), nullValue());
-        assertThat(kafkaProducerConfiguration.getMessage(), is(ConfigurationConstants.DEFAULT_MESSAGE));
-        assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION));
-        assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(false));
-        assertThat(kafkaProducerConfiguration.getTopicName(), is("my-topic"));
+        assertAll(
+                () -> assertThat(kafkaProducerConfiguration.getAcks(), is(ConfigurationConstants.DEFAULT_PRODUCER_ACKS)),
+                () -> assertThat(kafkaProducerConfiguration.getHeaders(), nullValue()),
+                () -> assertThat(kafkaProducerConfiguration.getMessage(), is(ConfigurationConstants.DEFAULT_MESSAGE)),
+                () -> assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION)),
+                () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(false)),
+                () -> assertThat(kafkaProducerConfiguration.getTopicName(), is("my-topic")),
+                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), nullValue())
+        );
     }
 
     @Test
@@ -46,6 +50,7 @@ public class KafkaProducerConfigurationTest {
         String acks = "0";
         String headers = "header_key_one=header_value_one, header_key_two=header_value_two";
         String message = "Muhehe";
+        String messageKey = "Key-Muhehe";
         int messagesPerTransaction = 125;
         String additionalConfig = ProducerConfig.TRANSACTIONAL_ID_CONFIG + " = my-id";
 
@@ -59,18 +64,22 @@ public class KafkaProducerConfigurationTest {
         configuration.put(ConfigurationConstants.PRODUCER_ACKS_ENV, acks);
         configuration.put(ConfigurationConstants.HEADERS_ENV, headers);
         configuration.put(ConfigurationConstants.MESSAGE_ENV, message);
+        configuration.put(ConfigurationConstants.MESSAGE_KEY_ENV, messageKey);
         configuration.put(ConfigurationConstants.MESSAGES_PER_TRANSACTION_ENV, String.valueOf(messagesPerTransaction));
         configuration.put(ConfigurationConstants.ADDITIONAL_CONFIG_ENV, additionalConfig);
 
         KafkaProducerConfiguration kafkaProducerConfiguration = new KafkaProducerConfiguration(configuration);
 
-        assertThat(kafkaProducerConfiguration.getAcks(), is(acks));
-        assertThat(kafkaProducerConfiguration.getHeaders(), is(expectedHeadersList));
-        assertThat(kafkaProducerConfiguration.getMessage(), is(message));
-        assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(messagesPerTransaction));
-        assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(true));
-        assertThat(kafkaProducerConfiguration.getTopicName(), is(topicName));
-        assertThat(kafkaProducerConfiguration.getBootstrapServers(), is(bootstrapServer));
+        assertAll(
+                () -> assertThat(kafkaProducerConfiguration.getAcks(), is(acks)),
+                () -> assertThat(kafkaProducerConfiguration.getHeaders(), is(expectedHeadersList)),
+                () -> assertThat(kafkaProducerConfiguration.getMessage(), is(message)),
+                () -> assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(messagesPerTransaction)),
+                () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(true)),
+                () -> assertThat(kafkaProducerConfiguration.getTopicName(), is(topicName)),
+                () -> assertThat(kafkaProducerConfiguration.getBootstrapServers(), is(bootstrapServer)),
+                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageKey))
+        );
     }
 
     @Test
