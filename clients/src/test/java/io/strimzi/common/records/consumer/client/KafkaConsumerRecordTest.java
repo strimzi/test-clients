@@ -39,7 +39,7 @@ class KafkaConsumerRecordTest {
                 key, value, headers, leaderEpoch);
         String result = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).toJsonString();
         String jsonLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("json");
-        String plainLog =KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("plain");
+        String plainLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("plain");
 
         String expectedResult = "{\"timestamp\":" + timestamp + ",\"timestampType\":\"" + timestampType.name + "\",\"topic\":\"" + topic + "\"," +
                 "\"partition\":" + partition + ",\"offset\":" + offset + ",\"key\":\"" + key + "\"," +

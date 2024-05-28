@@ -5,15 +5,14 @@
 package io.strimzi.kafka;
 
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.kafka.KafkaConsumerConfiguration;
-import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.models.KafkaConsumerRecord;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.common.header.Header;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
