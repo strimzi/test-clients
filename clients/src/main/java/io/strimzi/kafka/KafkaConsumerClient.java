@@ -104,21 +104,9 @@ public class KafkaConsumerClient implements ClientsInterface {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
 
         for (ConsumerRecord<String, String> consumerRecord : records) {
-            if (configuration.getOutputFormat().equalsIgnoreCase("json")) {
-                String jsonLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).toJsonString();
-                LOGGER.info("Received message: {}", jsonLog);
-            } else {
-                LOGGER.info("Received message:");
-                LOGGER.info("\tpartition: {}", consumerRecord.partition());
-                LOGGER.info("\toffset: {}", consumerRecord.offset());
-                LOGGER.info("\tvalue: {}", consumerRecord.value());
-                if (consumerRecord.headers() != null) {
-                    LOGGER.info("\theaders: ");
-                    for (Header header : consumerRecord.headers()) {
-                        LOGGER.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
-                    }
-                }
-            }
+            KafkaConsumerRecord kafkaConsumerRecord = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord);
+            String log = kafkaConsumerRecord.logMessage(configuration.getOutputFormat());
+            LOGGER.info("Received message: {}", log);
             consumedMessages++;
         }
 

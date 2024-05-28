@@ -9,12 +9,16 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
 import org.apache.kafka.common.record.TimestampType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 class KafkaConsumerRecordTest {
 
@@ -32,15 +36,35 @@ class KafkaConsumerRecordTest {
         Optional<Integer> leaderEpoch = Optional.empty();
         Headers headers = new RecordHeaders();
         headers.add("header-key", "header-value".getBytes());
+        headers.add("header-key-2", "header-value-2".getBytes());
 
         ConsumerRecord<String, String> consumerRecord = new ConsumerRecord<>(topic, partition, offset, timestamp, timestampType, serializedKeySize, serializedValueSize,
                 key, value, headers, leaderEpoch);
         String result = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).toJsonString();
+        String jsonLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("json");
+        String plainLog =KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("plain");
 
         String expectedResult = "{\"timestamp\":" + timestamp + ",\"timestampType\":\"" + timestampType.name + "\",\"topic\":\"" + topic + "\"," +
                 "\"partition\":" + partition + ",\"offset\":" + offset + ",\"key\":\"" + key + "\"," +
-                "\"payload\":\"" + value + "\",\"headers\":[{\"header-key\":\"header-value\"}]}";
+                "\"payload\":\"" + value + "\",\"headers\":[{\"header-key\":\"header-value\"},{\"header-key-2\":\"header-value-2\"}]}";
 
-        assertThat(result, is(expectedResult));
+        String expectedPlainLog = """
+
+                \ttopic: random-topic
+                \tpartition: 0
+                \toffset: 0
+                \tkey: key-0\
+
+                \tvalue: Hello world-0
+                \theaders:\s
+                \t\tkey: header-key, value: header-value\
+
+                \t\tkey: header-key-2, value: header-value-2""";
+
+        assertAll(
+                () -> assertThat(result, is(expectedResult)),
+                () -> assertThat(jsonLog, is(expectedResult)),
+                () -> assertThat(plainLog, is(expectedPlainLog))
+        );
     }
 }
