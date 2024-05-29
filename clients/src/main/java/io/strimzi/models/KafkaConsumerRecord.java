@@ -7,7 +7,6 @@ package io.strimzi.models;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.record.TimestampType;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -17,17 +16,8 @@ import java.util.Map;
 /**
  * The type Kafka consumer record.
  */
-public record KafkaConsumerRecord(long timestamp, TimestampType timestampType, String topic, int partition, long offset,
+public record KafkaConsumerRecord(long timestamp, String timestampType, String topic, int partition, long offset,
                                   String key, String payload, List<Map<String, String>> headers) {
-    /**
-     * Gets timestamp type.
-     *
-     * @return the timestamp type
-     */
-    public String getTimestampType() {
-        return timestampType.name;
-    }
-
     /**
      * Parse kafka consumer record.
      *
@@ -39,7 +29,7 @@ public record KafkaConsumerRecord(long timestamp, TimestampType timestampType, S
         consumerRecord.headers().forEach(h -> headers.add(Map.of(h.key(), new String(h.value(), StandardCharsets.UTF_8))));
         return new KafkaConsumerRecord(
                 consumerRecord.timestamp(),
-                consumerRecord.timestampType(),
+                consumerRecord.timestampType().name,
                 consumerRecord.topic(),
                 consumerRecord.partition(),
                 consumerRecord.offset(),
