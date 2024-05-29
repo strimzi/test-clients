@@ -4,7 +4,7 @@
  */
 package io.strimzi.http.producer;
 
-import io.strimzi.common.records.http.producer.ProducerRecord;
+import io.strimzi.common.records.producer.http.ProducerRecord;
 import io.strimzi.configuration.ConfigurationConstants;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
