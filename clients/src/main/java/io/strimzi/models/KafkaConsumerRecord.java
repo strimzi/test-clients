@@ -20,75 +20,12 @@ import java.util.Map;
 public record KafkaConsumerRecord(long timestamp, TimestampType timestampType, String topic, int partition, long offset,
                                   String key, String payload, List<Map<String, String>> headers) {
     /**
-     * Gets topic.
-     *
-     * @return the topic
-     */
-    public String getTopic() {
-        return topic;
-    }
-
-    /**
-     * Gets partition.
-     *
-     * @return the partition
-     */
-    public int getPartition() {
-        return partition;
-    }
-
-    /**
-     * Gets offset.
-     *
-     * @return the offset
-     */
-    public long getOffset() {
-        return offset;
-    }
-
-    /**
-     * Gets timestamp.
-     *
-     * @return the timestamp
-     */
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    /**
      * Gets timestamp type.
      *
      * @return the timestamp type
      */
     public String getTimestampType() {
         return timestampType.name;
-    }
-
-    /**
-     * Gets key.
-     *
-     * @return the key
-     */
-    public String getKey() {
-        return key;
-    }
-
-    /**
-     * Gets payload.
-     *
-     * @return the payload
-     */
-    public String getPayload() {
-        return payload;
-    }
-
-    /**
-     * Gets headers.
-     *
-     * @return the headers
-     */
-    public List<Map<String, String>> getHeaders() {
-        return headers;
     }
 
     /**
