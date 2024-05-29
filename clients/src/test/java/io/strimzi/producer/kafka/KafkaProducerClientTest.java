@@ -36,10 +36,10 @@ class KafkaProducerClientTest {
                 () -> assertThat(producerRecords.size(), is(ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION)),
                 () -> assertThat("All keys are null", producerRecords.stream().allMatch(p -> p.key() == null)),
                 () -> {
-                        for(int i = 0; i < ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION; i++) {
-                            assertThat(producerRecords.get(i).value(), is("Hello world - " + i));
-                        }
+                    for (int i = 0; i < ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION; i++) {
+                        assertThat(producerRecords.get(i).value(), is("Hello world - " + i));
                     }
+                }
         );
     }
 
