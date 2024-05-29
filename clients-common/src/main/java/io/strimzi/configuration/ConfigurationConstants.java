@@ -13,6 +13,7 @@ public interface ConfigurationConstants {
     String DEFAULT_MESSAGE = "Hello world";
     String DEFAULT_GROUP_ID = "my-group";
     String DEFAULT_CLIENT_ID = "my-consumer";
+    String DEFAULT_OUTPUT_FORMAT = "plain";
     long DEFAULT_POLL_INTERVAL = 1000;
     long DEFAULT_POLL_TIMEOUT = 100;
     long DEFAULT_TASK_COMPLETION_TIMEOUT = 60000;
@@ -48,6 +49,7 @@ public interface ConfigurationConstants {
     String MESSAGE_COUNT_ENV = "MESSAGE_COUNT";
     String DELAY_MS_ENV = "DELAY_MS";
     String MESSAGE_ENV = "MESSAGE";
+    String OUTPUT_FORMAT_ENV = "OUTPUT_FORMAT";
 
     /**
      * Kafka environment variables
