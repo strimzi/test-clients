@@ -5,8 +5,6 @@
 package io.strimzi.common.records.consumer.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.strimzi.common.records.http.consumer.ConsumerRecord;
-import io.strimzi.common.records.http.consumer.ConsumerRecordUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;

@@ -5,8 +5,6 @@
 package io.strimzi.common.records.producer.http;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import io.strimzi.common.records.http.producer.OffsetRecordSent;
-import io.strimzi.common.records.http.producer.OffsetRecordSentUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
