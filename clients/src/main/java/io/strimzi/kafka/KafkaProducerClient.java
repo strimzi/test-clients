@@ -5,16 +5,15 @@
 package io.strimzi.kafka;
 
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
-import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -109,23 +108,22 @@ public class KafkaProducerClient implements ClientsInterface {
         }
     }
 
-    public ProducerRecord generateMessage(int numOfMessage, @Nullable String messageKey) {
-        return new ProducerRecord(configuration.getTopicName(), null, null, messageKey,
-            "\"" + configuration.getMessage() + " - " + numOfMessage + "\"", configuration.getHeaders());
+    public ProducerRecord generateMessage(int numOfMessage) {
+        return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
+             configuration.getMessage() + " - " + numOfMessage, configuration.getHeaders());
     }
 
-    public List<ProducerRecord> generateMessages(@Nullable String messageKey) {
+    public List<ProducerRecord> generateMessages() {
         List<ProducerRecord> records = new ArrayList<>();
         for (int i = 0; i < configuration.getMessageCount(); i++) {
-            records.add(generateMessage(i, messageKey));
+            records.add(generateMessage(i));
         }
 
         return records;
     }
 
     public void sendMessages() {
-        String messageKey = configuration.getMessageKey();
-        List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages(messageKey) : Collections.singletonList(generateMessage(messageIndex, messageKey));
+        List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages() : Collections.singletonList(generateMessage(messageIndex));
 
         int currentMsgIndex = configuration.getDelayMs() == 0 ? 0 : messageIndex;
 

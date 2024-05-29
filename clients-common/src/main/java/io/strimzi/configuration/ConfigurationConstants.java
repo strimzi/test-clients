@@ -42,6 +42,11 @@ public interface ConfigurationConstants {
     String MESSAGE_KEY_ENV = "MESSAGE_KEY";
 
     /**
+     * Consumer environment variables
+     */
+    String OUTPUT_FORMAT_ENV = "OUTPUT_FORMAT";
+
+    /**
      * Common environment variables
      */
     String GROUP_ID_ENV = "GROUP_ID";
@@ -49,7 +54,6 @@ public interface ConfigurationConstants {
     String MESSAGE_COUNT_ENV = "MESSAGE_COUNT";
     String DELAY_MS_ENV = "DELAY_MS";
     String MESSAGE_ENV = "MESSAGE";
-    String OUTPUT_FORMAT_ENV = "OUTPUT_FORMAT";
 
     /**
      * Kafka environment variables
