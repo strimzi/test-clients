@@ -43,7 +43,7 @@ public record KafkaConsumerRecord(long timestamp, String timestampType, String t
      *
      * @return the string
      */
-    public String toJsonString() {
+    private String toJsonString() {
         ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);

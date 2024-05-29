@@ -37,7 +37,7 @@ class KafkaConsumerRecordTest {
 
         ConsumerRecord<String, String> consumerRecord = new ConsumerRecord<>(topic, partition, offset, timestamp, timestampType, serializedKeySize, serializedValueSize,
                 key, value, headers, leaderEpoch);
-        String result = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).toJsonString();
+
         String jsonLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("json");
         String plainLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("plain");
 
@@ -59,7 +59,6 @@ class KafkaConsumerRecordTest {
                 \t\tkey: header-key-2, value: header-value-2""";
 
         assertAll(
-                () -> assertThat(result, is(expectedResult)),
                 () -> assertThat(jsonLog, is(expectedResult)),
                 () -> assertThat(plainLog, is(expectedPlainLog))
         );
