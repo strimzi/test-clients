@@ -5,9 +5,9 @@
 package io.strimzi.kafka;
 
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
-import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -28,7 +28,6 @@ public class KafkaProducerClient implements ClientsInterface {
 
     private static final Logger LOGGER = LogManager.getLogger(KafkaProducerClient.class);
     private final KafkaProducerConfiguration configuration;
-    private final Properties properties;
     private final KafkaProducer producer;
     private int messageIndex;
     private int messageSuccessfullySent;
@@ -37,10 +36,10 @@ public class KafkaProducerClient implements ClientsInterface {
 
     public KafkaProducerClient(Map<String, String> configuration) {
         this.configuration = new KafkaProducerConfiguration(configuration);
-        this.properties = KafkaProperties.producerProperties(this.configuration);
+        Properties properties = KafkaProperties.producerProperties(this.configuration);
         TracingUtil.getTracing().addTracingPropsToProducerConfig(properties);
 
-        this.producer = new KafkaProducer<>(this.properties);
+        this.producer = new KafkaProducer<>(properties);
         this.messageIndex = 0;
         this.messageSuccessfullySent = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-producer"));
@@ -49,7 +48,7 @@ public class KafkaProducerClient implements ClientsInterface {
 
     @Override
     public void run() {
-        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
+        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration);
 
         if (configuration.isTransactionalProducer()) {
             LOGGER.info("Using transactional producer. Initializing the transactions.");
@@ -110,8 +109,8 @@ public class KafkaProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
-        return new ProducerRecord(configuration.getTopicName(), null, null, null,
-            "\"" + configuration.getMessage() + " - " + numOfMessage + "\"", configuration.getHeaders());
+        return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
+            configuration.getMessage() + " - " + numOfMessage, configuration.getHeaders());
     }
 
     public List<ProducerRecord> generateMessages() {
@@ -134,13 +133,13 @@ public class KafkaProducerClient implements ClientsInterface {
                 LOGGER.info("Beginning new transaction. Messages sent: {}", currentMsgIndex);
                 producer.beginTransaction();
             }
-            LOGGER.info("Sending message: {}", record.toString());
+            LOGGER.info("Sending message: {}", record);
 
             try {
                 producer.send(record).get();
                 messageSuccessfullySent++;
             } catch (Exception e) {
-                LOGGER.error("Failed to send messages: {} due to: \n{}", record.toString(), e.getMessage());
+                LOGGER.error("Failed to send messages: {} due to: \n{}", record, e.getMessage());
             } finally {
                 messageIndex++;
             }

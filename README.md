@@ -59,6 +59,7 @@ Kafka Producer
 * `TOPIC` - the topic producer will send to
 * `DELAY_MS` - the delay, in ms, between messages
 * `MESSAGE_COUNT` - the number of messages the producer should send
+* `MESSAGE_KEY` - the message key used by the producer for all messages sent.
 * `CA_CRT` - the certificate of the CA which signed the brokers' TLS certificates, for adding to the client's trust store
 * `USER_CRT` - the user's certificate
 * `USER_KEY` - the user's private key
