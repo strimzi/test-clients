@@ -110,7 +110,7 @@ public class KafkaProducerClient implements ClientsInterface {
 
     public ProducerRecord generateMessage(int numOfMessage) {
         return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
-             configuration.getMessage() + " - " + numOfMessage, configuration.getHeaders());
+            configuration.getMessage() + " - " + numOfMessage, configuration.getHeaders());
     }
 
     public List<ProducerRecord> generateMessages() {
