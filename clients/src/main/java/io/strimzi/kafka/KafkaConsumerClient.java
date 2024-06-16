@@ -101,14 +101,20 @@ public class KafkaConsumerClient implements ClientsInterface {
 
     public void consumeMessages() {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+        int recordProcessed = 0;
 
         for (ConsumerRecord<String, String> consumerRecord : records) {
             KafkaConsumerRecord kafkaConsumerRecord = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord);
             String log = kafkaConsumerRecord.logMessage(configuration.getOutputFormat());
             LOGGER.info("Received message: {}", log);
-            consumedMessages++;
+            recordProcessed++;
         }
 
-        consumer.commitSync();
+        try {
+            consumer.commitSync();
+            consumedMessages += recordProcessed;
+        } catch (Exception ex) {
+            LOGGER.warn("Failed to commit the offset: {}", ex.getMessage());
+        }
     }
 }
