@@ -109,6 +109,9 @@ public class KafkaProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
+        // we are using the double quotes for the Strimzi HTTP Bridge and the HTTP consumers, where the message type is JSON
+        // as part of https://github.com/strimzi/test-clients/issues/96 we should implement a possibility
+        // to specifying the type that user wants to use for sending the messages
         return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
             "\"" + configuration.getMessage() + " - " + numOfMessage + "\"", configuration.getHeaders());
     }
