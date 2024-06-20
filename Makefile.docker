@@ -12,6 +12,7 @@ DOCKER_REGISTRY    ?= quay.io
 DOCKER_ORG         ?= $(USER)
 DOCKER_TAG         ?= latest
 DOCKER_VERSION_ARG ?= $(VERSION)
+DOCKER_CMD         ?= docker
 
 ifdef DOCKER_ARCHITECTURE
   DOCKER_PLATFORM = --platform linux/$(DOCKER_ARCHITECTURE)
@@ -22,28 +23,28 @@ all: docker_build docker_push
 
 docker_build: copy_files
 	echo "Building Docker image ..."
-	docker $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKERFILE_DIR)
+	$(DOCKER_CMD) $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKERFILE_DIR)
 	rm -rf ./scripts
 
 docker_tag:
 	echo "Tagging strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) to $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
-	docker tag strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+	$(DOCKER_CMD) tag strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
 docker_push:docker_tag
 	echo "Pushing $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
-	docker push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+	$(DOCKER_CMD) push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
 .PHONY: docker_amend_manifest
 docker_amend_manifest:
 	# Create / Amend the manifest
-	docker manifest create $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) --amend $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+	$(DOCKER_CMD) manifest create $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) --amend $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
 .PHONY: docker_push_manifest
 docker_push_manifest:
 	# Push the manifest to the registry
-	docker manifest push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)
+	$(DOCKER_CMD) manifest push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)
 
 .PHONY: docker_delete_manifest
 docker_delete_manifest:
 	# Delete the manifest to the registry, ignore the error if manifest doesn't exist
-	docker manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true
+	$(DOCKER_CMD) manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true
