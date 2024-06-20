@@ -102,6 +102,7 @@ public class KafkaConsumerClient implements ClientsInterface {
 
     public void consumeMessages() {
         ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+        int recordProcessed = 0;
 
         for (ConsumerRecord<String, String> record : records) {
             LOGGER.info("Received message:");
@@ -114,9 +115,14 @@ public class KafkaConsumerClient implements ClientsInterface {
                     LOGGER.info("\t\tkey: {}, value: {}", header.key(), new String(header.value()));
                 }
             }
-            consumedMessages++;
+            recordProcessed++;
         }
 
-        consumer.commitSync();
+        try {
+            consumer.commitSync();
+            consumedMessages += recordProcessed;
+        } catch (Exception ex) {
+            LOGGER.warn("Failed to commit the offset: {}", ex.getMessage());
+        }
     }
 }
