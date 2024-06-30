@@ -22,7 +22,7 @@ clean_files:
 next_version:
 	mvn versions:set -DnewVersion=$(shell echo $(NEXT_VERSION) | tr a-z A-Z)
 	mvn versions:commit
-	echo -n "$(NEXT_VERSION)" > clients.version
+	echo "$(NEXT_VERSION)\c" > clients.version
 
 release_examples:
 	echo "Changing images in examples to: $(RELEASE_VERSION)"
@@ -34,4 +34,4 @@ release_maven:
 	mvn versions:commit
 
 release_clients_version:
-	echo -n "$(RELEASE_VERSION)" > clients.version
+	echo "$(RELEASE_VERSION)\c" > clients.version
