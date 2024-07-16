@@ -119,6 +119,8 @@ public class HttpConsumerClient implements ClientsInterface {
 
             if (response.statusCode() == HttpResponseStatus.OK.code()) {
                 LOGGER.info("Consumer successfully created. Response:\n{}", response.body());
+            } else if (response.statusCode() == HttpResponseStatus.CONFLICT.code()) {
+                LOGGER.info("Consumer already exists. Response:\n{}", response.body());
             } else {
                 throw new RuntimeException(String.format("Failed to create consumer. Status code: %s, response: %s", response.statusCode(), response.body()));
             }
