@@ -26,9 +26,8 @@
 
         <maven.surefire.version>3.3.1</maven.surefire.version>
         <maven.checkstyle.version>3.2.1</maven.checkstyle.version>
+        <log4j.version>2.23.1</log4j.version>
         <maven-shade.version>3.2.1</maven-shade.version>
-
-        <log4j.version>2.20.0</log4j.version>
         <slf4j-simple.version>2.0.6</slf4j-simple.version>
 
         <kafka.version>3.7.1</kafka.version>
@@ -44,6 +43,9 @@
         <checkstyle.version>10.8.1</checkstyle.version>
         <picocli.version>4.7.5</picocli.version>
         <sl4j-nop.version>1.7.36</sl4j-nop.version>
+
+        <data.generator.version>0.2.0-SNAPSHOT</data.generator.version>
+        <sl4j.version>2.0.13</sl4j.version>
 
         <skipTests>false</skipTests>
     </properties>
@@ -170,6 +172,17 @@
                 <artifactId>kafka-streams</artifactId>
                 <version>${kafka.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${sl4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.skodjob</groupId>
+                <artifactId>data-generator</artifactId>
+                <version>${data.generator.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -211,3 +224,4 @@
         </plugins>
     </build>
 </project>
+

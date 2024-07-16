@@ -104,11 +104,12 @@ public class HttpConsumerClient implements ClientsInterface {
     }
 
     public void createConsumer() {
-        String message = "{\"name\":\"" + configuration.getClientId() + "\",\"format\":\"json\",\"auto.offset.reset\":\"earliest\"}";
+        String message = "{\"name\":\"" + configuration.getClientId() + "\",\"format\":\"" +
+            this.configuration.getMessageType() + "\",\"auto.offset.reset\":\"earliest\"}";
 
         LOGGER.info("Creating new consumer:\n{}", message);
 
-        HttpContext context = HttpContext.post(configuration.getConsumerCreationURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE, message);
+        HttpContext context = HttpContext.post(configuration.getConsumerCreationURI(), ConfigurationConstants.HTTP_CONSUMER_POST_JSON_CONTENT_TYPE, message);
 
         HttpHandle<String> httpHandle = TracingUtil.getTracing().createHttpHandle("create-consumer");
         HttpRequest creationRequest = httpHandle.build(context);
@@ -135,7 +136,7 @@ public class HttpConsumerClient implements ClientsInterface {
 
         LOGGER.info("Subscribing consumer: {} to topic: {} with message: {}", configuration.getClientId(), configuration.getTopic(), subscriptionMessage);
 
-        HttpContext context = HttpContext.post(configuration.getSubscriptionURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE, subscriptionMessage);
+        HttpContext context = HttpContext.post(configuration.getSubscriptionURI(), ConfigurationConstants.HTTP_CONSUMER_POST_JSON_CONTENT_TYPE, subscriptionMessage);
 
         HttpHandle<String> httpHandle = TracingUtil.getTracing().createHttpHandle("subscribe-topic");
         HttpRequest subscriptionRequest = httpHandle.build(context);
@@ -156,7 +157,8 @@ public class HttpConsumerClient implements ClientsInterface {
     }
 
     public void consumeMessages() {
-        HttpContext context = HttpContext.get(configuration.getConsumeMessagesURI(), ConfigurationConstants.HTTP_JSON_CONTENT_TYPE);
+        String contentType = "application/vnd.kafka." + this.configuration.getMessageType() + ".v2+json";
+        HttpContext context = HttpContext.get(configuration.getConsumeMessagesURI(), contentType);
         try {
             LOGGER.info("Receiving messages - sending HTTP request to {}", configuration.getConsumeMessagesURI());
 

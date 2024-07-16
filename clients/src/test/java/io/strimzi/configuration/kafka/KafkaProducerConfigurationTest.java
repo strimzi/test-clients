@@ -51,6 +51,8 @@ public class KafkaProducerConfigurationTest {
         String headers = "header_key_one=header_value_one, header_key_two=header_value_two";
         String message = "Muhehe";
         String messageKey = "Key-Muhehe";
+        String messageTemplate = "payment_fiat";
+        String messageType = "text";
         int messagesPerTransaction = 125;
         String additionalConfig = ProducerConfig.TRANSACTIONAL_ID_CONFIG + " = my-id";
 
@@ -65,6 +67,8 @@ public class KafkaProducerConfigurationTest {
         configuration.put(ConfigurationConstants.HEADERS_ENV, headers);
         configuration.put(ConfigurationConstants.MESSAGE_ENV, message);
         configuration.put(ConfigurationConstants.MESSAGE_KEY_ENV, messageKey);
+        configuration.put(ConfigurationConstants.MESSAGE_TEMPLATE_ENV, messageTemplate);
+        configuration.put(ConfigurationConstants.MESSAGE_TYPE_ENV, messageType);
         configuration.put(ConfigurationConstants.MESSAGES_PER_TRANSACTION_ENV, String.valueOf(messagesPerTransaction));
         configuration.put(ConfigurationConstants.ADDITIONAL_CONFIG_ENV, additionalConfig);
 
@@ -78,7 +82,9 @@ public class KafkaProducerConfigurationTest {
                 () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(true)),
                 () -> assertThat(kafkaProducerConfiguration.getTopicName(), is(topicName)),
                 () -> assertThat(kafkaProducerConfiguration.getBootstrapServers(), is(bootstrapServer)),
-                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageKey))
+                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageKey)),
+                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageTemplate)),
+                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageType))
         );
     }
 

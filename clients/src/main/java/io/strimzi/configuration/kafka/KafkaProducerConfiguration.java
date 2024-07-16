@@ -22,6 +22,9 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
     private final boolean transactionalProducer;
     private final String message;
     private final String messageKey;
+    private final String messageTemplate;
+    private final String messageType;
+
     public KafkaProducerConfiguration(Map<String, String> map) {
         super(map);
         this.acks = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.PRODUCER_ACKS_ENV), ConfigurationConstants.DEFAULT_PRODUCER_ACKS);
@@ -29,6 +32,8 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.messagesPerTransaction = ClientsConfigurationUtils.parseIntOrDefault(map.get(ConfigurationConstants.MESSAGES_PER_TRANSACTION_ENV), ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION);
         this.transactionalProducer = getAdditionalConfig().toString().contains(ProducerConfig.TRANSACTIONAL_ID_CONFIG);
         this.message = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_ENV), ConfigurationConstants.DEFAULT_MESSAGE);
+        this.messageTemplate = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TEMPLATE_ENV), null);
+        this.messageType = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TYPE_ENV), ConfigurationConstants.DEFAULT_MESSAGE_TYPE);
         this.messageKey = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_KEY_ENV), null);
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
 
@@ -63,6 +68,14 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         return messageKey;
     }
 
+    public String getMessageTemplate() {
+        return messageTemplate;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
     @Override
     public String toString() {
         return "KafkaProducerConfiguration:\n" +
@@ -73,6 +86,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
             "messagesPerTransaction='" + this.getMessagesPerTransaction() + "',\n" +
             "transactionalProducer='" + this.isTransactionalProducer() + "',\n" +
             "messageKey='" + this.getMessageKey() + "',\n" +
-            "message='" + this.getMessage() + "'";
+            "message='" + this.getMessage() + "',\n" +
+            "messageTemplate='" + this.getMessageTemplate() + "'";
     }
 }

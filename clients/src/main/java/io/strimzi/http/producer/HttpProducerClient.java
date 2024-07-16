@@ -5,7 +5,10 @@
 package io.strimzi.http.producer;
 
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
+import io.skodjob.datagenerator.DataGenerator;
+import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.common.MessageType;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.http.HttpProducerConfiguration;
 import io.strimzi.common.records.producer.http.OffsetRecordSent;
@@ -21,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -36,6 +40,7 @@ public class HttpProducerClient implements ClientsInterface {
     private HttpHandle httpHandle;
     private final ScheduledExecutorService scheduledExecutor;
     private final CountDownLatch countDownLatch;
+    private DataGenerator dataGenerator;
 
     public HttpProducerClient(Map<String, String> configuration) {
         this.configuration = new HttpProducerConfiguration(configuration);
@@ -45,6 +50,10 @@ public class HttpProducerClient implements ClientsInterface {
         this.httpHandle = tracingHandle.createHttpHandle("send-messages");
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-producer"));
         this.countDownLatch = new CountDownLatch(1);
+
+        if (this.configuration.getMessageTemplate() != null) {
+            dataGenerator = new DataGenerator(ETemplateType.getFromString(this.configuration.getMessageTemplate()));
+        }
     }
 
     @Override
@@ -104,11 +113,21 @@ public class HttpProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
-        String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":\"" + configuration.getMessage() + "-" + numOfMessage + "\"}]}";
+        String message;
+        if (this.configuration.getMessageTemplate() != null) {
+            message = dataGenerator.generateStringData();
+        } else {
+            message = configuration.getMessage() + "-" + numOfMessage;
+        }
+        if (Objects.equals(this.configuration.getMessageType(), MessageType.text.name())) {
+            message = "\"" + message + "\"";
+        }
+
+        String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":" + message + "}]}";
 
         HttpContext context = HttpContext.post(
             configuration.getUri(),
-            "application/vnd.kafka.json.v2+json",
+            "application/vnd.kafka." + this.configuration.getMessageType() + ".v2+json",
             record);
 
         messageIndex++;
@@ -120,7 +139,17 @@ public class HttpProducerClient implements ClientsInterface {
         String record = "{\"records\":[";
 
         for (int i = 0; i < configuration.getMessageCount(); i++) {
-            record += "{\"key\":\"key-" + i + "\",\"value\":\"" + configuration.getMessage() + "-" + i + "\"}";
+            String message;
+            if (this.configuration.getMessageTemplate() != null) {
+                message = dataGenerator.generateStringData();
+            } else {
+                message = configuration.getMessage() + "-" + i;
+            }
+            if (Objects.equals(this.configuration.getMessageType(), MessageType.text.name())) {
+                message = "\"" + message + "\"";
+            }
+
+            record += "{\"key\":\"key-" + i + "\",\"value\":" + message + "}";
             if (i != configuration.getMessageCount() - 1) {
                 record += ",";
             }
@@ -130,7 +159,7 @@ public class HttpProducerClient implements ClientsInterface {
 
         HttpContext context = HttpContext.post(
             configuration.getUri(),
-            "application/vnd.kafka.json.v2+json",
+            "application/vnd.kafka." + this.configuration.getMessageType() + ".v2+json",
             record);
 
         messageIndex = configuration.getMessageCount() - 1;
@@ -162,3 +191,5 @@ public class HttpProducerClient implements ClientsInterface {
         }
     }
 }
+
+

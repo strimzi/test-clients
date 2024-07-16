@@ -4,7 +4,10 @@
  */
 package io.strimzi.kafka;
 
+import io.skodjob.datagenerator.DataGenerator;
+import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.common.MessageType;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
@@ -18,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -33,6 +37,7 @@ public class KafkaProducerClient implements ClientsInterface {
     private int messageSuccessfullySent;
     private final ScheduledExecutorService scheduledExecutor;
     private final CountDownLatch countDownLatch;
+    private DataGenerator dataGenerator;
 
     public KafkaProducerClient(Map<String, String> configuration) {
         this.configuration = new KafkaProducerConfiguration(configuration);
@@ -44,6 +49,10 @@ public class KafkaProducerClient implements ClientsInterface {
         this.messageSuccessfullySent = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-producer"));
         this.countDownLatch  = new CountDownLatch(1);
+        // If template is set, generate data based on it
+        if (this.configuration.getMessageTemplate() != null) {
+            dataGenerator = new DataGenerator(ETemplateType.getFromString(this.configuration.getMessageTemplate()));
+        }
     }
 
     @Override
@@ -109,8 +118,24 @@ public class KafkaProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
+        String message;
+
+        if (this.configuration.getMessageTemplate() != null) {
+            if (Objects.equals(this.configuration.getMessageType(), MessageType.json.name())) {
+                message = dataGenerator.generateStringData();
+            } else {
+                message = "\"" + dataGenerator.generateStringData() + "\"";
+            }
+        } else {
+            if (Objects.equals(this.configuration.getMessageType(), MessageType.json.name())) {
+                message = configuration.getMessage() + " - " + numOfMessage;
+            } else {
+                message = "\"" + configuration.getMessage() + " - " + numOfMessage + "\"";
+            }
+        }
+
         return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
-            configuration.getMessage() + " - " + numOfMessage, configuration.getHeaders());
+            message, configuration.getHeaders());
     }
 
     public List<ProducerRecord> generateMessages() {

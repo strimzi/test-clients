@@ -11,6 +11,7 @@ public interface ConfigurationConstants {
     long DEFAULT_DELAY_MS = 0;
 
     String DEFAULT_MESSAGE = "Hello world";
+    String DEFAULT_MESSAGE_TYPE = "text";
     String DEFAULT_GROUP_ID = "my-group";
     String DEFAULT_CLIENT_ID = "my-consumer";
     String DEFAULT_OUTPUT_FORMAT = "plain";
@@ -54,6 +55,8 @@ public interface ConfigurationConstants {
     String MESSAGE_COUNT_ENV = "MESSAGE_COUNT";
     String DELAY_MS_ENV = "DELAY_MS";
     String MESSAGE_ENV = "MESSAGE";
+    String MESSAGE_TEMPLATE_ENV = "MESSAGE_TEMPLATE";
+    String MESSAGE_TYPE_ENV = "MESSAGE_TYPE";
 
     /**
      * Kafka environment variables
@@ -141,5 +144,5 @@ public interface ConfigurationConstants {
     String CLIENT_TYPE_ENV = "CLIENT_TYPE";
     String TRACING_TYPE_ENV = "TRACING_TYPE";
 
-    String HTTP_JSON_CONTENT_TYPE = "application/vnd.kafka.json.v2+json";
+    String HTTP_CONSUMER_POST_JSON_CONTENT_TYPE = "application/vnd.kafka.v2+json";
 }
