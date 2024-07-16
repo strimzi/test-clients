@@ -28,7 +28,7 @@ import java.util.Map;
 @CommandLine.Command(name = "fetch-offsets")
 public class FetchOffsetsCommand extends BasicCommand {
 
-    @CommandLine.Option(names = {"--topic", "-t"}, description = "Name for topic to be inspected")
+    @CommandLine.Option(names = {"--topic", "-t"}, description = "Name for topic to be inspected", required = true)
     String topicName;
 
     @CommandLine.Option(names = {"--timestamp, --time"}, description = "Timestamp")
