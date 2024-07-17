@@ -6,6 +6,8 @@ package io.strimzi.arguments.topic;
 
 import io.strimzi.admin.AdminProperties;
 import io.strimzi.arguments.BasicCommand;
+import io.strimzi.utils.FetchOffsetsUtils;
+import io.strimzi.utils.OutputFormat;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.DescribeTopicsResult;
 import org.apache.kafka.clients.admin.ListOffsetsResult;
@@ -36,6 +38,9 @@ public class FetchOffsetsCommand extends BasicCommand {
     @CommandLine.Option(names = {"--timestamp", "--time"}, description = "Timestamp of the offsets before that. See kafka-get-offsets tool for more info.")
     String timestamp = "latest";
 
+    @CommandLine.Option(names = {"--output", "-o"}, defaultValue = "plain", description = "Output format supports: ${COMPLETION-CANDIDATES}")
+    private OutputFormat outputFormat;
+
     @Override
     public Integer call() {
         return fetchOffsets();
@@ -61,14 +66,12 @@ public class FetchOffsetsCommand extends BasicCommand {
             ListOffsetsResult listOffsetsResult = admin.listOffsets(requestOffsets);
             Map<TopicPartition, ListOffsetsResult.ListOffsetsResultInfo> offsets = listOffsetsResult.all().get();
 
-            // Print the offsets
-            for (Map.Entry<TopicPartition, ListOffsetsResult.ListOffsetsResultInfo> entry : offsets.entrySet()) {
-                System.out.println("Partition: " + entry.getKey().partition() + ", Offset: " + entry.getValue().offset());
-            }
+            // Print results
+            System.out.println(FetchOffsetsUtils.getOutput(outputFormat, offsets));
 
             return 0;
         } catch (Exception e) {
-            throw new RuntimeException("Unable to list topics due: " + e);
+            throw new RuntimeException("Unable to fetch offsets of topic %s with output %s due: %s".formatted(topicName, outputFormat, e));
         }
     }
 
