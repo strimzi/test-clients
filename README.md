@@ -126,3 +126,6 @@ HTTP Consumer
 * `POLL_INTERVAL` - interval, in ms, between polls
 * `POLL_TIMEOUT` - timeout, in ms, of one poll
 * `MESSAGE_COUNT` - the number of messages consumer should receive 
+
+## Admin Client
+See [README.md](admin/README.md)
