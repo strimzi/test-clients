@@ -33,7 +33,7 @@ public class FetchOffsetsCommand extends BasicCommand {
     @CommandLine.Option(names = {"--topic", "-t"}, description = "Name for topic to be inspected.", required = true)
     String topicName;
 
-    @CommandLine.Option(names = {"--timestamp, --time"}, description = "Timestamp of the offsets before that. See kafka-get-offsets tool for more info.")
+    @CommandLine.Option(names = {"--timestamp", "--time"}, description = "Timestamp of the offsets before that. See kafka-get-offsets tool for more info.")
     String timestamp = "latest";
 
     @Override
