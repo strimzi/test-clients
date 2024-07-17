@@ -13,6 +13,7 @@ import org.apache.kafka.clients.admin.OffsetSpec;
 import org.apache.kafka.clients.admin.TopicDescription;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.TopicPartitionInfo;
+import org.apache.kafka.common.requests.ListOffsetsRequest;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
@@ -20,19 +21,20 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Command for fetch offsets for topic in Kafka.
- * Accessed using `admin-client topic get-offsets`
+ * Accessed using `admin-client topic fetch-offsets`
  */
 @CommandLine.Command(name = "fetch-offsets")
 public class FetchOffsetsCommand extends BasicCommand {
 
-    @CommandLine.Option(names = {"--topic", "-t"}, description = "Name for topic to be inspected", required = true)
+    @CommandLine.Option(names = {"--topic", "-t"}, description = "Name for topic to be inspected.", required = true)
     String topicName;
 
-    @CommandLine.Option(names = {"--timestamp, --time"}, description = "Timestamp (default is -1)")
-    long timestamp = -1;
+    @CommandLine.Option(names = {"--timestamp, --time"}, description = "Timestamp of the offsets before that. See kafka-get-offsets tool for more info.")
+    String timestamp = "latest";
 
     @Override
     public Integer call() {
@@ -53,7 +55,7 @@ public class FetchOffsetsCommand extends BasicCommand {
 
             Map<TopicPartition, OffsetSpec> requestOffsets = new HashMap<>();
             for (TopicPartition partition : partitions) {
-                requestOffsets.put(partition, OffsetSpec.forTimestamp(timestamp));
+                requestOffsets.put(partition, getOffSetSpecFromTimestamp(timestamp));
             }
 
             ListOffsetsResult listOffsetsResult = admin.listOffsets(requestOffsets);
@@ -67,6 +69,23 @@ public class FetchOffsetsCommand extends BasicCommand {
             return 0;
         } catch (Exception e) {
             throw new RuntimeException("Unable to list topics due: " + e);
+        }
+    }
+
+    private static OffsetSpec getOffSetSpecFromTimestamp(String timestamp) {
+        if (Objects.equals(timestamp, "-1") || Objects.equals(timestamp, "latest")) {
+            return OffsetSpec.latest();
+        } else if (Objects.equals(timestamp, "-2") || Objects.equals(timestamp, "earliest")) {
+            return OffsetSpec.earliest();
+        } else if (Objects.equals(timestamp, "-3") || Objects.equals(timestamp, "max-timestamp")) {
+            return OffsetSpec.maxTimestamp();
+        } else if (Objects.equals(timestamp, "-4") || Objects.equals(timestamp, "earliest-local")) {
+            return OffsetSpec.forTimestamp(ListOffsetsRequest.EARLIEST_LOCAL_TIMESTAMP);
+        } else if (Objects.equals(timestamp, "-5") || Objects.equals(timestamp, "latest-tiered")) {
+            // Not yet public API in Kafka
+            return OffsetSpec.forTimestamp(-5L);
+        } else {
+            return OffsetSpec.forTimestamp(Long.parseLong(timestamp));
         }
     }
 }
