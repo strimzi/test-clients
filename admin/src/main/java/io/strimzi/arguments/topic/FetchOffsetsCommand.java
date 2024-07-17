@@ -35,8 +35,8 @@ public class FetchOffsetsCommand extends BasicCommand {
     @CommandLine.Option(names = {"--topic", "-t"}, description = "Name of the topic to be inspected.", required = true)
     String topicName;
 
-    @CommandLine.Option(names = {"--timestamp", "--time"}, description = "Timestamp marking the cutoff point before which offsets will be fetched. See kafka-get-offsets tool for more info.")
-    String timestamp = "latest";
+    @CommandLine.Option(names = {"--timestamp", "--time"}, defaultValue = "latest", description = "Timestamp marking the cutoff point before which offsets will be fetched. See kafka-get-offsets tool for more info.")
+    String timestamp;
 
     @CommandLine.Option(names = {"--output", "-o"}, defaultValue = "plain", description = "Output format supports: ${COMPLETION-CANDIDATES}")
     private OutputFormat outputFormat;
