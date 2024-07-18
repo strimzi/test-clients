@@ -119,7 +119,7 @@ public class HttpProducerClient implements ClientsInterface {
         } else {
             message = configuration.getMessage() + "-" + numOfMessage;
         }
-        if (Objects.equals(this.configuration.getMessageType(), MessageType.text.name())) {
+        if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.TEXT.name())) {
             message = "\"" + message + "\"";
         }
 
@@ -145,7 +145,7 @@ public class HttpProducerClient implements ClientsInterface {
             } else {
                 message = configuration.getMessage() + "-" + i;
             }
-            if (Objects.equals(this.configuration.getMessageType(), MessageType.text.name())) {
+            if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.TEXT.name())) {
                 message = "\"" + message + "\"";
             }
 

@@ -121,13 +121,13 @@ public class KafkaProducerClient implements ClientsInterface {
         String message;
 
         if (this.configuration.getMessageTemplate() != null) {
-            if (Objects.equals(this.configuration.getMessageType(), MessageType.json.name())) {
+            if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.JSON.name())) {
                 message = dataGenerator.generateStringData();
             } else {
                 message = "\"" + dataGenerator.generateStringData() + "\"";
             }
         } else {
-            if (Objects.equals(this.configuration.getMessageType(), MessageType.json.name())) {
+            if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.JSON.name())) {
                 message = configuration.getMessage() + " - " + numOfMessage;
             } else {
                 message = "\"" + configuration.getMessage() + " - " + numOfMessage + "\"";
