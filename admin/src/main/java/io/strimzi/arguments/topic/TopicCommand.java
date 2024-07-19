@@ -19,7 +19,8 @@ import picocli.CommandLine;
         DeleteTopicCommand.class,
         ListTopicCommand.class,
         DescribeTopicCommand.class,
-        AlterTopicCommand.class
+        AlterTopicCommand.class,
+        FetchOffsetsCommand.class
     }
 )
 public class TopicCommand {
