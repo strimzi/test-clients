@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class KafkaProducerClientTest {
+public class KafkaProducerClientTest {
 
     private Map<String, String> configuration;
 
