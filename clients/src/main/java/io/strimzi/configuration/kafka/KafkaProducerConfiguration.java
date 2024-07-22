@@ -4,6 +4,7 @@
  */
 package io.strimzi.configuration.kafka;
 
+import io.strimzi.common.MessageType;
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -38,6 +39,10 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
+
+        if (MessageType.getFromString(this.messageType) == MessageType.UNKNOWN) {
+            throw new InvalidParameterException("MESSAGE_TYPE should be 'json' or 'text'");
+        }
     }
 
     public String getAcks() {

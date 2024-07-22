@@ -8,7 +8,6 @@ import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
 import io.skodjob.datagenerator.DataGenerator;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.MessageType;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.http.HttpProducerConfiguration;
 import io.strimzi.common.records.producer.http.OffsetRecordSent;
@@ -24,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -115,13 +113,13 @@ public class HttpProducerClient implements ClientsInterface {
     public ProducerRecord generateMessage(int numOfMessage) {
         String message;
         if (this.configuration.getMessageTemplate() != null) {
-            message = dataGenerator.generateStringData();
+            message = dataGenerator.generateData();
         } else {
             message = configuration.getMessage() + "-" + numOfMessage;
         }
-        if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.TEXT.name())) {
-            message = "\"" + message + "\"";
-        }
+//        if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.TEXT.name())) {
+//            message = "\"" + message + "\"";
+//        }
 
         String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":" + message + "}]}";
 
@@ -141,12 +139,9 @@ public class HttpProducerClient implements ClientsInterface {
         for (int i = 0; i < configuration.getMessageCount(); i++) {
             String message;
             if (this.configuration.getMessageTemplate() != null) {
-                message = dataGenerator.generateStringData();
+                message = dataGenerator.generateData();
             } else {
                 message = configuration.getMessage() + "-" + i;
-            }
-            if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.TEXT.name())) {
-                message = "\"" + message + "\"";
             }
 
             record += "{\"key\":\"key-" + i + "\",\"value\":" + message + "}";

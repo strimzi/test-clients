@@ -4,6 +4,7 @@
  */
 package io.strimzi.configuration.http;
 
+import io.strimzi.common.MessageType;
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
 
@@ -27,6 +28,10 @@ public class HttpClientsConfiguration {
         int messageCount = ClientsConfigurationUtils.parseIntOrDefault(map.get(ConfigurationConstants.MESSAGE_COUNT_ENV), ConfigurationConstants.DEFAULT_MESSAGES_COUNT);
         String endpointPrefix = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), ConfigurationConstants.DEFAULT_ENDPOINT_PREFIX);
         this.messageType = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TYPE_ENV), ConfigurationConstants.DEFAULT_MESSAGE_TYPE);
+
+        if (MessageType.getFromString(this.messageType) == MessageType.UNKNOWN) {
+            throw new InvalidParameterException("MESSAGE_TYPE should be 'json' or 'text'");
+        }
 
         if (hostname == null || hostname.isEmpty()) throw new InvalidParameterException("Hostname is not set.");
 

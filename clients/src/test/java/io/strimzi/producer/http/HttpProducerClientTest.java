@@ -26,7 +26,7 @@ public class HttpProducerClientTest {
     void testGenerateMessage() {
         int numberOfMessage = 6;
 
-        String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":\"" + ConfigurationConstants.DEFAULT_MESSAGE + "-" + numberOfMessage + "\"}]}";
+        String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":" + ConfigurationConstants.DEFAULT_MESSAGE + "-" + numberOfMessage + "}]}";
 
         ProducerRecord result = producerClient.generateMessage(numberOfMessage);
 

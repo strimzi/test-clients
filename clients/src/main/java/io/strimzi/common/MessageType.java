@@ -5,9 +5,15 @@
 package io.strimzi.common;
 
 public enum MessageType {
-    TEXT,
-    JSON,
-    UNKNOWN;
+    TEXT("text"),
+    JSON("json"),
+    UNKNOWN("unknown");
+
+    private final String messageType;
+
+    MessageType(String messageType) {
+        this.messageType = messageType;
+    }
 
     public static MessageType getFromString(String value) {
         for (MessageType type : values()) {
@@ -16,5 +22,10 @@ public enum MessageType {
             }
         }
         return UNKNOWN;
+    }
+
+    @Override
+    public String toString() {
+        return this.messageType;
     }
 }

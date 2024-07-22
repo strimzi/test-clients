@@ -7,7 +7,6 @@ package io.strimzi.kafka;
 import io.skodjob.datagenerator.DataGenerator;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
-import io.strimzi.common.MessageType;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
@@ -121,17 +119,9 @@ public class KafkaProducerClient implements ClientsInterface {
         String message;
 
         if (this.configuration.getMessageTemplate() != null) {
-            if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.JSON.name())) {
-                message = dataGenerator.generateStringData();
-            } else {
-                message = "\"" + dataGenerator.generateStringData() + "\"";
-            }
+            message = dataGenerator.generateData();
         } else {
-            if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.JSON.name())) {
-                message = configuration.getMessage() + " - " + numOfMessage;
-            } else {
-                message = "\"" + configuration.getMessage() + " - " + numOfMessage + "\"";
-            }
+            message = configuration.getMessage() + " - " + numOfMessage;
         }
 
         return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),

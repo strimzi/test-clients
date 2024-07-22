@@ -42,7 +42,6 @@
         <grpc.version>1.61.0</grpc.version>
         <checkstyle.version>10.8.1</checkstyle.version>
         <picocli.version>4.7.5</picocli.version>
-        <sl4j-nop.version>1.7.36</sl4j-nop.version>
 
         <data.generator.version>0.2.0-SNAPSHOT</data.generator.version>
         <sl4j.version>2.0.13</sl4j.version>
@@ -103,12 +102,6 @@
                 <artifactId>picocli</artifactId>
                 <version>${picocli.version}</version>
             </dependency>
-            <!-- Needed as a dependency of Admin client to not log the SLF4J error -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-nop</artifactId>
-                <version>${sl4j-nop.version}</version>
-            </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
                 <artifactId>log4j-api</artifactId>
@@ -116,7 +109,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-slf4j-impl</artifactId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
                 <version>${log4j.version}</version>
             </dependency>
             <dependency>

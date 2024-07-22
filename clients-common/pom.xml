@@ -37,9 +37,5 @@
             <artifactId>hamcrest</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>io.skodjob</groupId>
-            <artifactId>data-generator</artifactId>
-        </dependency>
     </dependencies>
 </project>
