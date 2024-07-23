@@ -4,8 +4,6 @@
  */
 package io.strimzi.configuration.kafka;
 
-import io.skodjob.datagenerator.DataGenerator;
-import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.configuration.ConfigurationConstants;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.header.Header;
@@ -88,8 +86,6 @@ public class KafkaProducerConfigurationTest {
                 () -> assertThat(kafkaProducerConfiguration.getMessageTemplate(), is(messageTemplate)),
                 () -> assertThat(kafkaProducerConfiguration.getMessageType(), is(messageType))
         );
-
-        DataGenerator dataGenerator = new DataGenerator(ETemplateType.FLIGHTS);
     }
 
     @Test

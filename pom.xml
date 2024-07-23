@@ -43,7 +43,7 @@
         <checkstyle.version>10.8.1</checkstyle.version>
         <picocli.version>4.7.5</picocli.version>
 
-        <data.generator.version>0.2.0-SNAPSHOT</data.generator.version>
+        <data.generator.version>0.2.0</data.generator.version>
         <sl4j.version>2.0.13</sl4j.version>
 
         <skipTests>false</skipTests>
