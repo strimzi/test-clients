@@ -29,7 +29,7 @@
             <groupId>io.strimzi</groupId>
             <artifactId>kafka-kubernetes-config-provider</artifactId>
         </dependency>
-        <!-- No logger config yet, should be fixed -->
+        <!-- This is due to limitation of admin client - we don§t want to have kafka related logs in output, could be revisited in the future -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
