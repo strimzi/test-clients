@@ -4,6 +4,9 @@
  */
 package io.strimzi.common;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum MessageType {
     TEXT("text"),
     JSON("json"),
@@ -27,5 +30,11 @@ public enum MessageType {
     @Override
     public String toString() {
         return this.messageType;
+    }
+
+    public static List<MessageType> supportedTypes() {
+        List<MessageType> supportedMessageTypes = Arrays.asList(values());
+        supportedMessageTypes.remove(UNKNOWN);
+        return supportedMessageTypes;
     }
 }

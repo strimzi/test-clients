@@ -117,9 +117,6 @@ public class HttpProducerClient implements ClientsInterface {
         } else {
             message = configuration.getMessage() + "-" + numOfMessage;
         }
-//        if (this.configuration.getMessageType().equalsIgnoreCase(MessageType.TEXT.name())) {
-//            message = "\"" + message + "\"";
-//        }
 
         String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":" + message + "}]}";
 
@@ -186,5 +183,3 @@ public class HttpProducerClient implements ClientsInterface {
         }
     }
 }
-
-

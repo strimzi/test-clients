@@ -26,9 +26,9 @@
 
         <maven.surefire.version>3.3.1</maven.surefire.version>
         <maven.checkstyle.version>3.2.1</maven.checkstyle.version>
-        <log4j.version>2.23.1</log4j.version>
         <maven-shade.version>3.2.1</maven-shade.version>
-        <slf4j-simple.version>2.0.6</slf4j-simple.version>
+        <log4j.version>2.23.1</log4j.version>
+        <sl4j.version>2.0.13</sl4j.version>
 
         <kafka.version>3.7.1</kafka.version>
         <strimzi-oauth-callback.version>0.15.0</strimzi-oauth-callback.version>
@@ -44,7 +44,6 @@
         <picocli.version>4.7.5</picocli.version>
 
         <data.generator.version>0.2.0</data.generator.version>
-        <sl4j.version>2.0.13</sl4j.version>
 
         <skipTests>false</skipTests>
     </properties>
