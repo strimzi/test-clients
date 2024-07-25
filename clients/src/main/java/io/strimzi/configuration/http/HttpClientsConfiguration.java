@@ -4,6 +4,7 @@
  */
 package io.strimzi.configuration.http;
 
+import io.strimzi.common.MessageType;
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
 
@@ -17,6 +18,7 @@ public class HttpClientsConfiguration {
     private final long delay;
     private final int messageCount;
     private final String endpointPrefix;
+    private final String messageType;
 
     public HttpClientsConfiguration(Map<String, String> map) {
         String hostname = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.HOSTNAME_ENV), "");
@@ -25,6 +27,11 @@ public class HttpClientsConfiguration {
         long delay = ClientsConfigurationUtils.parseLongOrDefault(map.get(ConfigurationConstants.DELAY_MS_ENV), ConfigurationConstants.DEFAULT_DELAY_MS);
         int messageCount = ClientsConfigurationUtils.parseIntOrDefault(map.get(ConfigurationConstants.MESSAGE_COUNT_ENV), ConfigurationConstants.DEFAULT_MESSAGES_COUNT);
         String endpointPrefix = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), ConfigurationConstants.DEFAULT_ENDPOINT_PREFIX);
+        this.messageType = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TYPE_ENV), ConfigurationConstants.DEFAULT_MESSAGE_TYPE);
+
+        if (MessageType.getFromString(this.messageType) == MessageType.UNKNOWN) {
+            throw new InvalidParameterException("MESSAGE_TYPE should be one of " + MessageType.supportedTypes());
+        }
 
         if (hostname == null || hostname.isEmpty()) throw new InvalidParameterException("Hostname is not set.");
 
@@ -64,12 +71,17 @@ public class HttpClientsConfiguration {
         return endpointPrefix;
     }
 
+    public String getMessageType() {
+        return messageType;
+    }
+
     @Override
     public String toString() {
         return "hostname='" + this.getHostname() + "',\n" +
             "port='" + this.getPort() + "',\n" +
             "topic='" + this.getTopic() + "',\n" +
             "delay='" + this.getDelay() + "',\n" +
+            "messageType='" + this.getMessageType() + "',\n" +
             "messageCount='" + this.getMessageCount() + "'";
     }
 }

@@ -5,6 +5,8 @@
 package io.strimzi.http.producer;
 
 import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
+import io.skodjob.datagenerator.DataGenerator;
+import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.http.HttpProducerConfiguration;
@@ -36,6 +38,7 @@ public class HttpProducerClient implements ClientsInterface {
     private HttpHandle httpHandle;
     private final ScheduledExecutorService scheduledExecutor;
     private final CountDownLatch countDownLatch;
+    private DataGenerator dataGenerator;
 
     public HttpProducerClient(Map<String, String> configuration) {
         this.configuration = new HttpProducerConfiguration(configuration);
@@ -45,6 +48,10 @@ public class HttpProducerClient implements ClientsInterface {
         this.httpHandle = tracingHandle.createHttpHandle("send-messages");
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-producer"));
         this.countDownLatch = new CountDownLatch(1);
+
+        if (this.configuration.getMessageTemplate() != null) {
+            dataGenerator = new DataGenerator(ETemplateType.getFromString(this.configuration.getMessageTemplate()));
+        }
     }
 
     @Override
@@ -104,11 +111,18 @@ public class HttpProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
-        String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":\"" + configuration.getMessage() + "-" + numOfMessage + "\"}]}";
+        String message;
+        if (this.configuration.getMessageTemplate() != null) {
+            message = dataGenerator.generateData();
+        } else {
+            message = configuration.getMessage() + "-" + numOfMessage;
+        }
+
+        String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":" + message + "}]}";
 
         HttpContext context = HttpContext.post(
             configuration.getUri(),
-            "application/vnd.kafka.json.v2+json",
+            "application/vnd.kafka." + this.configuration.getMessageType() + ".v2+json",
             record);
 
         messageIndex++;
@@ -120,7 +134,14 @@ public class HttpProducerClient implements ClientsInterface {
         String record = "{\"records\":[";
 
         for (int i = 0; i < configuration.getMessageCount(); i++) {
-            record += "{\"key\":\"key-" + i + "\",\"value\":\"" + configuration.getMessage() + "-" + i + "\"}";
+            String message;
+            if (this.configuration.getMessageTemplate() != null) {
+                message = dataGenerator.generateData();
+            } else {
+                message = configuration.getMessage() + "-" + i;
+            }
+
+            record += "{\"key\":\"key-" + i + "\",\"value\":" + message + "}";
             if (i != configuration.getMessageCount() - 1) {
                 record += ",";
             }
@@ -130,7 +151,7 @@ public class HttpProducerClient implements ClientsInterface {
 
         HttpContext context = HttpContext.post(
             configuration.getUri(),
-            "application/vnd.kafka.json.v2+json",
+            "application/vnd.kafka." + this.configuration.getMessageType() + ".v2+json",
             record);
 
         messageIndex = configuration.getMessageCount() - 1;

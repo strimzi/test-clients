@@ -4,6 +4,8 @@
  */
 package io.strimzi.kafka;
 
+import io.skodjob.datagenerator.DataGenerator;
+import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
 import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.ConfigurationConstants;
@@ -33,6 +35,7 @@ public class KafkaProducerClient implements ClientsInterface {
     private int messageSuccessfullySent;
     private final ScheduledExecutorService scheduledExecutor;
     private final CountDownLatch countDownLatch;
+    private DataGenerator dataGenerator;
 
     public KafkaProducerClient(Map<String, String> configuration) {
         this.configuration = new KafkaProducerConfiguration(configuration);
@@ -44,6 +47,10 @@ public class KafkaProducerClient implements ClientsInterface {
         this.messageSuccessfullySent = 0;
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "kafka-producer"));
         this.countDownLatch  = new CountDownLatch(1);
+        // If template is set, generate data based on it
+        if (this.configuration.getMessageTemplate() != null) {
+            dataGenerator = new DataGenerator(ETemplateType.getFromString(this.configuration.getMessageTemplate()));
+        }
     }
 
     @Override
@@ -109,8 +116,16 @@ public class KafkaProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
+        String message;
+
+        if (this.configuration.getMessageTemplate() != null) {
+            message = dataGenerator.generateData();
+        } else {
+            message = configuration.getMessage() + " - " + numOfMessage;
+        }
+
         return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
-            configuration.getMessage() + " - " + numOfMessage, configuration.getHeaders());
+            message, configuration.getHeaders());
     }
 
     public List<ProducerRecord> generateMessages() {

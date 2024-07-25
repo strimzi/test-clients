@@ -29,10 +29,11 @@
             <groupId>io.strimzi</groupId>
             <artifactId>kafka-kubernetes-config-provider</artifactId>
         </dependency>
+        <!-- This is due to limitation of admin client - we don't want to have Kafka related logs in output, could be revisited in the future -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
-            <version>${sl4j-nop.version}</version>
+            <version>${sl4j.version}</version>
         </dependency>
     </dependencies>
 
