@@ -33,8 +33,6 @@ public enum MessageType {
     }
 
     public static List<MessageType> supportedTypes() {
-        List<MessageType> supportedMessageTypes = Arrays.asList(values());
-        supportedMessageTypes.remove(UNKNOWN);
-        return supportedMessageTypes;
+        return Arrays.stream(values()).filter(item -> item != UNKNOWN).toList();
     }
 }

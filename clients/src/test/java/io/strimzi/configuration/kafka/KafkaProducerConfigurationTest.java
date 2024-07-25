@@ -83,8 +83,7 @@ public class KafkaProducerConfigurationTest {
                 () -> assertThat(kafkaProducerConfiguration.getTopicName(), is(topicName)),
                 () -> assertThat(kafkaProducerConfiguration.getBootstrapServers(), is(bootstrapServer)),
                 () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageKey)),
-                () -> assertThat(kafkaProducerConfiguration.getMessageTemplate(), is(messageTemplate)),
-                () -> assertThat(kafkaProducerConfiguration.getMessageType(), is(messageType))
+                () -> assertThat(kafkaProducerConfiguration.getMessageTemplate(), is(messageTemplate))
         );
     }
 

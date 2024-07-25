@@ -4,7 +4,6 @@
  */
 package io.strimzi.configuration.kafka;
 
-import io.strimzi.common.MessageType;
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -24,7 +23,6 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
     private final String message;
     private final String messageKey;
     private final String messageTemplate;
-    private final String messageType;
 
     public KafkaProducerConfiguration(Map<String, String> map) {
         super(map);
@@ -34,15 +32,10 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.transactionalProducer = getAdditionalConfig().toString().contains(ProducerConfig.TRANSACTIONAL_ID_CONFIG);
         this.message = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_ENV), ConfigurationConstants.DEFAULT_MESSAGE);
         this.messageTemplate = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TEMPLATE_ENV), null);
-        this.messageType = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TYPE_ENV), ConfigurationConstants.DEFAULT_MESSAGE_TYPE);
         this.messageKey = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_KEY_ENV), null);
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
-
-        if (MessageType.getFromString(this.messageType) == MessageType.UNKNOWN) {
-            throw new InvalidParameterException("MESSAGE_TYPE should be 'json' or 'text'");
-        }
     }
 
     public String getAcks() {
@@ -75,10 +68,6 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
 
     public String getMessageTemplate() {
         return messageTemplate;
-    }
-
-    public String getMessageType() {
-        return messageType;
     }
 
     @Override

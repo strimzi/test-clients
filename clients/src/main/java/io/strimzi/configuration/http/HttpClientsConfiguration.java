@@ -30,7 +30,7 @@ public class HttpClientsConfiguration {
         this.messageType = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TYPE_ENV), ConfigurationConstants.DEFAULT_MESSAGE_TYPE);
 
         if (MessageType.getFromString(this.messageType) == MessageType.UNKNOWN) {
-            throw new InvalidParameterException("MESSAGE_TYPE should be 'json' or 'text'");
+            throw new InvalidParameterException("MESSAGE_TYPE should be one of " + MessageType.supportedTypes());
         }
 
         if (hostname == null || hostname.isEmpty()) throw new InvalidParameterException("Hostname is not set.");
