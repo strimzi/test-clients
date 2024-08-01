@@ -21,9 +21,37 @@ import static org.hamcrest.Matchers.is;
 public class HttpProducerClientTest {
 
     private HttpProducerClient producerClient;
+    private Map<String, String> configuration = new HashMap<>();
 
     @Test
-    void testGenerateMessage() {
+    void testGenerateMessageDefault() {
+        producerClient = new HttpProducerClient(configuration);
+        int numberOfMessage = 6;
+
+        String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":\"" + ConfigurationConstants.DEFAULT_MESSAGE + "-" + numberOfMessage + "\"}]}";
+
+        ProducerRecord result = producerClient.generateMessage(numberOfMessage);
+
+        assertThat(result.message(), is(desiredJsonMessage));
+    }
+
+    @Test
+    void testGenerateMessageText() {
+        configuration.put("MESSAGE_TYPE", "text");
+        producerClient = new HttpProducerClient(configuration);
+        int numberOfMessage = 6;
+
+        String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":\"" + ConfigurationConstants.DEFAULT_MESSAGE + "-" + numberOfMessage + "\"}]}";
+
+        ProducerRecord result = producerClient.generateMessage(numberOfMessage);
+
+        assertThat(result.message(), is(desiredJsonMessage));
+    }
+
+    @Test
+    void testGenerateMessageJson() {
+        configuration.put("MESSAGE_TYPE", "json");
+        producerClient = new HttpProducerClient(configuration);
         int numberOfMessage = 6;
 
         String desiredJsonMessage = "{\"records\":[{\"key\":\"key-" + numberOfMessage + "\",\"value\":" + ConfigurationConstants.DEFAULT_MESSAGE + "-" + numberOfMessage + "}]}";
@@ -35,12 +63,8 @@ public class HttpProducerClientTest {
 
     @BeforeAll
     void setup() {
-        Map<String, String> configuration = new HashMap<>();
-
         configuration.put("HOSTNAME", "localhost");
         configuration.put("PORT", "8080");
         configuration.put("TOPIC", "my-topic");
-
-        producerClient = new HttpProducerClient(configuration);
     }
 }

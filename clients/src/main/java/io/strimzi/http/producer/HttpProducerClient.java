@@ -23,6 +23,7 @@ import org.apache.logging.log4j.Logger;
 import java.net.http.HttpClient;
 import java.net.http.HttpResponse;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -118,6 +119,10 @@ public class HttpProducerClient implements ClientsInterface {
             message = configuration.getMessage() + "-" + numOfMessage;
         }
 
+        if (Objects.equals(this.configuration.getMessageType(), ConfigurationConstants.DEFAULT_MESSAGE_TYPE)) {
+            message = "\"" + message + "\"";
+        }
+
         String record = "{\"records\":[{\"key\":\"key-" + numOfMessage + "\",\"value\":" + message + "}]}";
 
         HttpContext context = HttpContext.post(
@@ -139,6 +144,10 @@ public class HttpProducerClient implements ClientsInterface {
                 message = dataGenerator.generateData();
             } else {
                 message = configuration.getMessage() + "-" + i;
+            }
+
+            if (Objects.equals(this.configuration.getMessageType(), ConfigurationConstants.DEFAULT_MESSAGE_TYPE)) {
+                message = "\"" + message + "\"";
             }
 
             record += "{\"key\":\"key-" + i + "\",\"value\":" + message + "}";
