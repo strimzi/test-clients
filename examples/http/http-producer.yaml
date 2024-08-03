@@ -34,7 +34,7 @@ spec:
               value: DEBUG
             - name: CLIENT_TYPE
               value: HttpProducer
-          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.8.0
+          image: quay.io/strimzi-test-clients/test-clients:0.9.0-kafka-3.8.0
           imagePullPolicy: IfNotPresent
           name: http-producer
       restartPolicy: "Never"
