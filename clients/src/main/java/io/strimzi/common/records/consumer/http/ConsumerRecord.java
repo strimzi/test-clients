@@ -12,6 +12,7 @@ public class ConsumerRecord {
     private Object value;
     private int partition;
     private long offset;
+    private Long timestamp;
 
     public void setTopic(String topic) {
         this.topic = topic;
@@ -33,6 +34,10 @@ public class ConsumerRecord {
         this.offset = offset;
     }
 
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
+    }
+
     @Override
     public boolean equals(Object o) {
         // self check
@@ -49,7 +54,8 @@ public class ConsumerRecord {
 
         ConsumerRecord cr = (ConsumerRecord) o;
 
-        return cr.partition == partition &&
+        return Objects.equals(cr.timestamp, timestamp) &&
+            cr.partition == partition &&
             cr.offset == offset &&
             Objects.equals(cr.value, value) &&
             Objects.equals(cr.topic, topic) &&
@@ -64,10 +70,11 @@ public class ConsumerRecord {
     @Override
     public String toString() {
         return "ConsumerRecord: " +
-            ", topic = " + this.topic +
+            "topic = " + this.topic +
             ", key = " + this.key +
             ", value = " + this.value +
             ", partition = " + this.partition +
-            ", offset = " + this.offset;
+            ", offset = " + this.offset +
+            ", timestamp = " + this.timestamp;
     }
 }
