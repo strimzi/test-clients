@@ -70,7 +70,7 @@ public class ConsumerRecord {
     @Override
     public String toString() {
         return "ConsumerRecord: " +
-            ", topic = " + this.topic +
+            "topic = " + this.topic +
             ", key = " + this.key +
             ", value = " + this.value +
             ", partition = " + this.partition +
