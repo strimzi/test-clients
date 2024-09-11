@@ -6,6 +6,8 @@ package io.strimzi.configuration.kafka;
 
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.StreamsConfig;
 
 import java.security.InvalidParameterException;
 import java.util.Map;
@@ -16,6 +18,8 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
     private final String sourceTopic;
     private final String targetTopic;
     private final long commitIntervalMs;
+    private final String defaultKeySerde;
+    private final String defaultValueSerde;
 
     public KafkaStreamsConfiguration(Map<String, String> map) {
         super(map);
@@ -29,6 +33,8 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
         if (sourceTopic == null || sourceTopic.isEmpty()) throw new InvalidParameterException("Source topic is not set");
 
         if (targetTopic == null || targetTopic.isEmpty()) throw new InvalidParameterException("Target topic is not set");
+        this.defaultKeySerde = map.getOrDefault(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().toString());
+        this.defaultValueSerde = map.getOrDefault(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().toString());
     }
 
     public String getApplicationId() {
@@ -45,6 +51,14 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
 
     public long getCommitIntervalMs() {
         return commitIntervalMs;
+    }
+
+    public String getDefaultKeySerde() {
+        return defaultKeySerde;
+    }
+
+    public String getDefaultValueSerde() {
+        return defaultValueSerde;
     }
 
     @Override

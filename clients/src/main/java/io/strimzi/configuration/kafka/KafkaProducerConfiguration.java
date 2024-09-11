@@ -6,8 +6,10 @@ package io.strimzi.configuration.kafka;
 
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -23,6 +25,8 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
     private final String message;
     private final String messageKey;
     private final String messageTemplate;
+    private final String keySerializer;
+    private final String valueSerializer;
 
     public KafkaProducerConfiguration(Map<String, String> map) {
         super(map);
@@ -36,6 +40,8 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
+        this.valueSerializer = map.getOrDefault(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        this.keySerializer = map.getOrDefault(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
     }
 
     public String getAcks() {
@@ -68,6 +74,14 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
 
     public String getMessageTemplate() {
         return messageTemplate;
+    }
+
+    public String getKeySerializer() {
+        return keySerializer;
+    }
+
+    public String getValueSerializer() {
+        return valueSerializer;
     }
 
     @Override
