@@ -11,6 +11,11 @@ import org.apache.kafka.streams.StreamsConfig;
 
 import java.security.InvalidParameterException;
 import java.util.Map;
+import java.util.Properties;
+
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseMapOfProperties;
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseStringOrDefault;
+import static io.strimzi.configuration.ConfigurationConstants.ADDITIONAL_CONFIG_ENV;
 
 
 public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
@@ -33,8 +38,19 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
         if (sourceTopic == null || sourceTopic.isEmpty()) throw new InvalidParameterException("Source topic is not set");
 
         if (targetTopic == null || targetTopic.isEmpty()) throw new InvalidParameterException("Target topic is not set");
-        this.defaultKeySerde = map.getOrDefault(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().toString());
-        this.defaultValueSerde = map.getOrDefault(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().toString());
+
+        Properties additionalConfig = parseMapOfProperties(parseStringOrDefault(map.get(ADDITIONAL_CONFIG_ENV), ""));
+        if (additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG) != null) {
+            this.defaultKeySerde = additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString();
+        } else {
+            this.defaultKeySerde = Serdes.String().getClass().toString();
+        }
+
+        if (additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG) != null) {
+            this.defaultValueSerde = additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString();
+        } else {
+            this.defaultValueSerde = Serdes.String().getClass().toString();
+        }
     }
 
     public String getApplicationId() {

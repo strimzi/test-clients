@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static io.strimzi.configuration.ConfigurationConstants.ADDITIONAL_CONFIG_ENV;
 import static io.strimzi.configuration.ConfigurationConstants.APPLICATION_ID_ENV;
 import static io.strimzi.configuration.ConfigurationConstants.BOOTSTRAP_SERVERS_ENV;
 import static io.strimzi.configuration.ConfigurationConstants.CLIENT_ID_ENV;
@@ -56,6 +57,7 @@ public class KafkaPropertiesTest {
 
         String producerAcks = "0";
         configuration.put(PRODUCER_ACKS_ENV, producerAcks);
+        configuration.put(ADDITIONAL_CONFIG_ENV, "value.serializer=io.apicurio.registry.serde.avro.AvroKafkaSerializer");
 
         kafkaProducerConfiguration = new KafkaProducerConfiguration(configuration);
         producerProperties = KafkaProperties.producerProperties(kafkaProducerConfiguration);

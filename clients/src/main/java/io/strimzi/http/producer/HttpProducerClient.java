@@ -112,7 +112,7 @@ public class HttpProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
-        String message;
+        Object message;
         if (this.configuration.getMessageTemplate() != null) {
             message = dataGenerator.generateData();
         } else {
@@ -139,7 +139,7 @@ public class HttpProducerClient implements ClientsInterface {
         String record = "{\"records\":[";
 
         for (int i = 0; i < configuration.getMessageCount(); i++) {
-            String message;
+            Object message;
             if (this.configuration.getMessageTemplate() != null) {
                 message = dataGenerator.generateData();
             } else {

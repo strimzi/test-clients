@@ -43,7 +43,9 @@
         <checkstyle.version>10.8.1</checkstyle.version>
         <picocli.version>4.7.5</picocli.version>
 
-        <data.generator.version>0.2.0</data.generator.version>
+        <data.generator.version>0.3.0</data.generator.version>
+
+        <apicurio-registry.version>2.6.1.Final</apicurio-registry.version>
 
         <skipTests>false</skipTests>
     </properties>

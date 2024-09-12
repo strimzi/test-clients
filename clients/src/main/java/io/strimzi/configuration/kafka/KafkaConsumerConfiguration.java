@@ -11,6 +11,11 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 
 import java.security.InvalidParameterException;
 import java.util.Map;
+import java.util.Properties;
+
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseMapOfProperties;
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseStringOrDefault;
+import static io.strimzi.configuration.ConfigurationConstants.ADDITIONAL_CONFIG_ENV;
 
 
 public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
@@ -31,8 +36,19 @@ public class KafkaConsumerConfiguration extends KafkaClientsConfiguration {
         this.outputFormat = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.OUTPUT_FORMAT_ENV), ConfigurationConstants.DEFAULT_OUTPUT_FORMAT);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
-        this.keyDeserializer = map.getOrDefault(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
-        this.valueDeserializer = map.getOrDefault(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class.getName());
+
+        Properties additionalConfig = parseMapOfProperties(parseStringOrDefault(map.get(ADDITIONAL_CONFIG_ENV), ""));
+        if (additionalConfig.get(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG) != null) {
+            this.keyDeserializer = additionalConfig.get(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG).toString();
+        } else {
+            this.keyDeserializer = StringDeserializer.class.getName();
+        }
+
+        if (additionalConfig.get(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG) != null) {
+            this.valueDeserializer = additionalConfig.get(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG).toString();
+        } else {
+            this.valueDeserializer = StringDeserializer.class.getName();
+        }
     }
 
     public String getGroupId() {
