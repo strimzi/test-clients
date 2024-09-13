@@ -64,6 +64,8 @@ public class KafkaPropertiesTest {
 
         // check custom properties
         assertThat(producerProperties.getProperty(ProducerConfig.ACKS_CONFIG), is(producerAcks));
+        assertThat(producerProperties.getProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaSerializer"));
     }
 
     @Test
