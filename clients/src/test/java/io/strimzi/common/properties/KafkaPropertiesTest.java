@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static io.strimzi.configuration.ConfigurationConstants.ADDITIONAL_CONFIG_ENV;
 import static io.strimzi.configuration.ConfigurationConstants.APPLICATION_ID_ENV;
 import static io.strimzi.configuration.ConfigurationConstants.BOOTSTRAP_SERVERS_ENV;
 import static io.strimzi.configuration.ConfigurationConstants.CLIENT_ID_ENV;
@@ -56,12 +57,18 @@ public class KafkaPropertiesTest {
 
         String producerAcks = "0";
         configuration.put(PRODUCER_ACKS_ENV, producerAcks);
+        configuration.put(ADDITIONAL_CONFIG_ENV, "value.serializer=io.apicurio.registry.serde.avro.AvroKafkaSerializer\n" +
+            "key.serializer=io.apicurio.registry.serde.avro.AvroKafkaSerializer");
 
         kafkaProducerConfiguration = new KafkaProducerConfiguration(configuration);
         producerProperties = KafkaProperties.producerProperties(kafkaProducerConfiguration);
 
         // check custom properties
         assertThat(producerProperties.getProperty(ProducerConfig.ACKS_CONFIG), is(producerAcks));
+        assertThat(producerProperties.getProperty(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaSerializer"));
+        assertThat(producerProperties.getProperty(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaSerializer"));
     }
 
     @Test
@@ -90,6 +97,8 @@ public class KafkaPropertiesTest {
         configuration.put(CLIENT_ID_ENV, clientId);
         configuration.put(GROUP_ID_ENV, groupId);
         configuration.put(CLIENT_RACK_ENV, clientRack);
+        configuration.put(ADDITIONAL_CONFIG_ENV, "value.deserializer=io.apicurio.registry.serde.avro.AvroKafkaDeserializer\n" +
+            "key.deserializer=io.apicurio.registry.serde.avro.AvroKafkaDeserializer");
 
         kafkaConsumerConfiguration = new KafkaConsumerConfiguration(configuration);
 
@@ -99,6 +108,10 @@ public class KafkaPropertiesTest {
         assertThat(consumerProperties.getProperty(ConsumerConfig.CLIENT_ID_CONFIG), is(clientId));
         assertThat(consumerProperties.getProperty(ConsumerConfig.GROUP_ID_CONFIG), is(groupId));
         assertThat(consumerProperties.getProperty(ConsumerConfig.CLIENT_RACK_CONFIG), is(clientRack));
+        assertThat(consumerProperties.getProperty(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaDeserializer"));
+        assertThat(consumerProperties.getProperty(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaDeserializer"));
     }
 
     @Test
@@ -122,6 +135,8 @@ public class KafkaPropertiesTest {
 
         long commitInterval = 7000L;
         configuration.put(COMMIT_INTERVAL_MS_ENV, String.valueOf(commitInterval));
+        configuration.put(ADDITIONAL_CONFIG_ENV, "default.value.serde=io.apicurio.registry.serde.avro.AvroKafkaDeserializer\n" +
+            "default.key.serde=io.apicurio.registry.serde.avro.AvroKafkaDeserializer");
 
         kafkaStreamsConfiguration = new KafkaStreamsConfiguration(configuration);
 
@@ -129,5 +144,9 @@ public class KafkaPropertiesTest {
 
         // check custom properties
         assertThat(streamsProperties.get(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG), is(commitInterval));
+        assertThat(streamsProperties.getProperty(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaDeserializer"));
+        assertThat(streamsProperties.getProperty(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG),
+            is("io.apicurio.registry.serde.avro.AvroKafkaDeserializer"));
     }
 }

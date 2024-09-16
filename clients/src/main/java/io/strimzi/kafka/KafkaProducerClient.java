@@ -30,7 +30,7 @@ public class KafkaProducerClient implements ClientsInterface {
 
     private static final Logger LOGGER = LogManager.getLogger(KafkaProducerClient.class);
     private final KafkaProducerConfiguration configuration;
-    private final KafkaProducer producer;
+    private final KafkaProducer<Object, Object> producer;
     private int messageIndex;
     private int messageSuccessfullySent;
     private final ScheduledExecutorService scheduledExecutor;
@@ -116,7 +116,7 @@ public class KafkaProducerClient implements ClientsInterface {
     }
 
     public ProducerRecord generateMessage(int numOfMessage) {
-        String message;
+        Object message;
 
         if (this.configuration.getMessageTemplate() != null) {
             message = dataGenerator.generateData();

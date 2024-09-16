@@ -6,9 +6,16 @@ package io.strimzi.configuration.kafka;
 
 import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
+import org.apache.kafka.common.serialization.Serdes;
+import org.apache.kafka.streams.StreamsConfig;
 
 import java.security.InvalidParameterException;
 import java.util.Map;
+import java.util.Properties;
+
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseMapOfProperties;
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseStringOrDefault;
+import static io.strimzi.configuration.ConfigurationConstants.ADDITIONAL_CONFIG_ENV;
 
 
 public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
@@ -16,6 +23,8 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
     private final String sourceTopic;
     private final String targetTopic;
     private final long commitIntervalMs;
+    private final String defaultKeySerde;
+    private final String defaultValueSerde;
 
     public KafkaStreamsConfiguration(Map<String, String> map) {
         super(map);
@@ -29,6 +38,19 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
         if (sourceTopic == null || sourceTopic.isEmpty()) throw new InvalidParameterException("Source topic is not set");
 
         if (targetTopic == null || targetTopic.isEmpty()) throw new InvalidParameterException("Target topic is not set");
+
+        Properties additionalConfig = parseMapOfProperties(parseStringOrDefault(map.get(ADDITIONAL_CONFIG_ENV), ""));
+        if (additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG) != null) {
+            this.defaultKeySerde = additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString();
+        } else {
+            this.defaultKeySerde = Serdes.String().getClass().toString();
+        }
+
+        if (additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG) != null) {
+            this.defaultValueSerde = additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString();
+        } else {
+            this.defaultValueSerde = Serdes.String().getClass().toString();
+        }
     }
 
     public String getApplicationId() {
@@ -45,6 +67,14 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
 
     public long getCommitIntervalMs() {
         return commitIntervalMs;
+    }
+
+    public String getDefaultKeySerde() {
+        return defaultKeySerde;
+    }
+
+    public String getDefaultValueSerde() {
+        return defaultValueSerde;
     }
 
     @Override

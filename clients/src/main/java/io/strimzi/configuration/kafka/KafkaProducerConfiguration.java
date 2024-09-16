@@ -8,10 +8,16 @@ import io.strimzi.configuration.ClientsConfigurationUtils;
 import io.strimzi.configuration.ConfigurationConstants;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.header.Header;
+import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.security.InvalidParameterException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseMapOfProperties;
+import static io.strimzi.configuration.ClientsConfigurationUtils.parseStringOrDefault;
+import static io.strimzi.configuration.ConfigurationConstants.ADDITIONAL_CONFIG_ENV;
 
 public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
 
@@ -23,6 +29,8 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
     private final String message;
     private final String messageKey;
     private final String messageTemplate;
+    private final String keySerializer;
+    private final String valueSerializer;
 
     public KafkaProducerConfiguration(Map<String, String> map) {
         super(map);
@@ -36,6 +44,19 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
+
+        Properties additionalConfig = parseMapOfProperties(parseStringOrDefault(map.get(ADDITIONAL_CONFIG_ENV), ""));
+        if (additionalConfig.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG) != null) {
+            this.keySerializer = additionalConfig.get(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG).toString();
+        } else {
+            this.keySerializer = StringSerializer.class.getName();
+        }
+
+        if (additionalConfig.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG) != null) {
+            this.valueSerializer = additionalConfig.get(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG).toString();
+        } else {
+            this.valueSerializer = StringSerializer.class.getName();
+        }
     }
 
     public String getAcks() {
@@ -68,6 +89,14 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
 
     public String getMessageTemplate() {
         return messageTemplate;
+    }
+
+    public String getKeySerializer() {
+        return keySerializer;
+    }
+
+    public String getValueSerializer() {
+        return valueSerializer;
     }
 
     @Override
