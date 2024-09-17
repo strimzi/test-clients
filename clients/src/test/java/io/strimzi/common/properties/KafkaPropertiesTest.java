@@ -130,8 +130,8 @@ public class KafkaPropertiesTest {
 
         assertThat(streamsProperties.getProperty(StreamsConfig.APPLICATION_ID_CONFIG), is(appId));
         assertThat(streamsProperties.get(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG), is(DEFAULT_COMMIT_INTERVAL_MS));
-        assertThat(streamsProperties.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString(), is(Serdes.String().getClass().toString()));
-        assertThat(streamsProperties.get(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG).toString(), is(Serdes.String().getClass().toString()));
+        assertThat(streamsProperties.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString(), is(Serdes.String().getClass().getName()));
+        assertThat(streamsProperties.get(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG).toString(), is(Serdes.String().getClass().getName()));
 
         long commitInterval = 7000L;
         configuration.put(COMMIT_INTERVAL_MS_ENV, String.valueOf(commitInterval));

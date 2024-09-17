@@ -43,13 +43,13 @@ public class KafkaStreamsConfiguration extends KafkaClientsConfiguration {
         if (additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG) != null) {
             this.defaultKeySerde = additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString();
         } else {
-            this.defaultKeySerde = Serdes.String().getClass().toString();
+            this.defaultKeySerde = Serdes.String().getClass().getName();
         }
 
         if (additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG) != null) {
             this.defaultValueSerde = additionalConfig.get(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG).toString();
         } else {
-            this.defaultValueSerde = Serdes.String().getClass().toString();
+            this.defaultValueSerde = Serdes.String().getClass().getName();
         }
     }
 
