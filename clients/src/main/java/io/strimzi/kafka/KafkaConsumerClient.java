@@ -44,10 +44,6 @@ public class KafkaConsumerClient implements ClientsInterface {
         this.countDownLatch  = new CountDownLatch(1);
     }
 
-    public int getConsumedMessagesCount() {
-        return consumedMessages;
-    }
-
     @Override
     public void run() {
         LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration);

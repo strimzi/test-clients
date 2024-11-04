@@ -53,10 +53,6 @@ public class KafkaProducerClient implements ClientsInterface {
         }
     }
 
-    public int getProducedMessagesCount() {
-        return messageSuccessfullySent;
-    }
-
     @Override
     public void run() {
         LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration);
