@@ -17,14 +17,14 @@ import java.util.Map;
  * The type Kafka consumer record.
  */
 public record KafkaConsumerRecord(long timestamp, String timestampType, String topic, int partition, long offset,
-                                  String key, String payload, List<Map<String, String>> headers) {
+                                  Object key, Object payload, List<Map<String, String>> headers) {
     /**
      * Parse kafka consumer record.
      *
      * @param consumerRecord the consumer record
      * @return the kafka consumer record
      */
-    public static KafkaConsumerRecord parseKafkaConsumerRecord(final ConsumerRecord<String, String> consumerRecord) {
+    public static KafkaConsumerRecord parseKafkaConsumerRecord(final ConsumerRecord<Object, Object> consumerRecord) {
         List<Map<String, String>> headers = new ArrayList<>();
         consumerRecord.headers().forEach(h -> headers.add(Map.of(h.key(), new String(h.value(), StandardCharsets.UTF_8))));
         return new KafkaConsumerRecord(

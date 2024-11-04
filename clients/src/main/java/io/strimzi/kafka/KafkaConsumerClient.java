@@ -44,6 +44,10 @@ public class KafkaConsumerClient implements ClientsInterface {
         this.countDownLatch  = new CountDownLatch(1);
     }
 
+    public int getConsumedMessagesCount() {
+        return consumedMessages;
+    }
+
     @Override
     public void run() {
         LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration);
@@ -100,10 +104,10 @@ public class KafkaConsumerClient implements ClientsInterface {
     }
 
     public void consumeMessages() {
-        ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
+        ConsumerRecords<Object, Object> records = consumer.poll(Duration.ofMillis(Long.MAX_VALUE));
         int recordProcessed = 0;
 
-        for (ConsumerRecord<String, String> consumerRecord : records) {
+        for (ConsumerRecord<Object, Object> consumerRecord : records) {
             KafkaConsumerRecord kafkaConsumerRecord = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord);
             String log = kafkaConsumerRecord.logMessage(configuration.getOutputFormat());
             LOGGER.info("Received message: {}", log);

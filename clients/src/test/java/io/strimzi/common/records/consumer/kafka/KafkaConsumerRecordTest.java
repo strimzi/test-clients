@@ -34,7 +34,7 @@ public class KafkaConsumerRecordTest {
         headers.add("header-key", "header-value".getBytes());
         headers.add("header-key-2", "header-value-2".getBytes());
 
-        ConsumerRecord<String, String> consumerRecord = new ConsumerRecord<>(topic, partition, offset, timestamp, timestampType, serializedKeySize, serializedValueSize,
+        ConsumerRecord<Object, Object> consumerRecord = new ConsumerRecord<>(topic, partition, offset, timestamp, timestampType, serializedKeySize, serializedValueSize,
                 key, value, headers, leaderEpoch);
 
         String jsonLog = KafkaConsumerRecord.parseKafkaConsumerRecord(consumerRecord).logMessage("json");
