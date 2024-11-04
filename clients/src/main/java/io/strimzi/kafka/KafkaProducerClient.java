@@ -156,11 +156,13 @@ public class KafkaProducerClient implements ClientsInterface {
             } catch (Exception e) {
                 LOGGER.error("Failed to send messages: {} due to: \n{}", record, e.getMessage());
             } finally {
+                LOGGER.info("Messages sent: {}", currentMsgIndex);
                 messageIndex++;
+                currentMsgIndex++;
             }
 
             if (configuration.isTransactionalProducer() && (currentMsgIndex + 1) % configuration.getMessagesPerTransaction() == 0) {
-                LOGGER.info("Committing the transaction. Messages sent: {}", currentMsgIndex);
+                LOGGER.info("Committing the transaction for message {}", currentMsgIndex);
                 producer.commitTransaction();
             }
         }
