@@ -4,8 +4,8 @@
  */
 package io.strimzi.integration;
 
-import io.apicurio.registry.rest.v2.beans.IfExists;
-import io.apicurio.registry.serde.SerdeConfig;
+import io.apicurio.registry.rest.v3.beans.IfArtifactExists;
+import io.apicurio.registry.serde.config.SerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaDeserializer;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.config.IdOption;
@@ -40,12 +40,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class KafkaClientWithRegistryIT extends AbstractIT {
-    private static String REGISTRY_IMAGE = "quay.io/apicurio/apicurio-registry:3.0.3";
+    private static String registryImage = "quay.io/apicurio/apicurio-registry:3.0.3";
     private static GenericContainer registry;
 
     @BeforeAll
     void startRegistry() {
-        registry = new GenericContainer<>(DockerImageName.parse(REGISTRY_IMAGE))
+        registry = new GenericContainer<>(DockerImageName.parse(registryImage))
             .withNetwork(Network.SHARED)
             .withExposedPorts(8080)
             .waitingFor(Wait.forHttp("/apis/registry/v3/system/info")
@@ -60,17 +60,13 @@ public class KafkaClientWithRegistryIT extends AbstractIT {
 
     private String getRegistryConfig() {
         return System.lineSeparator() +
-            "apicurio.registry.url=http://0.0.0.0" + ":" + registry.getMappedPort(8080) + "/apis/registry/v2" +
-            System.lineSeparator() +
-            SerdeConfig.ENABLE_CONFLUENT_ID_HANDLER + "=" + Boolean.TRUE +
+            "apicurio.registry.url=http://0.0.0.0" + ":" + registry.getMappedPort(8080) + "/apis/registry/v3" +
             System.lineSeparator() +
             SerdeConfig.USE_ID + "=" + IdOption.contentId +
             System.lineSeparator() +
-            SerdeConfig.ENABLE_HEADERS + "=" + Boolean.FALSE +
-            System.lineSeparator() +
             SerdeConfig.AUTO_REGISTER_ARTIFACT + "=" + Boolean.TRUE +
             System.lineSeparator() +
-            SerdeConfig.AUTO_REGISTER_ARTIFACT_IF_EXISTS + "=" + IfExists.RETURN.name();
+            SerdeConfig.AUTO_REGISTER_ARTIFACT_IF_EXISTS + "=" + IfArtifactExists.FAIL.name();
     }
 
     private Stream<Arguments> getImplementedTemplates() {
