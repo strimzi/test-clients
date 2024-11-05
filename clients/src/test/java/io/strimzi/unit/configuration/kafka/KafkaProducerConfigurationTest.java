@@ -2,9 +2,10 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.configuration.kafka;
+package io.strimzi.unit.configuration.kafka;
 
 import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.header.internals.RecordHeader;

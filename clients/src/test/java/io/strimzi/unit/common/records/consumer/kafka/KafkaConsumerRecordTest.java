@@ -2,8 +2,9 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.common.records.consumer.kafka;
+package io.strimzi.unit.common.records.consumer.kafka;
 
+import io.strimzi.common.records.consumer.kafka.KafkaConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.header.internals.RecordHeaders;
