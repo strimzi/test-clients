@@ -40,14 +40,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class KafkaClientWithRegistryIT extends AbstractIT {
+    private static String REGISTRY_IMAGE = "quay.io/apicurio/apicurio-registry:3.0.3";
     private static GenericContainer registry;
 
     @BeforeAll
     void startRegistry() {
-        registry = new GenericContainer<>(DockerImageName.parse("quay.io/apicurio/apicurio-registry-mem:2.6.5.Final"))
+        registry = new GenericContainer<>(DockerImageName.parse(REGISTRY_IMAGE))
             .withNetwork(Network.SHARED)
             .withExposedPorts(8080)
-            .waitingFor(Wait.forHttp("/apis/registry/v2/system/info")
+            .waitingFor(Wait.forHttp("/apis/registry/v3/system/info")
                 .forStatusCode(200));
         registry.start();
     }
