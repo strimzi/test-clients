@@ -2,8 +2,9 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.common.properties;
+package io.strimzi.unit.common.properties;
 
+import io.strimzi.common.properties.KafkaProperties;
 import io.strimzi.configuration.kafka.KafkaConsumerConfiguration;
 import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
 import io.strimzi.configuration.kafka.KafkaStreamsConfiguration;

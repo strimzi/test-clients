@@ -2,9 +2,10 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.configuration.http;
+package io.strimzi.unit.configuration.http;
 
 import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.http.HttpProducerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 

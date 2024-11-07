@@ -2,7 +2,7 @@
  * Copyright Strimzi authors.
  * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
  */
-package io.strimzi.producer.http;
+package io.strimzi.unit.producer.http;
 
 import io.strimzi.common.records.producer.http.ProducerRecord;
 import io.strimzi.configuration.ConfigurationConstants;
