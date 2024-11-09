@@ -32,7 +32,7 @@ spec:
               value: DEBUG
             - name: CLIENT_TYPE
               value: KafkaConsumer
-          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.8.1
+          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-3.9.0
           imagePullPolicy: IfNotPresent
           name: kafka-consumer-client
       restartPolicy: "Never"
