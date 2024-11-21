@@ -6,6 +6,9 @@ package io.strimzi.arguments.nodes;
 
 import io.strimzi.admin.AdminProperties;
 import io.strimzi.arguments.BasicCommand;
+import io.strimzi.constants.Constants;
+import io.strimzi.utils.DescribeNodesUtils;
+import io.strimzi.utils.OutputFormat;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.common.Node;
 import picocli.CommandLine;
@@ -23,6 +26,9 @@ import java.util.List;
  */
 @CommandLine.Command(name = "describe")
 public class DescribeNodeCommand extends BasicCommand {
+    @CommandLine.Option(names = {"--output", "-o"}, defaultValue = "plain", description = "Output format supports: ${COMPLETION-CANDIDATES}")
+    OutputFormat outputFormat;
+
     @CommandLine.Option(names = {"--node-ids"}, description = "Comma-separated list of nodes which we want to describe. For describing all nodes, you can use `all`.", required = true)
     String nodeIds;
 
@@ -40,17 +46,12 @@ public class DescribeNodeCommand extends BasicCommand {
     private Integer describeNode() {
         try (Admin admin = Admin.create(AdminProperties.adminProperties(this.bootstrapServer))) {
             List<Node> nodes = admin.describeCluster().nodes().get().stream().toList();
-            if (!nodeIds.equals("all")) {
+            if (!nodeIds.equals(Constants.ALL_OPTION)) {
                 List<String> listOfNodeIds = Arrays.stream(nodeIds.split(",")).toList();
                 nodes = nodes.stream().filter(node -> listOfNodeIds.contains(node.idString())).toList();
             }
 
-            // printing the info for each node
-            nodes.forEach(node -> System.out.println("Node " + node.idString() +
-                "\n  hostname: " + node.host() + ":" + node.port() +
-                "\n  node ID: " + node.idString() +
-                "\n  rack: " + node.rack() + "\n")
-            );
+            System.out.println(DescribeNodesUtils.getOutput(outputFormat, nodes));
             return 0;
         } catch (Exception e) {
             throw new RuntimeException("Unable to list cluster nodes due to: " + e.getCause());
