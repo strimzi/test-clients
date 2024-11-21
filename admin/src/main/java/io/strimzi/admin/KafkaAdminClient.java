@@ -5,6 +5,7 @@
 package io.strimzi.admin;
 
 import io.strimzi.arguments.configure.ConfigureCommand;
+import io.strimzi.arguments.nodes.NodeCommand;
 import io.strimzi.arguments.topic.TopicCommand;
 import picocli.CommandLine;
 
@@ -17,7 +18,8 @@ import picocli.CommandLine;
     name = "admin-client",
     subcommands = {
         TopicCommand.class,
-        ConfigureCommand.class
+        ConfigureCommand.class,
+        NodeCommand.class
     }
 )
 public class KafkaAdminClient {
