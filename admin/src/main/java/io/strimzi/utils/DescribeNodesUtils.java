@@ -77,6 +77,6 @@ public class DescribeNodesUtils {
 
         root.set("nodes", nodesArray);
 
-        return mapper.writeValueAsString(nodes);
+        return mapper.writeValueAsString(root);
     }
 }
