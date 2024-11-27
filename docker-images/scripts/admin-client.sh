@@ -1,3 +1,5 @@
 #!/bin/bash
 
-java -jar /admin.jar "$@"
+export CLASSPATH="/admin.jar:${CLASSPATH}"
+
+java -cp $CLASSPATH io.strimzi.Main
