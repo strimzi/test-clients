@@ -2,4 +2,4 @@
 
 export CLASSPATH="/admin.jar:${CLASSPATH}"
 
-java -cp $CLASSPATH io.strimzi.Main
+java -cp $CLASSPATH io.strimzi.Main "$@"
