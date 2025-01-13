@@ -13,9 +13,12 @@ import io.strimzi.configuration.kafka.KafkaProducerConfiguration;
 import io.strimzi.test.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.ByteArraySerializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -119,7 +122,15 @@ public class KafkaProducerClient implements ClientsInterface {
         Object message;
 
         if (this.configuration.getMessageTemplate() != null) {
-            message = dataGenerator.generateData();
+            if (this.configuration.getValueSerializer().contains(StringSerializer.class.getName())) {
+                // Convert generated data to String
+                message = dataGenerator.generateData().toString();
+            }  else if (this.configuration.getValueSerializer().equals(ByteArraySerializer.class.getName())) {
+                // Convert generated data to bytes
+                message = dataGenerator.generateData().toString().getBytes(StandardCharsets.UTF_8);
+            } else {
+                message = dataGenerator.generateData();
+            }
         } else {
             message = configuration.getMessage() + " - " + numOfMessage;
         }
