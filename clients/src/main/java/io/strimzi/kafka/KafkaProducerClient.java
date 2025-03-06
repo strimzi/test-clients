@@ -4,6 +4,7 @@
  */
 package io.strimzi.kafka;
 
+import io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaSerializer;
 import io.skodjob.datagenerator.DataGenerator;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.common.ClientsInterface;
@@ -128,7 +129,10 @@ public class KafkaProducerClient implements ClientsInterface {
             }  else if (this.configuration.getValueSerializer().equals(ByteArraySerializer.class.getName())) {
                 // Convert generated data to bytes
                 message = dataGenerator.generateData().toString().getBytes(StandardCharsets.UTF_8);
-            } else {
+            }  else if (this.configuration.getValueSerializer().equals(JsonSchemaKafkaSerializer.class.getName())) {
+                // JSON message
+                message = dataGenerator.generateJsonData();
+            }  else {
                 message = dataGenerator.generateData();
             }
         } else {
