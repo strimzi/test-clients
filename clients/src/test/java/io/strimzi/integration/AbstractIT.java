@@ -23,7 +23,6 @@ public class AbstractIT {
     @BeforeAll
     static void setup() {
         kafkaCluster = new StrimziKafkaCluster.StrimziKafkaClusterBuilder()
-            .withKraft()
             .withNumberOfBrokers(1)
             .withInternalTopicReplicationFactor(1)
             .withSharedNetwork()
