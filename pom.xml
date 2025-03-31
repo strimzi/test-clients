@@ -16,13 +16,6 @@
         <module>clients-common</module>
     </modules>
 
-    <repositories>
-        <repository>
-            <id>staging</id>
-            <url>https://oss.sonatype.org/content/repositories/iostrimzi-1255/</url>
-        </repository>
-    </repositories>
-
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
@@ -54,7 +47,7 @@
 
         <apicurio-registry.version>2.6.5.Final</apicurio-registry.version>
 
-        <strimzi-test-container.version>0.110.0-rc1</strimzi-test-container.version>
+        <strimzi-test-container.version>0.110.0</strimzi-test-container.version>
 
         <skipTests>false</skipTests>
     </properties>
