@@ -37,6 +37,7 @@ public class KafkaProducerClient implements ClientsInterface {
     private final KafkaProducer<Object, Object> producer;
     private int messageIndex;
     private int messageSuccessfullySent;
+    private boolean transactionActive = false;
     private final ScheduledExecutorService scheduledExecutor;
     private final CountDownLatch countDownLatch;
     private DataGenerator dataGenerator;
@@ -72,6 +73,12 @@ public class KafkaProducerClient implements ClientsInterface {
         } else {
             scheduledExecutor.scheduleAtFixedRate(this::checkAndSendMessages, ConfigurationConstants.DEFAULT_DELAY_MS, configuration.getDelayMs(), TimeUnit.MILLISECONDS);
             awaitCompletion();
+        }
+
+        // Ensure any un-committed transaction is committed at the end
+        if (configuration.isTransactionalProducer() && transactionActive) {
+            LOGGER.info("Committing final transaction after loop.");
+            producer.commitTransaction();
         }
 
         checkFinalState();
@@ -156,17 +163,16 @@ public class KafkaProducerClient implements ClientsInterface {
         List<ProducerRecord> records = configuration.getDelayMs() == 0 ? generateMessages() : Collections.singletonList(generateMessage(messageIndex));
 
         int currentMsgIndex = configuration.getDelayMs() == 0 ? 0 : messageIndex;
-        boolean transactionActive = false;
 
         for (ProducerRecord record : records) {
-            if (configuration.isTransactionalProducer() && currentMsgIndex % configuration.getMessagesPerTransaction() == 0) {
-                LOGGER.info("Beginning new transaction. Messages sent: {}", currentMsgIndex);
-                producer.beginTransaction();
-                transactionActive = true;
-            }
-            LOGGER.info("Sending message: {}", record);
-
             try {
+                if (configuration.isTransactionalProducer() && !transactionActive) {
+                    LOGGER.info("Beginning new transaction. Messages sent: {}", currentMsgIndex);
+                    producer.beginTransaction();
+                    transactionActive = true;
+                }
+
+                LOGGER.info("Sending message: {}", record);
                 producer.send(record).get();
                 messageSuccessfullySent++;
             } catch (Exception e) {
@@ -184,17 +190,14 @@ public class KafkaProducerClient implements ClientsInterface {
                 currentMsgIndex++;
             }
 
-            if (configuration.isTransactionalProducer() && (currentMsgIndex + 1) % configuration.getMessagesPerTransaction() == 0) {
+            if (configuration.isTransactionalProducer()
+                && currentMsgIndex % configuration.getMessagesPerTransaction() == 0
+                && transactionActive
+            ) {
                 LOGGER.info("Committing the transaction for message {}", currentMsgIndex);
                 producer.commitTransaction();
                 transactionActive = false;
             }
-        }
-
-        // Ensure any un-committed transaction is committed at the end
-        if (configuration.isTransactionalProducer() && transactionActive) {
-            LOGGER.info("Committing final transaction after loop.");
-            producer.commitTransaction();
         }
     }
 }
