@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: admin
-          image: quay.io/strimzi-test-clients/test-clients:latest-kafka-4.0.0
+          image: quay.io/strimzi-test-clients/test-clients:0.11.0-kafka-4.0.0
           command: [ "sleep" ]
           args: [ "infinity" ]
