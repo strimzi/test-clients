@@ -17,6 +17,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,7 +32,7 @@ public class AdminTopicIT extends AbstractIT {
 
         cmd.execute("topic", "create", "-tp", "2", "-trf", "2", "-t", topicName);
         // Sleep for a while to prevent race condition during topics creation
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
 
         Optional<String> topic = admin.listTopics().names().get().stream().filter(t -> t.equals(topicName)).findFirst();
 
@@ -44,7 +46,7 @@ public class AdminTopicIT extends AbstractIT {
         cmd.execute("topic", "create", "-tp", "1", "-trf", "1", "-tpref", topicPref, "-fi", "3", "-tc", "10");
 
         // Sleep for a while to prevent race condition during topics creation
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
 
         List<String> prefixedTopics = admin.listTopics().names().get().stream()
             .filter(t -> t.startsWith(topicPref))
@@ -57,7 +59,7 @@ public class AdminTopicIT extends AbstractIT {
     }
 
     @Test
-    void testListTopics() throws InterruptedException {
+    void testListTopics() {
         String listTopicPrefix = "list-topic-";
         List<NewTopic> listTopicsToBeCreated = new ArrayList<>();
 
@@ -68,7 +70,7 @@ public class AdminTopicIT extends AbstractIT {
         admin.createTopics(listTopicsToBeCreated);
 
         // Sleep for a while to prevent race condition during topics creation
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
         cmd.execute("topic", "list");
         List<String> topics = Arrays.stream(OUT.toString().split("\\n")).filter(t -> t.startsWith(listTopicPrefix)).toList();
 
@@ -77,13 +79,13 @@ public class AdminTopicIT extends AbstractIT {
     }
 
     @Test
-    void testDescribeTopic() throws InterruptedException, JsonProcessingException {
+    void testDescribeTopic() throws JsonProcessingException {
         String topicName = "describe-topic";
         NewTopic newTopic = new NewTopic(topicName, 3, (short) 2);
         admin.createTopics(List.of(newTopic));
 
         // Sleep for a while to prevent race condition during topics creation
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
 
         cmd.execute("topic", "describe", "-t", topicName);
         assertThat(OUT.toString().contains("name:describe-topic, partitions:3, replicas:2"), is(true));
@@ -108,7 +110,7 @@ public class AdminTopicIT extends AbstractIT {
         admin.createTopics(List.of(newTopic));
 
         // Sleep for a while to prevent race condition during topics creation
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
 
         // Check that the topic is really present
         List<String> topics = admin.listTopics().names().get().stream().toList();
@@ -119,7 +121,7 @@ public class AdminTopicIT extends AbstractIT {
         assertThat(OUT.toString().contains("Topic(s) with name/prefix: delete-topic successfully deleted"), is(true));
 
         // Sleep for a while to prevent race condition during topics deletion
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
         topics = admin.listTopics().names().get().stream().toList();
         assertThat(topics.stream().anyMatch(t -> t.equals(topicName)), is(false));
     }
@@ -131,14 +133,14 @@ public class AdminTopicIT extends AbstractIT {
         admin.createTopics(List.of(newTopic));
 
         // Sleep for a while to prevent race condition during topics creation
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
 
         // Alter topic using admin-client
         cmd.execute("topic", "alter", "-t", topicName, "-tp", "2");
         assertThat(OUT.toString().contains("Topic(s) with name/prefix: alter-topic successfully altered."), is(true));
 
         // Sleep for a while to prevent race condition during topics alteration
-        Thread.sleep(1000);
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
 
         TopicDescription topicDescription = admin.describeTopics(List.of(topicName)).allTopicNames().get().get(topicName);
         assertThat(topicDescription.partitions().size(), is(2));
