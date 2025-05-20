@@ -9,6 +9,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.admin.TopicDescription;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -16,6 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
@@ -145,5 +150,37 @@ public class AdminTopicIT extends AbstractIT {
         TopicDescription topicDescription = admin.describeTopics(List.of(topicName)).allTopicNames().get().get(topicName);
         assertThat(topicDescription.partitions().size(), is(2));
         assertThat(topicDescription.partitions().get(0).replicas().size(), is(1));
+    }
+
+    @Test
+    void testFetchOffsetsForTopic() throws JsonProcessingException {
+        String topicName = "fetch-offsets-topic";
+        NewTopic newTopic = new NewTopic(topicName, 1, (short) 1);
+        admin.createTopics(List.of(newTopic));
+
+        // Sleep for a while to prevent race condition during topic creation
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(2));
+
+        Properties configuration = new Properties();
+        configuration.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaCluster.getBootstrapServers());
+        configuration.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        configuration.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class.getName());
+        configuration.put(ProducerConfig.ACKS_CONFIG, "all");
+
+        KafkaProducer<String, String> producer = new KafkaProducer<>(configuration);
+
+        for (int i = 0; i < 100; i++) {
+            producer.send(new ProducerRecord<>(topicName, "my-key-" + i, "my-value" + i));
+        }
+
+        // Sleep for a while to prevent race condition during sending messages
+        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(5));
+
+        cmd.execute("topic", "fetch-offsets", "-t", topicName, "-o", "json");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode offsets = objectMapper.readTree(OUT.toString()).get("0");
+
+        assertThat(offsets.get("offset").asInt(), is(100));
     }
 }
