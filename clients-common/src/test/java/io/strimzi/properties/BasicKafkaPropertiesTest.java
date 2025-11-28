@@ -11,8 +11,7 @@ import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.security.auth.SecurityProtocol;
-import org.apache.kafka.common.security.plain.PlainLoginModule;
-import org.apache.kafka.common.security.scram.ScramLoginModule;
+import org.apache.kafka.common.security.scram.internals.ScramMechanism;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -176,7 +175,9 @@ public class BasicKafkaPropertiesTest {
         String saslJaasConfig = "my-sasl-config";
         String userName = "arnost";
         String userPassword = "completely-top-secret";
-        String expectedJaas = ScramLoginModule.class + String.format(" required username=%s password=%s algorithm=SHA-512;", userName, userPassword);
+        String scramLoginModule = "org.apache.kafka.common.security.scram.ScramLoginModule";
+        String plainLoginModule = "org.apache.kafka.common.security.plain.PlainLoginModule";
+        String expectedJaas = String.format("%s required username=%s password=%s algorithm=SHA-512;", scramLoginModule, userName, userPassword);
 
         Map<String, String> configuration = new HashMap<>();
         configuration.put(BOOTSTRAP_SERVERS_ENV, bootstrapServer);
@@ -188,7 +189,7 @@ public class BasicKafkaPropertiesTest {
         properties = BasicKafkaProperties.updatePropertiesWithSaslConfiguration(properties, clientsConfiguration);
 
         assertThat(properties.get(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG), is(SecurityProtocol.SASL_SSL.toString()));
-        assertThat(properties.getProperty(SaslConfigs.SASL_MECHANISM), is(SaslType.SCRAM_SHA_512.getKafkaProperty()));
+        assertThat(ScramMechanism.forMechanismName(properties.getProperty(SaslConfigs.SASL_MECHANISM)), is(ScramMechanism.SCRAM_SHA_512));
         assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is(saslJaasConfig));
 
         configuration.remove(SASL_JAAS_CONFIG_ENV);
@@ -199,6 +200,8 @@ public class BasicKafkaPropertiesTest {
         properties = BasicKafkaProperties.updatePropertiesWithSaslConfiguration(properties, clientsConfiguration);
 
         assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is(expectedJaas));
+        assertThat(ScramMechanism.forMechanismName(properties.getProperty(SaslConfigs.SASL_MECHANISM)), is(ScramMechanism.SCRAM_SHA_512));
+
 
         configuration.put(SASL_MECHANISM_ENV, SaslType.SCRAM_SHA_256.getName());
 
@@ -208,15 +211,17 @@ public class BasicKafkaPropertiesTest {
         expectedJaas = expectedJaas.replace(" algorithm=SHA-512", "");
 
         assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is(expectedJaas));
+        assertThat(ScramMechanism.forMechanismName(properties.getProperty(SaslConfigs.SASL_MECHANISM)), is(ScramMechanism.SCRAM_SHA_256));
 
         configuration.put(SASL_MECHANISM_ENV, SaslType.PLAIN.getName());
 
         clientsConfiguration = new KafkaClientsConfiguration(configuration);
         properties = BasicKafkaProperties.updatePropertiesWithSaslConfiguration(properties, clientsConfiguration);
 
-        expectedJaas = expectedJaas.replace(ScramLoginModule.class.toString(), PlainLoginModule.class.toString());
+        expectedJaas = expectedJaas.replace(scramLoginModule, plainLoginModule);
 
         assertThat(properties.getProperty(SaslConfigs.SASL_JAAS_CONFIG), is(expectedJaas));
+        assertThat(properties.getProperty(SaslConfigs.SASL_MECHANISM), is("PLAIN"));
     }
 
     @Test

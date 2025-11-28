@@ -70,7 +70,7 @@ public class BasicKafkaProperties {
         String saslJaasConfig = configuration.getSaslJaasConfig();
 
         if (saslJaasConfig == null) {
-            saslJaasConfig = saslType.equals(SaslType.PLAIN) ? PlainLoginModule.class.toString() : ScramLoginModule.class.toString();
+            saslJaasConfig = saslType.equals(SaslType.PLAIN) ? PlainLoginModule.class.getName() : ScramLoginModule.class.getName();
             saslJaasConfig += String.format(" required username=%s password=%s", configuration.getSaslUserName(), configuration.getSaslPassword());
 
             if (saslType.equals(SaslType.SCRAM_SHA_512)) {

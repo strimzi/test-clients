@@ -8,8 +8,8 @@ import java.util.List;
 
 public enum SaslType {
     PLAIN("PLAIN", "PLAIN"),
-    SCRAM_SHA_256("SCRAM-SHA-256", "SCRAM-SHA256"),
-    SCRAM_SHA_512("SCRAM-SHA-512", "SCRAM-SHA512"),
+    SCRAM_SHA_256("SCRAM-SHA-256", "SCRAM-SHA-256"),
+    SCRAM_SHA_512("SCRAM-SHA-512", "SCRAM-SHA-512"),
     UNKNOWN("UNKNOWN", "NONE");
 
     private final String name;
