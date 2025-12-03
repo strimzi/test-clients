@@ -19,7 +19,7 @@ public class HttpClientsConfiguration {
     private final int messageCount;
     private final String endpointPrefix;
     private final String messageType;
-
+    private final String sslTruststoreCertificate;
     public HttpClientsConfiguration(Map<String, String> map) {
         String hostname = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.HOSTNAME_ENV), "");
         String port = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.PORT_ENV), "");
@@ -28,6 +28,7 @@ public class HttpClientsConfiguration {
         int messageCount = ClientsConfigurationUtils.parseIntOrDefault(map.get(ConfigurationConstants.MESSAGE_COUNT_ENV), ConfigurationConstants.DEFAULT_MESSAGES_COUNT);
         String endpointPrefix = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), ConfigurationConstants.DEFAULT_ENDPOINT_PREFIX);
         this.messageType = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TYPE_ENV), ConfigurationConstants.DEFAULT_MESSAGE_TYPE);
+        this.sslTruststoreCertificate = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.CA_CRT_ENV), null);
 
         if (MessageType.getFromString(this.messageType) == MessageType.UNKNOWN) {
             throw new InvalidParameterException("MESSAGE_TYPE should be one of " + MessageType.supportedTypes());
@@ -73,6 +74,10 @@ public class HttpClientsConfiguration {
 
     public String getMessageType() {
         return messageType;
+    }
+
+    public String getSslTruststoreCertificate() {
+        return sslTruststoreCertificate;
     }
 
     @Override

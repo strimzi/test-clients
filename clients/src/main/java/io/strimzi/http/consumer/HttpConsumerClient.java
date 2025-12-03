@@ -10,6 +10,7 @@ import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.http.HttpConsumerConfiguration;
 import io.strimzi.common.records.consumer.http.ConsumerRecord;
 import io.strimzi.common.records.consumer.http.ConsumerRecordUtils;
+import io.strimzi.http.HttpBridgeClientUtil;
 import io.strimzi.test.tracing.HttpContext;
 import io.strimzi.test.tracing.HttpHandle;
 import io.strimzi.test.tracing.TracingHandle;
@@ -40,7 +41,7 @@ public class HttpConsumerClient implements ClientsInterface {
     public HttpConsumerClient(Map<String, String> configuration) {
         this.configuration = new HttpConsumerConfiguration(configuration);
         this.consumedMessages = 0;
-        this.client = HttpClient.newHttpClient();
+        this.client = createHttpClient();
         this.tracingHandle = TracingUtil.getTracing();
         this.httpHandle = tracingHandle.createHttpHandle("receive-messages");
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-consumer"));
@@ -101,6 +102,10 @@ public class HttpConsumerClient implements ClientsInterface {
                 countDownLatch.countDown();
             }
         }
+    }
+
+    private HttpClient createHttpClient() {
+        return HttpBridgeClientUtil.getHttpClient(configuration.getSslTruststoreCertificate());
     }
 
     public void createConsumer() {
