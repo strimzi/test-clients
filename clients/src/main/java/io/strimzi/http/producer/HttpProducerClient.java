@@ -13,6 +13,7 @@ import io.strimzi.configuration.http.HttpProducerConfiguration;
 import io.strimzi.common.records.producer.http.OffsetRecordSent;
 import io.strimzi.common.records.producer.http.OffsetRecordSentUtils;
 import io.strimzi.common.records.producer.http.ProducerRecord;
+import io.strimzi.http.HttpBridgeClientUtil;
 import io.strimzi.test.tracing.HttpContext;
 import io.strimzi.test.tracing.HttpHandle;
 import io.strimzi.test.tracing.TracingHandle;
@@ -44,7 +45,7 @@ public class HttpProducerClient implements ClientsInterface {
     public HttpProducerClient(Map<String, String> configuration) {
         this.configuration = new HttpProducerConfiguration(configuration);
         this.messageIndex = 0;
-        this.client = HttpClient.newHttpClient();
+        this.client = createHttpClient();
         this.tracingHandle = TracingUtil.getTracing();
         this.httpHandle = tracingHandle.createHttpHandle("send-messages");
         this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-producer"));
@@ -92,6 +93,10 @@ public class HttpProducerClient implements ClientsInterface {
             LOGGER.error("Unable to correctly send all messages");
             throw new RuntimeException("Failed to send all messages");
         }
+    }
+
+    private HttpClient createHttpClient() {
+        return HttpBridgeClientUtil.getHttpClient(configuration.getSslTruststoreCertificate());
     }
 
     public void checkAndSendMessages() {
