@@ -25,8 +25,7 @@ public class HttpConsumerConfiguration extends HttpClientsConfiguration {
         this.pollInterval = ClientsConfigurationUtils.parseLongOrDefault(map.get(ConfigurationConstants.POLL_INTERVAL_ENV), ConfigurationConstants.DEFAULT_POLL_INTERVAL);
         this.pollTimeout = ClientsConfigurationUtils.parseLongOrDefault(map.get(ConfigurationConstants.POLL_TIMEOUT_ENV), ConfigurationConstants.DEFAULT_POLL_TIMEOUT);
 
-        String prefix = getSslTruststoreCertificate() == null ? "http://" : "https://";
-        String baseUri = prefix + this.getHostname() + ":" + this.getPort() + "/consumers/" + this.groupId;
+        String baseUri = getUrlPrefix() + this.getHostname() + ":" + this.getPort() + "/consumers/" + this.groupId;
 
         this.consumerCreationURI =  baseUri;
         this.subscriptionURI = baseUri + "/instances/" + this.clientId + "/subscription";
