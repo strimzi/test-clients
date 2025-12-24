@@ -66,4 +66,22 @@ public class HttpConsumerConfigurationTest {
         assertThat(consumerConfiguration.getSubscriptionURI(), is(subscriptionUri));
         assertThat(consumerConfiguration.getConsumeMessagesURI(), is(consumeUri));
     }
+
+    @Test
+    void testSslConfiguration() {
+        String groupId = "big-group";
+        String port = "8443";
+        String cert = "my-cert";
+
+        Map<String, String> configuration = new HashMap<>(defaultConfiguration);
+        configuration.put(ConfigurationConstants.GROUP_ID_ENV, groupId);
+        configuration.put(ConfigurationConstants.PORT_ENV, port);
+        configuration.put(ConfigurationConstants.CA_CRT_ENV, cert);
+
+        HttpConsumerConfiguration consumerConfiguration = new HttpConsumerConfiguration(configuration);
+
+        String expectedUri = "https://localhost:" + port + "/consumers/" + groupId;
+
+        assertThat(consumerConfiguration.getConsumerCreationURI(), is(expectedUri));
+    }
 }

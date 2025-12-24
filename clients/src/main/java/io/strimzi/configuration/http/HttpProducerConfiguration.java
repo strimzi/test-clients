@@ -18,7 +18,7 @@ public class HttpProducerConfiguration extends HttpClientsConfiguration {
         super(map);
         this.message = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_ENV), ConfigurationConstants.DEFAULT_MESSAGE);
         this.messageTemplate = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TEMPLATE_ENV), null);
-        this.uri =  "http://" + this.getHostname() + ":" + this.getPort() + this.getEndpointPrefix() + "/topics/" + this.getTopic();
+        this.uri =  getUrlPrefix() + this.getHostname() + ":" + this.getPort() + this.getEndpointPrefix() + "/topics/" + this.getTopic();
     }
 
     public String getMessage() {
