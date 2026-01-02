@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - "main"
+      - "gha-migration"
       - "release-*"
     tags:
       - "*"
@@ -49,5 +49,5 @@ jobs:
           quayPass: ${{ secrets.QUAY_PASS }}
         env:
           DOCKER_REGISTRY: "quay.io"
-          DOCKER_ORG: "strimzi-test-clients"
+          DOCKER_ORG: "jstejska"
           DOCKER_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name|| 'latest' }}
