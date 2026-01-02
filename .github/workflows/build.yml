@@ -45,7 +45,7 @@ jobs:
         with:
           # TODO - change this once we will use matrix strategy
           # architecture: ${{ matrix.architecture }}
-          architecture: "amd64,arm64,s390x,ppc64le"
+          architecture: "amd64 s390x ppc64le arm64"
           runnerArch: "amd64"
           dockerTag: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name|| 'latest' }}
           quayUser: ${{ secrets.QUAY_USER }}
