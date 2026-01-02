@@ -56,16 +56,16 @@ runs:
         echo "Container archives created:"
         ls -lh ./docker-images/container-archives/test-clients-*.tar.gz || echo "No container archives found"
 
-    - name: Create tarball with all containers for this architecture
+    - name: Create tarball with all containers
       shell: bash
       run: |
-        tar -cvpf containers-${{ inputs.architecture }}.tar ./docker-images/container-archives/test-clients-*.tar.gz
+        tar -cvpf containers.tar ./docker-images/container-archives/test-clients-*.tar.gz
 
     - name: Upload container artifact
       uses: actions/upload-artifact@v4
       with:
-        name: containers-${{ inputs.architecture }}.tar
-        path: containers-${{ inputs.architecture }}.tar
+        name: containers.tar
+        path: containers.tar
         retention-days: 7
 
     - name: Login to container registry
