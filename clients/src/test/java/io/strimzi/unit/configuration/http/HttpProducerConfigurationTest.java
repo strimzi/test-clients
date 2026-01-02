@@ -54,4 +54,25 @@ public class HttpProducerConfigurationTest {
         assertThat(producerConfiguration.getMessage(), is(message));
         assertThat(producerConfiguration.getUri(), is(expectedUri));
     }
+
+    @Test
+    void testSslConfiguration() {
+        String hostname = "my-hostname";
+        String port = "8443";
+        String topic = "custom-topic";
+        String endpointPrefix = "/prefix";
+        String expectedUri = "https://" + hostname + ":" + port + endpointPrefix + "/topics/" + topic;
+        String cert = "my-cert";
+
+        Map<String, String> configuration = new HashMap<>();
+        configuration.put(ConfigurationConstants.HOSTNAME_ENV, hostname);
+        configuration.put(ConfigurationConstants.PORT_ENV, port);
+        configuration.put(ConfigurationConstants.TOPIC_ENV, topic);
+        configuration.put(ConfigurationConstants.ENDPOINT_PREFIX_ENV, endpointPrefix);
+        configuration.put(ConfigurationConstants.CA_CRT_ENV, cert);
+
+        HttpProducerConfiguration producerConfiguration = new HttpProducerConfiguration(configuration);
+
+        assertThat(producerConfiguration.getUri(), is(expectedUri));
+    }
 }

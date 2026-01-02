@@ -120,6 +120,7 @@ HTTP Producer
 * `MESSAGE` - message which the producer should send
 * `MESSAGE_TEMPLATE` - template from [data-generator](https://github.com/skodjob/data-generator) for messages. It has higher priority than `MESSAGE` evn var.
 * `MESSAGE_TYPE` - type of message that will be used in records headers. Available are json and text.
+* `CA_CRT` - the certificate of the CA which signed the HTTP Bridge's TLS certificates, for adding to the client's trust store
 
 HTTP Consumer
 * `HOSTNAME` - hostname of service
@@ -131,6 +132,7 @@ HTTP Consumer
 * `POLL_TIMEOUT` - timeout, in ms, of one poll
 * `MESSAGE_COUNT` - the number of messages consumer should receive 
 * `MESSAGE_TYPE` - type of message that will be used in records headers. Available are json and text.
+* `CA_CRT` - the certificate of the CA which signed the HTTP Bridge's TLS certificates, for adding to the client's trust store
 
 ## Admin Client
 See [README.md](admin/README.md)

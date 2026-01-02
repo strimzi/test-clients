@@ -63,6 +63,7 @@ public class HttpClientsConfigurationTest {
         long delayMs = 30000;
         int messageCount = 333;
         String endpointPrefix = "/prefix";
+        String sslTruststoreCert = "my-cert";
 
         configuration.put(ConfigurationConstants.HOSTNAME_ENV, hostname);
         configuration.put(ConfigurationConstants.PORT_ENV, port);
@@ -70,6 +71,7 @@ public class HttpClientsConfigurationTest {
         configuration.put(ConfigurationConstants.DELAY_MS_ENV, String.valueOf(delayMs));
         configuration.put(ConfigurationConstants.MESSAGE_COUNT_ENV, String.valueOf(messageCount));
         configuration.put(ConfigurationConstants.ENDPOINT_PREFIX_ENV, endpointPrefix);
+        configuration.put(ConfigurationConstants.CA_CRT_ENV, sslTruststoreCert);
 
         HttpClientsConfiguration clientsConfiguration = new HttpClientsConfiguration(configuration);
 
@@ -79,6 +81,7 @@ public class HttpClientsConfigurationTest {
         assertThat(clientsConfiguration.getPort(), is(port));
         assertThat(clientsConfiguration.getTopic(), is(topic));
         assertThat(clientsConfiguration.getHostname(), is(hostname));
+        assertThat(clientsConfiguration.getSslTruststoreCertificate(), is(sslTruststoreCert));
     }
 
     @Test
