@@ -54,7 +54,7 @@ runs:
       shell: bash
       run: |
         echo "Container archives created:"
-        ls -lh test-clients-container-*.tar.gz || echo "No container archives found"
+        ls -lh ./docker-images/container-archives/test-clients-*.tar.gz || echo "No container archives found"
 
     - name: Create tarball with all containers for this architecture
       shell: bash
