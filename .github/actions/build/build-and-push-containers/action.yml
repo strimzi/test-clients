@@ -45,7 +45,7 @@ runs:
         ARCHITECTURES: ${{ inputs.architecture }}
         DOCKER_TAG: ${{ inputs.dockerTag }}
         DOCKER_REGISTRY: "quay.io"
-        DOCKER_ORG: "strimzi-test-clients"
+        DOCKER_ORG: "jstejska"
         BUILD_REASON: "IndividualCI"
         BRANCH: ${{ github.ref }}
         DOCKER_BUILDX: "buildx"
