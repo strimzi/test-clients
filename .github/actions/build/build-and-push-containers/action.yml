@@ -59,7 +59,7 @@ runs:
     - name: Create tarball with all containers for this architecture
       shell: bash
       run: |
-        tar -cvpf containers-${{ inputs.architecture }}.tar ./docker-images/container-archives/test-clients-container-*.tar.gz
+        tar -cvpf containers-${{ inputs.architecture }}.tar ./docker-images/container-archives/test-clients-*.tar.gz
 
     - name: Upload container artifact
       uses: actions/upload-artifact@v4
