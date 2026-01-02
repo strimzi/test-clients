@@ -40,7 +40,7 @@ runs:
     - name: Build containers for architecture
       shell: bash
       run: |
-        make docker_build docker_save --directory=docker-images/
+        make docker_build docker_tag docker_save --directory=docker-images/
       env:
         ARCHITECTURES: ${{ inputs.architecture }}
         DOCKER_TAG: ${{ inputs.dockerTag }}
