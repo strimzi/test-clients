@@ -30,24 +30,23 @@ jobs:
     name: Build and Push Containers
     needs:
       - build-and-test
-    strategy:
-      matrix:
-        architecture:
-          - amd64
-          - arm64
-          - s390x
-          - ppc64le
+    # TODO - Eventualy we should use matrix strategy, but it requires build process changes, leaving it here as todo
+    # strategy:
+    #   matrix:
+    #     architecture:
+    #       - amd64
+    #       - arm64
+    #       - s390x
+    #       - ppc64le
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: ./.github/actions/build/build-and-push-containers
         with:
-          architecture: ${{ matrix.architecture }}
+          # TODO - change this once we will use matrix strategy
+          # architecture: ${{ matrix.architecture }}
+          architecture: "amd64,arm64,s390x,ppc64le"
           runnerArch: "amd64"
-          dockerTag: "latest"
+          dockerTag: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name|| 'latest' }}
           quayUser: ${{ secrets.QUAY_USER }}
           quayPass: ${{ secrets.QUAY_PASS }}
-        env:
-          DOCKER_REGISTRY: "quay.io"
-          DOCKER_ORG: "jstejska"
-          DOCKER_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name|| 'latest' }}

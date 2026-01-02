@@ -80,7 +80,7 @@ runs:
         make docker_push docker_amend_manifest docker_push_manifest --directory=docker-images/
       env:
         DOCKER_REGISTRY: "quay.io"
-        DOCKER_ORG: "strimzi-test-clients"
+        DOCKER_ORG: "jstejska"
         DOCKER_TAG: "${{ inputs.dockerTag }}"
 
     - name: List built images
