@@ -11,6 +11,10 @@ on:
     branches:
       - "*"
 
+# Declare default permissions as read only
+permissions:
+  contents: read
+  
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,7 +24,7 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/build/build-and-test
         with:
           mvnArgs: "-B"
@@ -40,7 +44,7 @@ jobs:
     #       - ppc64le
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/build/build-and-push-containers
         with:
           # TODO - change this once we will use matrix strategy

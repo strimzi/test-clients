@@ -25,12 +25,14 @@ runs:
   steps:
     - name: Setup Java
       uses: strimzi/strimzi-kafka-operator/.github/actions/dependencies/setup-java@main
+      with:
+        javaVersion: "17"
 
     - name: Setup Docker
       uses: strimzi/strimzi-kafka-operator/.github/actions/dependencies/install-docker@main
 
     - name: Restore Maven cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ~/.m2/repository
         key: maven-${{ hashFiles('**/pom.xml') }}
@@ -62,7 +64,7 @@ runs:
         tar -cvpf containers.tar ./docker-images/container-archives/test-clients-*.tar.gz
 
     - name: Upload container artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: containers.tar
         path: containers.tar

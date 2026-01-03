@@ -18,7 +18,7 @@ runs:
       uses: strimzi/strimzi-kafka-operator/.github/actions/dependencies/setup-java@main
 
     - name: Restore Maven cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       with:
         path: ~/.m2/repository
         key: maven-${{ hashFiles('**/pom.xml') }}
@@ -56,7 +56,7 @@ runs:
 
     - name: Save Maven cache
       if: github.ref == 'refs/heads/main'
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: ~/.m2/repository
         key: maven-${{ hashFiles('**/pom.xml') }}
