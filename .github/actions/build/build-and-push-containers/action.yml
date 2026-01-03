@@ -71,6 +71,7 @@ runs:
         retention-days: 7
 
     - name: Login to container registry
+      if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
       shell: bash
       run: docker login -u ${{ inputs.quayUser }} -p ${{ inputs.quayPass }} ${DOCKER_REGISTRY}
       env:
