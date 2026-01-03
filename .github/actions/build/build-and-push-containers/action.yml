@@ -78,6 +78,7 @@ runs:
         DOCKER_REGISTRY: "quay.io"
 
     - name: Push containers and create manifests
+      if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
       shell: bash
       run: |
         make docker_push docker_amend_manifest docker_push_manifest --directory=docker-images/
