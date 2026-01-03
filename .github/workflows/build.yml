@@ -1,0 +1,56 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - "main"
+      - "release-*"
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - "*"
+
+# Declare default permissions as read only
+permissions:
+  contents: read
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/build/build-and-test
+        with:
+          mvnArgs: "-B"
+          runnerArch: "amd64"
+
+  build-and-push-containers:
+    name: Build and Push Containers
+    needs:
+      - build-and-test
+    # TODO - Eventualy we should use matrix strategy, but it requires build process changes, leaving it here as todo
+    # strategy:
+    #   matrix:
+    #     architecture:
+    #       - amd64
+    #       - arm64
+    #       - s390x
+    #       - ppc64le
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/build/build-and-push-containers
+        with:
+          # TODO - change this once we will use matrix strategy
+          # architecture: ${{ matrix.architecture }}
+          architecture: "amd64 s390x ppc64le arm64"
+          runnerArch: "amd64"
+          dockerTag: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name|| 'latest' }}
+          quayUser: ${{ secrets.QUAY_USER }}
+          quayPass: ${{ secrets.QUAY_PASS }}

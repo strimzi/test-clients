@@ -1,0 +1,93 @@
+name: "Build Test Clients Containers"
+description: "Build test-clients container images for all Kafka versions and specified architecture"
+
+inputs:
+  architecture:
+    description: "Architecture to build (amd64, arm64, s390x, ppc64le)"
+    required: true
+  runnerArch:
+    description: "Architecture of GitHub runner"
+    required: false
+    default: "amd64"
+  dockerTag:
+    description: "Docker tag to use"
+    required: false
+    default: "latest"
+  quayUser:
+    description: "Quay.io username"
+    required: true
+  quayPass:
+    description: "Quay.io password"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Java
+      uses: strimzi/strimzi-kafka-operator/.github/actions/dependencies/setup-java@main
+      with:
+        javaVersion: "17"
+
+    - name: Setup Docker
+      uses: strimzi/strimzi-kafka-operator/.github/actions/dependencies/install-docker@main
+
+    - name: Restore Maven cache
+      uses: actions/cache/restore@v5
+      with:
+        path: ~/.m2/repository
+        key: maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          maven-
+
+    - name: Build containers for architecture
+      shell: bash
+      run: |
+        make docker_build docker_tag docker_save --directory=docker-images/
+      env:
+        ARCHITECTURES: ${{ inputs.architecture }}
+        DOCKER_TAG: ${{ inputs.dockerTag }}
+        DOCKER_REGISTRY: "quay.io"
+        DOCKER_ORG: "strimzi-test-clients"
+        BUILD_REASON: "IndividualCI"
+        BRANCH: ${{ github.ref }}
+        DOCKER_BUILDX: "buildx"
+
+    - name: List built container archives
+      shell: bash
+      run: |
+        echo "Container archives created:"
+        ls -lh ./docker-images/container-archives/test-clients-*.tar.gz || echo "No container archives found"
+
+    - name: Create tarball with all containers
+      shell: bash
+      run: |
+        tar -cvpf containers.tar ./docker-images/container-archives/test-clients-*.tar.gz
+
+    - name: Upload container artifact
+      uses: actions/upload-artifact@v5
+      with:
+        name: containers.tar
+        path: containers.tar
+        retention-days: 7
+
+    - name: Login to container registry
+      if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+      shell: bash
+      run: docker login -u ${{ inputs.quayUser }} -p ${{ inputs.quayPass }} ${DOCKER_REGISTRY}
+      env:
+        DOCKER_REGISTRY: "quay.io"
+
+    - name: Push containers and create manifests
+      if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/') }}
+      shell: bash
+      run: |
+        make docker_push docker_amend_manifest docker_push_manifest --directory=docker-images/
+      env:
+        DOCKER_REGISTRY: "quay.io"
+        DOCKER_ORG: "strimzi-test-clients"
+        DOCKER_TAG: "${{ inputs.dockerTag }}"
+
+    - name: List built images
+      if: ${{ always() }}
+      shell: bash
+      run: docker images -a
