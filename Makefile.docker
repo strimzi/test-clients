@@ -6,6 +6,8 @@
 # default latest) variables are used to name the Docker image. DOCKER_REGISTRY identifies
 # the registry where the image will be pushed (default is Docker Hub). DOCKER_VERSION_ARG
 # is passed to the image build (based on Git commit, default latest)
+TOPDIR=$(dir $(lastword $(MAKEFILE_LIST)))
+ARCHIVE_DIR=$(TOPDIR)docker-images/container-archives
 
 DOCKERFILE_DIR     ?= docker-images/.
 DOCKER_REGISTRY    ?= quay.io
@@ -48,3 +50,9 @@ docker_push_manifest:
 docker_delete_manifest:
 	# Delete the manifest to the registry, ignore the error if manifest doesn't exist
 	$(DOCKER_CMD) manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true
+
+.PHONY: docker_save
+docker_save:
+	# Saves the container as TGZ file
+	test -d $(ARCHIVE_DIR) || mkdir -p  $(ARCHIVE_DIR)
+	$(DOCKER_CMD) save $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) | gzip > $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
