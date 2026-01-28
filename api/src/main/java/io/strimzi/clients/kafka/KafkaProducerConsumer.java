@@ -4,6 +4,8 @@
  */
 package io.strimzi.clients.kafka;
 
+import io.strimzi.configuration.Tracing;
+import io.strimzi.configuration.TracingBuilder;
 import io.strimzi.configuration.Transactional;
 import io.sundr.builder.annotations.Buildable;
 
@@ -35,6 +37,9 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setProducerName(String producerName) {
+        if (producerName == null) {
+            throw new IllegalArgumentException("Producer name cannot be empty");
+        }
         this.producerName = producerName;
     }
 
@@ -43,6 +48,9 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setConsumerName(String consumerName) {
+        if (consumerName == null) {
+            throw new IllegalArgumentException("Consumer name cannot be empty");
+        }
         this.consumerName = consumerName;
     }
 
@@ -51,6 +59,9 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setTopicName(String topicName) {
+        if (topicName == null) {
+            throw new IllegalArgumentException("Topic name cannot be empty");
+        }
         this.topicName = topicName;
     }
 
@@ -151,6 +162,16 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     private KafkaProducerClient configureProducer() {
+        Tracing producerTracing = null;
+
+        if (getTracing() != null) {
+            producerTracing = new TracingBuilder()
+                .withTracingType(getTracing().getTracingType())
+                .withServiceNameEnvVar(getTracing().getServiceNameEnvVar())
+                .withServiceName(getTracing().getServiceName() + "-producer")
+                .build();
+        }
+
         return new KafkaProducerClientBuilder()
             .withAcks(getAcks())
             .withMessage(getMessage())
@@ -160,13 +181,15 @@ public class KafkaProducerConsumer extends KafkaCommon {
             .withTopicName(getTopicName())
             .withTransactional(getTransactional())
             .withName(getProducerName())
+            .withMessageCount(getMessageCount())
+            .withDelayMs(getDelayMs())
             .withNamespaceName(getNamespaceName())
             .withBootstrapAddress(getBootstrapAddress())
             .withImage(getImage())
             .withOauth(getOauth())
             .withSasl(getSasl())
             .withSsl(getSsl())
-            .withTracing(getTracing())
+            .withTracing(producerTracing)
             .withAdditionalEnvVars(getAdditionalEnvVars())
             .withAdditionalConfig(getAdditionalConfig())
             .build();
@@ -183,6 +206,16 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     private KafkaConsumerClient configureConsumer() {
+        Tracing consumerTracing = null;
+
+        if (getTracing() != null) {
+            consumerTracing = new TracingBuilder()
+                .withTracingType(getTracing().getTracingType())
+                .withServiceNameEnvVar(getTracing().getServiceNameEnvVar())
+                .withServiceName(getTracing().getServiceName() + "-consumer")
+                .build();
+        }
+
         return new KafkaConsumerClientBuilder()
             .withClientId(getClientId())
             .withClientRack(getClientRack())
@@ -197,7 +230,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
             .withOauth(getOauth())
             .withSasl(getSasl())
             .withSsl(getSsl())
-            .withTracing(getTracing())
+            .withTracing(consumerTracing)
             .withAdditionalEnvVars(getAdditionalEnvVars())
             .withAdditionalConfig(getAdditionalConfig())
             .build();

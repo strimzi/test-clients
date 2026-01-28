@@ -7,6 +7,9 @@ package io.strimzi.clients.kafka;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.strimzi.configuration.ClientType;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.Environment;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.ArrayList;
@@ -24,6 +27,9 @@ public class KafkaStreamsClient extends KafkaBaseClient {
     }
 
     public void setApplicationId(String applicationId) {
+        if (applicationId == null) {
+            throw new IllegalArgumentException("Application ID cannot be empty");
+        }
         this.applicationId = applicationId;
     }
 
@@ -32,6 +38,9 @@ public class KafkaStreamsClient extends KafkaBaseClient {
     }
 
     public void setSourceTopicName(String sourceTopicName) {
+        if (sourceTopicName == null) {
+            throw new IllegalArgumentException("Source topic name cannot be empty");
+        }
         this.sourceTopicName = sourceTopicName;
     }
 
@@ -40,6 +49,9 @@ public class KafkaStreamsClient extends KafkaBaseClient {
     }
 
     public void setTargetTopicName(String targetTopicName) {
+        if (targetTopicName == null) {
+            throw new IllegalArgumentException("Target topic name cannot be empty");
+        }
         this.targetTopicName = targetTopicName;
     }
 
@@ -51,29 +63,19 @@ public class KafkaStreamsClient extends KafkaBaseClient {
         this.commitIntervalMs = commitIntervalMs;
     }
 
-    public Job getStreams() {
+    public Job getJob() {
         List<EnvVar> streamsSpecificEnvVars = new ArrayList<>(List.of(
             new EnvVarBuilder()
-                .withName("APPLICATION_ID")
-                .withValue(this.getApplicationId())
-                .build(),
-            new EnvVarBuilder()
-                .withName("SOURCE_TOPIC")
-                .withValue(this.getSourceTopicName())
-                .build(),
-            new EnvVarBuilder()
-                .withName("TARGET_TOPIC")
-                .withValue(this.getTargetTopicName())
-                .build(),
-            new EnvVarBuilder()
-                .withName("COMMIT_INTERVAL_MS")
-                .withValue(String.valueOf(this.getCommitIntervalMs()))
-                .build(),
-            new EnvVarBuilder()
-                .withName("CLIENT_TYPE")
-                .withValue("KafkaStreams")
+                .withName(ConfigurationConstants.CLIENT_TYPE_ENV)
+                .withValue(ClientType.KafkaStreams.name())
                 .build()
         ));
+
+        Environment.configureEnvVariableOrSkip(streamsSpecificEnvVars, ConfigurationConstants.APPLICATION_ID_ENV, this.getApplicationId());
+        Environment.configureEnvVariableOrSkip(streamsSpecificEnvVars, ConfigurationConstants.SOURCE_TOPIC_ENV, this.getSourceTopicName());
+        Environment.configureEnvVariableOrSkip(streamsSpecificEnvVars, ConfigurationConstants.TARGET_TOPIC_ENV, this.getTargetTopicName());
+        Environment.configureEnvVariableOrSkip(streamsSpecificEnvVars, ConfigurationConstants.COMMIT_INTERVAL_MS_ENV, this.getCommitIntervalMs());
+
 
         return getClientJob(streamsSpecificEnvVars);
     }

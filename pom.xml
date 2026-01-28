@@ -222,6 +222,11 @@
                 <artifactId>kubernetes-model-batch</artifactId>
                 <version>${fabric8.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model-extensions</artifactId>
+                <version>${fabric8.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

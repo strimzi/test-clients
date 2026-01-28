@@ -18,7 +18,7 @@ class KafkaCommon {
 
     private String bootstrapAddress;
 
-    private Image image;
+    private Image image = new Image();
     private OAuth oauth;
     private Sasl sasl;
     private Ssl ssl;
@@ -32,6 +32,9 @@ class KafkaCommon {
     }
 
     public void setNamespaceName(String namespaceName) {
+        if (namespaceName == null) {
+            throw new IllegalArgumentException("Name of Namespace cannot be empty");
+        }
         this.namespaceName = namespaceName;
     }
 
@@ -40,6 +43,9 @@ class KafkaCommon {
     }
 
     public void setBootstrapAddress(String bootstrapAddress) {
+        if (bootstrapAddress == null) {
+            throw new IllegalArgumentException("Bootstrap address cannot be empty");
+        }
         this.bootstrapAddress = bootstrapAddress;
     }
 

@@ -5,7 +5,6 @@
 package io.strimzi.configuration;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.ArrayList;
@@ -62,45 +61,11 @@ public class OAuth {
     public List<EnvVar> getOAuthEnvVars() {
         List<EnvVar> envVars = new ArrayList<>();
 
-        if (this.getOauthClientId() != null && !this.getOauthClientId().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("OAUTH_CLIENT_ID")
-                .withValue(this.getOauthClientId())
-                .build()
-            );
-        }
-
-        if (this.getOauthClientSecret() != null && !this.getOauthClientSecret().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("OAUTH_CLIENT_SECRET")
-                .withValue(this.getOauthClientSecret())
-                .build()
-            );
-        }
-
-        if (this.getOauthAccessToken() != null && !this.getOauthAccessToken().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("OAUTH_ACCESS_TOKEN")
-                .withValue(this.getOauthAccessToken())
-                .build()
-            );
-        }
-
-        if (this.getOauthRefreshToken() != null && !this.getOauthRefreshToken().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("OAUTH_REFRESH_TOKEN")
-                .withValue(this.getOauthRefreshToken())
-                .build()
-            );
-        }
-
-        if (this.getOauthTokenEndpointUri() != null && !this.getOauthTokenEndpointUri().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("OAUTH_TOKEN_ENDPOINT_URI")
-                .withValue(this.getOauthTokenEndpointUri())
-                .build()
-            );
-        }
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_CLIENT_ID_ENV, this.getOauthClientId());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_CLIENT_SECRET_ENV, this.getOauthClientSecret());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_ACCESS_TOKEN_ENV, this.getOauthAccessToken());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_REFRESH_TOKEN_ENV, this.getOauthRefreshToken());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_TOKEN_ENDPOINT_URI_ENV, this.getOauthTokenEndpointUri());
 
         return envVars;
     }

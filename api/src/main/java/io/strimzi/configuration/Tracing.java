@@ -53,13 +53,7 @@ public class Tracing {
             );
         }
 
-        if (this.getTracingType() != null && !this.getTracingType().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("TRACING_TYPE")
-                .withValue(this.getTracingType())
-                .build()
-            );
-        }
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.TRACING_TYPE_ENV, this.getTracingType());
 
         return envVars;
     }

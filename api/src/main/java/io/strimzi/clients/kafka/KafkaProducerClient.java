@@ -7,6 +7,9 @@ package io.strimzi.clients.kafka;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.strimzi.configuration.ClientType;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.Environment;
 import io.strimzi.configuration.Transactional;
 import io.sundr.builder.annotations.Buildable;
 
@@ -20,8 +23,8 @@ public class KafkaProducerClient extends KafkaBaseClient {
     private String messageTemplate;
     private String messageKey;
     private String headers;
-    private String topicName;
 
+    private String topicName;
     private Long delayMs;
     private Long messageCount;
 
@@ -72,22 +75,25 @@ public class KafkaProducerClient extends KafkaBaseClient {
     }
 
     public void setTopicName(String topicName) {
+        if (topicName == null) {
+            throw new IllegalArgumentException("Topic name cannot be empty");
+        }
         this.topicName = topicName;
     }
 
-    public long getDelayMs() {
+    public Long getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(long delayMs) {
+    public void setDelayMs(Long delayMs) {
         this.delayMs = delayMs;
     }
 
-    public long getMessageCount() {
+    public Long getMessageCount() {
         return messageCount;
     }
 
-    public void setMessageCount(long messageCount) {
+    public void setMessageCount(Long messageCount) {
         this.messageCount = messageCount;
     }
 
@@ -99,51 +105,24 @@ public class KafkaProducerClient extends KafkaBaseClient {
         this.transactional = transactional;
     }
 
-    public Job getProducer() {
+    public Job getJob() {
         List<EnvVar> producerSpecificEnvVars = new ArrayList<>(List.of(
             new EnvVarBuilder()
-                .withName("PRODUCER_ACKS")
-                .withValue(this.getAcks())
-                .build(),
-            new EnvVarBuilder()
-                .withName("MESSAGE")
-                .withValue(this.getMessage())
-                .build(),
-            new EnvVarBuilder()
-                .withName("MESSAGE_TEMPLATE")
-                .withValue(this.getMessageTemplate())
-                .build(),
-            new EnvVarBuilder()
-                .withName("MESSAGE_KEY")
-                .withValue(this.getMessageKey())
-                .build(),
-            new EnvVarBuilder()
-                .withName("TOPIC")
-                .withValue(this.getTopicName())
-                .build(),
-            new EnvVarBuilder()
-                .withName("DELAY_MS")
-                .withValue(String.valueOf(this.getDelayMs()))
-                .build(),
-            new EnvVarBuilder()
-                .withName("MESSAGE_COUNT")
-                .withValue(String.valueOf(this.getMessageCount()))
-                .build(),
-            new EnvVarBuilder()
-                .withName("CLIENT_TYPE")
-                .withValue("KafkaProducer")
+                .withName(ConfigurationConstants.CLIENT_TYPE_ENV)
+                .withValue(ClientType.KafkaProducer.name())
                 .build()
         ));
 
-        if (this.getHeaders() != null && !this.getHeaders().isEmpty()) {
-            producerSpecificEnvVars.add(new EnvVarBuilder()
-                .withName("HEADERS")
-                .withValue(this.getHeaders())
-                .build()
-            );
-        }
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.PRODUCER_ACKS_ENV, this.getAcks());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.MESSAGE_ENV, this.getMessage());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.MESSAGE_TEMPLATE_ENV, this.getMessageTemplate());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.MESSAGE_KEY_ENV, this.getMessageKey());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.TOPIC_ENV, this.getTopicName());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.DELAY_MS_ENV, this.getDelayMs());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.MESSAGE_COUNT_ENV, this.getMessageCount());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.HEADERS_ENV, this.getHeaders());
 
-        if (this.getTransactional().getTransactionalEnvVar() != null) {
+        if (this.getTransactional() != null && this.getTransactional().getTransactionalEnvVar() != null) {
             producerSpecificEnvVars.add(this.getTransactional().getTransactionalEnvVar());
         }
 

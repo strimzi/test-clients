@@ -7,6 +7,9 @@ package io.strimzi.clients.kafka;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.strimzi.configuration.ClientType;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.Environment;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.ArrayList;
@@ -18,8 +21,8 @@ public class KafkaConsumerClient extends KafkaBaseClient {
     private String clientRack;
     private String topicName;
     private String consumerGroup;
-    private long delayMs;
-    private long messageCount;
+    private Long delayMs;
+    private Long messageCount;
 
     public String getClientId() {
         return clientId;
@@ -42,6 +45,9 @@ public class KafkaConsumerClient extends KafkaBaseClient {
     }
 
     public void setTopicName(String topicName) {
+        if (topicName == null) {
+            throw new IllegalArgumentException("Topic name cannot be empty");
+        }
         this.topicName = topicName;
     }
 
@@ -53,53 +59,36 @@ public class KafkaConsumerClient extends KafkaBaseClient {
         this.consumerGroup = consumerGroup;
     }
 
-    public long getDelayMs() {
+    public Long getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(long delayMs) {
+    public void setDelayMs(Long delayMs) {
         this.delayMs = delayMs;
     }
 
-    public long getMessageCount() {
+    public Long getMessageCount() {
         return messageCount;
     }
 
-    public void setMessageCount(long messageCount) {
+    public void setMessageCount(Long messageCount) {
         this.messageCount = messageCount;
     }
 
-    public Job getConsumer() {
+    public Job getJob() {
         List<EnvVar> consumerSpecificEnvVars = new ArrayList<>(List.of(
             new EnvVarBuilder()
-                .withName("CLIENT_ID")
-                .withValue(this.getClientId())
-                .build(),
-            new EnvVarBuilder()
-                .withName("CLIENT_RACK")
-                .withValue(this.getClientRack())
-                .build(),
-            new EnvVarBuilder()
-                .withName("TOPIC")
-                .withValue(this.getTopicName())
-                .build(),
-            new EnvVarBuilder()
-                .withName("GROUP_ID")
-                .withValue(this.getConsumerGroup())
-                .build(),
-            new EnvVarBuilder()
-                .withName("DELAY_MS")
-                .withValue(String.valueOf(this.getDelayMs()))
-                .build(),
-            new EnvVarBuilder()
-                .withName("MESSAGE_COUNT")
-                .withValue(String.valueOf(this.getMessageCount()))
-                .build(),
-            new EnvVarBuilder()
-                .withName("CLIENT_TYPE")
-                .withValue("KafkaConsumer")
+                .withName(ConfigurationConstants.CLIENT_TYPE_ENV)
+                .withValue(ClientType.KafkaConsumer.name())
                 .build()
         ));
+
+        Environment.configureEnvVariableOrSkip(consumerSpecificEnvVars, ConfigurationConstants.CLIENT_ID_ENV, this.getClientId());
+        Environment.configureEnvVariableOrSkip(consumerSpecificEnvVars, ConfigurationConstants.CLIENT_RACK_ENV, this.getClientRack());
+        Environment.configureEnvVariableOrSkip(consumerSpecificEnvVars, ConfigurationConstants.TOPIC_ENV, this.getTopicName());
+        Environment.configureEnvVariableOrSkip(consumerSpecificEnvVars, ConfigurationConstants.GROUP_ID_ENV, this.getConsumerGroup());
+        Environment.configureEnvVariableOrSkip(consumerSpecificEnvVars, ConfigurationConstants.DELAY_MS_ENV, this.getDelayMs());
+        Environment.configureEnvVariableOrSkip(consumerSpecificEnvVars, ConfigurationConstants.MESSAGE_COUNT_ENV, this.getMessageCount());
 
         return getClientJob(consumerSpecificEnvVars);
     }

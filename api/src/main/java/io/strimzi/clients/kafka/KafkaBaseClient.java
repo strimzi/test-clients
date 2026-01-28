@@ -5,11 +5,12 @@
 package io.strimzi.clients.kafka;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.PodSpecBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobBuilder;
+import io.strimzi.configuration.ConfigurationConstants;
+import io.strimzi.configuration.Environment;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.ArrayList;
@@ -26,6 +27,9 @@ public class KafkaBaseClient extends KafkaCommon {
     }
 
     public void setName(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Name of the client cannot be empty");
+        }
         this.name = name;
     }
 
@@ -47,33 +51,24 @@ public class KafkaBaseClient extends KafkaCommon {
         }
 
         // Add EnvVars for tracing if configured
-        if (!this.getTracing().getTracingEnvVars().isEmpty()) {
+        if (this.getTracing() != null && !this.getTracing().getTracingEnvVars().isEmpty()) {
             envVars.addAll(this.getTracing().getTracingEnvVars());
         }
 
-        if (!this.getOauth().getOAuthEnvVars().isEmpty()) {
+        if (this.getOauth() != null && !this.getOauth().getOAuthEnvVars().isEmpty()) {
             envVars.addAll(this.getOauth().getOAuthEnvVars());
         }
 
-        if (!this.getSasl().getSaslEnvVars().isEmpty()) {
+        if (this.getSasl() != null && !this.getSasl().getSaslEnvVars().isEmpty()) {
             envVars.addAll(this.getSasl().getSaslEnvVars());
         }
 
-        if (!this.getSsl().getSslEnvVar().isEmpty()) {
+        if (this.getSsl() != null && !this.getSsl().getSslEnvVar().isEmpty()) {
             envVars.addAll(this.getSsl().getSslEnvVar());
         }
 
-        // Configure default environment variables
-        envVars.addAll(List.of(
-            new EnvVarBuilder()
-                .withName("BOOTSTRAP_SERVERS")
-                .withValue(this.getBootstrapAddress())
-                .build(),
-            new EnvVarBuilder()
-                .withName("ADDITIONAL_CONFIG")
-                .withValue(this.getAdditionalConfig())
-                .build()
-        ));
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.BOOTSTRAP_SERVERS_ENV, this.getBootstrapAddress());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.ADDITIONAL_CONFIG_ENV, this.getAdditionalConfig());
 
         return new JobBuilder()
             .withNewMetadata()

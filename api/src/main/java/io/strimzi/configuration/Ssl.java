@@ -5,7 +5,6 @@
 package io.strimzi.configuration;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
-import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.sundr.builder.annotations.Buildable;
 
 import java.util.ArrayList;
@@ -44,29 +43,9 @@ public class Ssl {
     public List<EnvVar> getSslEnvVar() {
         List<EnvVar> envVars = new ArrayList<>();
 
-        if (this.getSslTruststoreCertificate() != null && !this.getSslTruststoreCertificate().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("CA_CRT")
-                .withValue(this.getSslTruststoreCertificate())
-                .build()
-            );
-        }
-
-        if (this.getSslKeystoreKey() != null && !this.getSslKeystoreKey().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("USER_KEY")
-                .withValue(this.getSslKeystoreKey())
-                .build()
-            );
-        }
-
-        if (this.getSslKeystoreCertificateChain() != null && !this.getSslKeystoreCertificateChain().isEmpty()) {
-            envVars.add(new EnvVarBuilder()
-                .withName("USER_CRT")
-                .withValue(this.getSslKeystoreCertificateChain())
-                .build()
-            );
-        }
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.CA_CRT_ENV, this.getSslTruststoreCertificate());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.USER_KEY_ENV, this.getSslKeystoreKey());
+        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.USER_CRT_ENV, this.getSslKeystoreCertificateChain());
 
         return envVars;
     }

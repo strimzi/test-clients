@@ -7,6 +7,7 @@ package io.strimzi.clients.http;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
+import io.strimzi.configuration.ClientType;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.configuration.Environment;
 import io.sundr.builder.annotations.Buildable;
@@ -57,7 +58,7 @@ public class HttpConsumerClient extends HttpClientBase {
         List<EnvVar> consumerSpecificEnvVars = new ArrayList<>(List.of(
             new EnvVarBuilder()
                 .withName(ConfigurationConstants.CLIENT_TYPE_ENV)
-                .withValue("HttpConsumer")
+                .withValue(ClientType.HttpConsumer.name())
                 .build()
         ));
 

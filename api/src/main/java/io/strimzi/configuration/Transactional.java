@@ -23,7 +23,7 @@ public class Transactional {
     public EnvVar getTransactionalEnvVar() {
         if (this.getMessagesPerTransaction() != null) {
             return new EnvVarBuilder()
-                .withName("MESSAGES_PER_TRANSACTION")
+                .withName(ConfigurationConstants.MESSAGES_PER_TRANSACTION_ENV)
                 .withValue(Long.toString(this.getMessagesPerTransaction()))
                 .build();
         }
