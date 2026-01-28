@@ -21,6 +21,7 @@ public class HttpClientsConfiguration {
     private final String messageType;
     private final String sslTruststoreCertificate;
     private final String urlPrefix;
+
     public HttpClientsConfiguration(Map<String, String> map) {
         String hostname = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.HOSTNAME_ENV), "");
         String port = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.PORT_ENV), "");

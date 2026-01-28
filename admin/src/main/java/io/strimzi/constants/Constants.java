@@ -11,7 +11,5 @@ public interface Constants {
     String KEYSTORE_KEY_FILE_NAME = "keystore.key";
     String KEYSTORE_CERT_FILE_NAME = "keystore.crt";
 
-    String CONFIG_FOLDER_PATH_ENV = "CONFIG_FOLDER_PATH";
-
     String ALL_OPTION = "all";
 }

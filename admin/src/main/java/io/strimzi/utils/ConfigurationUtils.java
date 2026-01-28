@@ -4,7 +4,7 @@
  */
 package io.strimzi.utils;
 
-import io.strimzi.constants.Constants;
+import io.strimzi.configuration.ConfigurationConstants;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -174,7 +174,7 @@ public class ConfigurationUtils {
     }
 
     private static String getConfigFolderPath() {
-        String specificFolderPath = System.getenv(Constants.CONFIG_FOLDER_PATH_ENV);
+        String specificFolderPath = System.getenv(ConfigurationConstants.CONFIG_FOLDER_PATH_ENV);
         return specificFolderPath == null || specificFolderPath.isEmpty() ? CONFIG_FOLDER_PATH_DEFAULT : specificFolderPath + "/" + CONFIG_FOLDER_NAME;
     }
 
