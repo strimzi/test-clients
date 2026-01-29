@@ -86,6 +86,7 @@ runs:
         DOCKER_REGISTRY: "quay.io"
         DOCKER_ORG: "strimzi-test-clients"
         DOCKER_TAG: "${{ inputs.dockerTag }}"
+        ARCHITECTURES: ${{ inputs.architecture }}
 
     - name: List built images
       if: ${{ always() }}
