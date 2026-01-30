@@ -14,6 +14,7 @@
         <module>clients</module>
         <module>admin</module>
         <module>clients-common</module>
+        <module>api</module>
     </modules>
 
     <properties>
@@ -49,6 +50,9 @@
 
         <strimzi-test-container.version>0.114.0</strimzi-test-container.version>
 
+        <fabric8.version>7.5.1</fabric8.version>
+        <sundrio.version>0.230.2</sundrio.version>
+
         <skipTests>false</skipTests>
     </properties>
 
@@ -83,6 +87,12 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
                 <version>${junit.jupiter.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -195,6 +205,38 @@
                 <artifactId>strimzi-test-container</artifactId>
                 <version>${strimzi-test-container.version}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.sundr</groupId>
+                <artifactId>builder-annotations</artifactId>
+                <version>${sundrio.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.sundr</groupId>
+                <artifactId>sundr-core</artifactId>
+                <version>${sundrio.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model-core</artifactId>
+                <version>${fabric8.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model-batch</artifactId>
+                <version>${fabric8.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-model-extensions</artifactId>
+                <version>${fabric8.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.strimzi</groupId>
+                <artifactId>clients-common</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

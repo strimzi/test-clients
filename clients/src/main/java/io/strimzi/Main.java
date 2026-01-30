@@ -4,8 +4,8 @@
  */
 package io.strimzi;
 
-import io.strimzi.common.ClientType;
 import io.strimzi.common.ClientsInterface;
+import io.strimzi.configuration.ClientType;
 import io.strimzi.configuration.ConfigurationConstants;
 import io.strimzi.http.consumer.HttpConsumerClient;
 import io.strimzi.http.producer.HttpProducerClient;

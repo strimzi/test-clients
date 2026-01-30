@@ -145,4 +145,6 @@ public interface ConfigurationConstants {
     String TRACING_TYPE_ENV = "TRACING_TYPE";
 
     String HTTP_CONSUMER_POST_JSON_CONTENT_TYPE = "application/vnd.kafka.v2+json";
+
+    String CONFIG_FOLDER_PATH_ENV = "CONFIG_FOLDER_PATH";
 }
