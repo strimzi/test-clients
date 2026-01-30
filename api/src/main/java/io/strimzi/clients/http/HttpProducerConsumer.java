@@ -29,7 +29,7 @@ public class HttpProducerConsumer extends HttpCommon {
     }
 
     public void setProducerName(String producerName) {
-        if (producerName == null) {
+        if (producerName == null || producerName.isEmpty()) {
             throw new IllegalArgumentException("Producer name cannot be empty");
         }
         this.producerName = producerName;
@@ -40,7 +40,7 @@ public class HttpProducerConsumer extends HttpCommon {
     }
 
     public void setConsumerName(String consumerName) {
-        if (consumerName == null) {
+        if (consumerName == null || consumerName.isEmpty()) {
             throw new IllegalArgumentException("Consumer name cannot be empty");
         }
         this.consumerName = consumerName;

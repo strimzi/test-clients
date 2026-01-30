@@ -75,7 +75,7 @@ public class KafkaProducerClient extends KafkaBaseClient {
     }
 
     public void setTopicName(String topicName) {
-        if (topicName == null) {
+        if (topicName == null || topicName.isEmpty()) {
             throw new IllegalArgumentException("Topic name cannot be empty");
         }
         this.topicName = topicName;

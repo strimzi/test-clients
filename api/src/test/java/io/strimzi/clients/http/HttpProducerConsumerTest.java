@@ -223,7 +223,18 @@ public class HttpProducerConsumerTest {
         assertThat(illegalArgumentException.getMessage(), is("Producer name cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
+            .withProducerName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Producer name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
             .withProducerName("client")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Consumer name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
+            .withProducerName("client")
+            .withConsumerName("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Consumer name cannot be empty"));
 
@@ -236,7 +247,22 @@ public class HttpProducerConsumerTest {
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
             .withProducerName("client")
             .withConsumerName("client")
+            .withNamespaceName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
+            .withProducerName("client")
+            .withConsumerName("client")
             .withNamespaceName("myproject")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Hostname cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
+            .withProducerName("client")
+            .withConsumerName("client")
+            .withNamespaceName("myproject")
+            .withHostname("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Hostname cannot be empty"));
 
@@ -254,6 +280,16 @@ public class HttpProducerConsumerTest {
             .withNamespaceName("myproject")
             .withHostname("localhost")
             .withPort(8080)
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Topic cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
+            .withProducerName("client")
+            .withConsumerName("client")
+            .withNamespaceName("myproject")
+            .withHostname("localhost")
+            .withPort(8080)
+            .withTopicName("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Name of Topic cannot be empty"));
 

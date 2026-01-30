@@ -307,6 +307,12 @@ public class KafkaStreamsClientTest {
         assertThat(illegalArgumentException.getMessage(), is("Application ID cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
+            .withApplicationId("")
+            .build()
+        );
+        assertThat(illegalArgumentException.getMessage(), is("Application ID cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
             .withApplicationId("my-application")
             .build()
         );
@@ -314,7 +320,22 @@ public class KafkaStreamsClientTest {
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
             .withApplicationId("my-application")
+            .withSourceTopicName("")
+            .build()
+        );
+        assertThat(illegalArgumentException.getMessage(), is("Source topic name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
+            .withApplicationId("my-application")
             .withSourceTopicName("source-topic")
+            .build()
+        );
+        assertThat(illegalArgumentException.getMessage(), is("Target topic name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
+            .withApplicationId("my-application")
+            .withSourceTopicName("source-topic")
+            .withTargetTopicName("")
             .build()
         );
         assertThat(illegalArgumentException.getMessage(), is("Target topic name cannot be empty"));
@@ -331,6 +352,14 @@ public class KafkaStreamsClientTest {
             .withApplicationId("my-application")
             .withSourceTopicName("source-topic")
             .withTargetTopicName("target-topic")
+            .withName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
+            .withApplicationId("my-application")
+            .withSourceTopicName("source-topic")
+            .withTargetTopicName("target-topic")
             .withName("client")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
@@ -340,7 +369,26 @@ public class KafkaStreamsClientTest {
             .withSourceTopicName("source-topic")
             .withTargetTopicName("target-topic")
             .withName("client")
+            .withNamespaceName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
+            .withApplicationId("my-application")
+            .withSourceTopicName("source-topic")
+            .withTargetTopicName("target-topic")
+            .withName("client")
             .withNamespaceName("namespace")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaStreamsClientBuilder()
+            .withApplicationId("my-application")
+            .withSourceTopicName("source-topic")
+            .withTargetTopicName("target-topic")
+            .withName("client")
+            .withNamespaceName("namespace")
+            .withBootstrapAddress("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
 

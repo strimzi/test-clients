@@ -27,7 +27,7 @@ public class KafkaBaseClient extends KafkaCommon {
     }
 
     public void setName(String name) {
-        if (name == null) {
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name of the client cannot be empty");
         }
         this.name = name;
@@ -46,7 +46,7 @@ public class KafkaBaseClient extends KafkaCommon {
         List<EnvVar> envVars = new ArrayList<>(clientSpecificEnvVars);
 
         // Add all the additional EnvVars to the List
-        if (this.getAdditionalEnvVars() != null && !this.getAdditionalEnvVars().isEmpty()) {
+        if (this.getAdditionalEnvVars() != null) {
             envVars.addAll(this.getAdditionalEnvVars());
         }
 

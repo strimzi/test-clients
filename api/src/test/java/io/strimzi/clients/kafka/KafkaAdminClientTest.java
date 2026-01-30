@@ -249,13 +249,31 @@ public class KafkaAdminClientTest {
         assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaAdminClientBuilder()
+            .withName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaAdminClientBuilder()
             .withName("client")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaAdminClientBuilder()
             .withName("client")
+            .withNamespaceName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaAdminClientBuilder()
+            .withName("client")
             .withNamespaceName("namespace")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaAdminClientBuilder()
+            .withName("client")
+            .withNamespaceName("namespace")
+            .withBootstrapAddress("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
 

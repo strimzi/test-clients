@@ -285,9 +285,21 @@ public class KafkaConsumerClientTest {
         assertThat(illegalArgumentException.getMessage(), is("Topic name cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
+            .withTopicName("")
+            .build()
+        );
+        assertThat(illegalArgumentException.getMessage(), is("Topic name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
             .withTopicName("my-topic")
             .build()
         );
+        assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
+            .withTopicName("my-topic")
+            .withName("")
+            .build());
         assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
@@ -299,7 +311,22 @@ public class KafkaConsumerClientTest {
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
             .withTopicName("my-topic")
             .withName("client")
+            .withNamespaceName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
+            .withTopicName("my-topic")
+            .withName("client")
             .withNamespaceName("namespace")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaConsumerClientBuilder()
+            .withTopicName("my-topic")
+            .withName("client")
+            .withNamespaceName("namespace")
+            .withBootstrapAddress("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
 

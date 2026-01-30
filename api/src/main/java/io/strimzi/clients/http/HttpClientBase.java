@@ -25,7 +25,7 @@ class HttpClientBase extends HttpCommon {
     }
 
     public void setName(String name) {
-        if (name == null) {
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException("Name of the client cannot be empty");
         }
 
@@ -38,14 +38,16 @@ class HttpClientBase extends HttpCommon {
 
         PodSpecBuilder podSpecBuilder = new PodSpecBuilder();
 
-        if (this.getImage().getImagePullSecret() != null && !this.getImage().getImagePullSecret().isEmpty()) {
+        if (this.getImage() != null
+            && this.getImage().getImagePullSecret() != null
+            && !this.getImage().getImagePullSecret().isEmpty()) {
             podSpecBuilder.withImagePullSecrets(new LocalObjectReference(this.getImage().getImagePullSecret()));
         }
 
         List<EnvVar> envVars = new ArrayList<>(clientSpecificEnvVars);
 
         // Add all the additional EnvVars to the List
-        if (this.getAdditionalEnvVars() != null && !this.getAdditionalEnvVars().isEmpty()) {
+        if (this.getAdditionalEnvVars() != null) {
             envVars.addAll(this.getAdditionalEnvVars());
         }
 

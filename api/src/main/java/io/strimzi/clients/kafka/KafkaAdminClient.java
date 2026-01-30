@@ -36,14 +36,16 @@ public class KafkaAdminClient extends KafkaBaseClient {
 
         PodSpecBuilder podSpecBuilder = new PodSpecBuilder();
 
-        if (this.getImage().getImagePullSecret() != null && !this.getImage().getImagePullSecret().isEmpty()) {
+        if (this.getImage() != null
+            && this.getImage().getImagePullSecret() != null
+            && !this.getImage().getImagePullSecret().isEmpty()) {
             podSpecBuilder.withImagePullSecrets(new LocalObjectReference(this.getImage().getImagePullSecret()));
         }
 
         List<EnvVar> envVars = new ArrayList<>();
 
         // Add all the additional EnvVars to the List
-        if (this.getAdditionalEnvVars() != null && !this.getAdditionalEnvVars().isEmpty()) {
+        if (this.getAdditionalEnvVars() != null) {
             envVars.addAll(this.getAdditionalEnvVars());
         }
 

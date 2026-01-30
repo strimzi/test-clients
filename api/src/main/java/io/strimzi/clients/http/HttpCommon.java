@@ -31,7 +31,7 @@ class HttpCommon {
     }
 
     public void setNamespaceName(String namespaceName) {
-        if (namespaceName == null) {
+        if (namespaceName == null || namespaceName.isEmpty()) {
             throw new IllegalArgumentException("Name of Namespace cannot be empty");
         }
         this.namespaceName = namespaceName;
@@ -42,7 +42,7 @@ class HttpCommon {
     }
 
     public void setHostname(String hostname) {
-        if (hostname == null) {
+        if (hostname == null || hostname.isEmpty()) {
             throw new IllegalArgumentException("Hostname cannot be empty");
         }
         this.hostname = hostname;
@@ -72,7 +72,7 @@ class HttpCommon {
     }
 
     public void setTopicName(String topicName) {
-        if (topicName == null) {
+        if (topicName == null || topicName.isEmpty()) {
             throw new IllegalArgumentException("Name of Topic cannot be empty");
         }
 

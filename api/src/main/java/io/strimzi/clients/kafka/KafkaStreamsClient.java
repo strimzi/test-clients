@@ -27,7 +27,7 @@ public class KafkaStreamsClient extends KafkaBaseClient {
     }
 
     public void setApplicationId(String applicationId) {
-        if (applicationId == null) {
+        if (applicationId == null || applicationId.isEmpty()) {
             throw new IllegalArgumentException("Application ID cannot be empty");
         }
         this.applicationId = applicationId;
@@ -38,7 +38,7 @@ public class KafkaStreamsClient extends KafkaBaseClient {
     }
 
     public void setSourceTopicName(String sourceTopicName) {
-        if (sourceTopicName == null) {
+        if (sourceTopicName == null || sourceTopicName.isEmpty()) {
             throw new IllegalArgumentException("Source topic name cannot be empty");
         }
         this.sourceTopicName = sourceTopicName;
@@ -49,7 +49,7 @@ public class KafkaStreamsClient extends KafkaBaseClient {
     }
 
     public void setTargetTopicName(String targetTopicName) {
-        if (targetTopicName == null) {
+        if (targetTopicName == null || targetTopicName.isEmpty()) {
             throw new IllegalArgumentException("Target topic name cannot be empty");
         }
         this.targetTopicName = targetTopicName;

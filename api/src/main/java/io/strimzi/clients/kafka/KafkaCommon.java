@@ -32,7 +32,7 @@ class KafkaCommon {
     }
 
     public void setNamespaceName(String namespaceName) {
-        if (namespaceName == null) {
+        if (namespaceName == null || namespaceName.isEmpty()) {
             throw new IllegalArgumentException("Name of Namespace cannot be empty");
         }
         this.namespaceName = namespaceName;
@@ -43,7 +43,7 @@ class KafkaCommon {
     }
 
     public void setBootstrapAddress(String bootstrapAddress) {
-        if (bootstrapAddress == null) {
+        if (bootstrapAddress == null || bootstrapAddress.isEmpty()) {
             throw new IllegalArgumentException("Bootstrap address cannot be empty");
         }
         this.bootstrapAddress = bootstrapAddress;

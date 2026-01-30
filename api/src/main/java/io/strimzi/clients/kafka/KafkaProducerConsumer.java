@@ -37,7 +37,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setProducerName(String producerName) {
-        if (producerName == null) {
+        if (producerName == null || producerName.isEmpty()) {
             throw new IllegalArgumentException("Producer name cannot be empty");
         }
         this.producerName = producerName;
@@ -48,7 +48,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setConsumerName(String consumerName) {
-        if (consumerName == null) {
+        if (consumerName == null || consumerName.isEmpty()) {
             throw new IllegalArgumentException("Consumer name cannot be empty");
         }
         this.consumerName = consumerName;
@@ -59,7 +59,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setTopicName(String topicName) {
-        if (topicName == null) {
+        if (topicName == null || topicName.isEmpty()) {
             throw new IllegalArgumentException("Topic name cannot be empty");
         }
         this.topicName = topicName;
@@ -193,8 +193,6 @@ public class KafkaProducerConsumer extends KafkaCommon {
             .withAdditionalEnvVars(getAdditionalEnvVars())
             .withAdditionalConfig(getAdditionalConfig())
             .build();
-
-
     }
 
     public KafkaConsumerClient getConsumer() {
@@ -234,6 +232,5 @@ public class KafkaProducerConsumer extends KafkaCommon {
             .withAdditionalEnvVars(getAdditionalEnvVars())
             .withAdditionalConfig(getAdditionalConfig())
             .build();
-
     }
 }

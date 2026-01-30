@@ -173,13 +173,31 @@ public class HttpConsumerClientTest {
         assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpConsumerClientBuilder()
+            .withName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of the client cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpConsumerClientBuilder()
             .withName("client")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpConsumerClientBuilder()
             .withName("client")
+            .withNamespaceName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpConsumerClientBuilder()
+            .withName("client")
             .withNamespaceName("myproject")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Hostname cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpConsumerClientBuilder()
+            .withName("client")
+            .withNamespaceName("myproject")
+            .withHostname("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Hostname cannot be empty"));
 
@@ -195,6 +213,15 @@ public class HttpConsumerClientTest {
             .withNamespaceName("myproject")
             .withHostname("localhost")
             .withPort(8080)
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Topic cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpConsumerClientBuilder()
+            .withName("client")
+            .withNamespaceName("myproject")
+            .withHostname("localhost")
+            .withPort(8080)
+            .withTopicName("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Name of Topic cannot be empty"));
 

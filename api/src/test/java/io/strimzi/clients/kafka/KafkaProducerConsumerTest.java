@@ -458,7 +458,18 @@ public class KafkaProducerConsumerTest {
         assertThat(illegalArgumentException.getMessage(), is("Producer name cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
+            .withProducerName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Producer name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
             .withProducerName("my-producer")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Consumer name cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
+            .withProducerName("my-producer")
+            .withConsumerName("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Consumer name cannot be empty"));
 
@@ -468,6 +479,12 @@ public class KafkaProducerConsumerTest {
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Topic name cannot be empty"));
 
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
+            .withProducerName("my-producer")
+            .withConsumerName("my-consumer")
+            .withTopicName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Topic name cannot be empty"));
 
         illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
             .withProducerName("my-producer")
@@ -480,7 +497,24 @@ public class KafkaProducerConsumerTest {
             .withProducerName("my-producer")
             .withConsumerName("my-consumer")
             .withTopicName("my-topic")
+            .withNamespaceName("")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Name of Namespace cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
+            .withProducerName("my-producer")
+            .withConsumerName("my-consumer")
+            .withTopicName("my-topic")
             .withNamespaceName("namespace")
+            .build());
+        assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
+
+        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new KafkaProducerConsumerBuilder()
+            .withProducerName("my-producer")
+            .withConsumerName("my-consumer")
+            .withTopicName("my-topic")
+            .withNamespaceName("namespace")
+            .withBootstrapAddress("")
             .build());
         assertThat(illegalArgumentException.getMessage(), is("Bootstrap address cannot be empty"));
 
