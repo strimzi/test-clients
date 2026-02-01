@@ -9,7 +9,7 @@
         <version>0.13.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>api</artifactId>
+    <artifactId>builders</artifactId>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>

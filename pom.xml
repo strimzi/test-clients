@@ -14,7 +14,7 @@
         <module>clients</module>
         <module>admin</module>
         <module>clients-common</module>
-        <module>api</module>
+        <module>builders</module>
     </modules>
 
     <properties>
