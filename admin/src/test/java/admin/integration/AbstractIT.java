@@ -4,7 +4,7 @@
  */
 package admin.integration;
 
-import io.strimzi.admin.KafkaAdminClient;
+import io.strimzi.testclients.admin.KafkaAdminClient;
 import io.strimzi.test.container.StrimziKafkaCluster;
 import org.apache.kafka.clients.admin.Admin;
 import org.apache.kafka.clients.admin.AdminClientConfig;

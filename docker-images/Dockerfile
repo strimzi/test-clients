@@ -29,4 +29,4 @@ RUN chmod +x /usr/bin/admin-client
 
 USER 1001
 
-CMD ["/bin/run.sh", "clients.jar", "io.strimzi.Main"]
+CMD ["/bin/run.sh", "clients.jar", "io.strimzi.testclients.Main"]

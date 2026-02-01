@@ -1,0 +1,188 @@
+/*
+ * Copyright Strimzi authors.
+ * License: Apache License 2.0 (see the file LICENSE or http://apache.org/licenses/LICENSE-2.0.html).
+ */
+package io.strimzi.testclients.http.consumer;
+
+import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpResponseStatus;
+import io.strimzi.testclients.common.ClientsInterface;
+import io.strimzi.testclients.configuration.ConfigurationConstants;
+import io.strimzi.testclients.configuration.http.HttpConsumerConfiguration;
+import io.strimzi.testclients.common.records.consumer.http.ConsumerRecord;
+import io.strimzi.testclients.common.records.consumer.http.ConsumerRecordUtils;
+import io.strimzi.testclients.http.HttpBridgeClientUtil;
+import io.strimzi.testclients.tracing.HttpContext;
+import io.strimzi.testclients.tracing.HttpHandle;
+import io.strimzi.testclients.tracing.TracingHandle;
+import io.strimzi.testclients.tracing.TracingUtil;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class HttpConsumerClient implements ClientsInterface {
+
+    private static final Logger LOGGER = LogManager.getLogger(HttpConsumerClient.class);
+    private final HttpConsumerConfiguration configuration;
+    private int consumedMessages;
+    private HttpClient client;
+    private TracingHandle tracingHandle;
+    private HttpHandle httpHandle;
+    private final ScheduledExecutorService scheduledExecutor;
+    private CountDownLatch countDownLatch;
+
+    public HttpConsumerClient(Map<String, String> configuration) {
+        this.configuration = new HttpConsumerConfiguration(configuration);
+        this.consumedMessages = 0;
+        this.client = createHttpClient();
+        this.tracingHandle = TracingUtil.getTracing();
+        this.httpHandle = tracingHandle.createHttpHandle("receive-messages");
+        this.scheduledExecutor = Executors.newScheduledThreadPool(1, r -> new Thread(r, "http-consumer"));
+        this.countDownLatch  = new CountDownLatch(1);
+    }
+
+    @Override
+    public void run() {
+        LOGGER.info("Starting {} with configuration: \n{}", this.getClass().getName(), configuration.toString());
+
+        createConsumer();
+        subscribeToTopic();
+
+        long delayMs = configuration.getPollInterval() == 0 ? ConfigurationConstants.DEFAULT_POLL_INTERVAL : configuration.getPollInterval();
+        scheduledExecutor.scheduleWithFixedDelay(this::checkAndReceiveMessages, 0, delayMs, TimeUnit.MILLISECONDS);
+
+        awaitCompletion();
+        checkFinalState();
+    }
+
+    @Override
+    public void awaitCompletion() {
+        try {
+            countDownLatch.await();
+            scheduledExecutor.awaitTermination(ConfigurationConstants.DEFAULT_TASK_COMPLETION_TIMEOUT, TimeUnit.MILLISECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.error("Failed to wait for task completion due to: {}", e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (!scheduledExecutor.isShutdown()) {
+                scheduledExecutor.shutdownNow();
+            }
+        }
+    }
+
+    @Override
+    public void checkFinalState() {
+        if (consumedMessages >= configuration.getMessageCount()) {
+            LOGGER.info("All messages successfully received");
+        } else {
+            LOGGER.error("Unable to correctly receive all messages");
+            throw new RuntimeException("Failed to receive all messages");
+        }
+    }
+
+    private void checkAndReceiveMessages() {
+        if (consumedMessages >= configuration.getMessageCount()) {
+            LOGGER.info("Shutting down the executor");
+            scheduledExecutor.shutdown();
+            countDownLatch.countDown();
+        } else {
+            try {
+                this.consumeMessages();
+            } catch (Exception e) {
+                LOGGER.error("Caught exception: {}", e.getMessage());
+                e.printStackTrace();
+                scheduledExecutor.shutdown();
+                countDownLatch.countDown();
+            }
+        }
+    }
+
+    private HttpClient createHttpClient() {
+        return HttpBridgeClientUtil.getHttpClient(configuration.getSslTruststoreCertificate());
+    }
+
+    public void createConsumer() {
+        String message = "{\"name\":\"" + configuration.getClientId() + "\",\"format\":\"" +
+            this.configuration.getMessageType() + "\",\"auto.offset.reset\":\"earliest\"}";
+
+        LOGGER.info("Creating new consumer:\n{}", message);
+
+        HttpContext context = HttpContext.post(configuration.getConsumerCreationURI(), ConfigurationConstants.HTTP_CONSUMER_POST_JSON_CONTENT_TYPE, message);
+
+        HttpHandle<String> httpHandle = TracingUtil.getTracing().createHttpHandle("create-consumer");
+        HttpRequest creationRequest = httpHandle.build(context);
+
+        try {
+            HttpResponse<String> response = client.send(creationRequest, HttpResponse.BodyHandlers.ofString());
+            httpHandle.finish(response);
+
+            if (response.statusCode() == HttpResponseStatus.OK.code()) {
+                LOGGER.info("Consumer successfully created. Response:\n{}", response.body());
+            } else if (response.statusCode() == HttpResponseStatus.CONFLICT.code()) {
+                LOGGER.info("Consumer already exists. Response:\n{}", response.body());
+            } else {
+                throw new RuntimeException(String.format("Failed to create consumer. Status code: %s, response: %s", response.statusCode(), response.body()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(String.format("Failed to create consumer: %s due to: %s", configuration.getClientId(), e.getMessage()));
+        }
+    }
+
+    public void subscribeToTopic() {
+        String subscriptionMessage = "{\"topics\":[\"" + configuration.getTopic() + "\"]}";
+
+        LOGGER.info("Subscribing consumer: {} to topic: {} with message: {}", configuration.getClientId(), configuration.getTopic(), subscriptionMessage);
+
+        HttpContext context = HttpContext.post(configuration.getSubscriptionURI(), ConfigurationConstants.HTTP_CONSUMER_POST_JSON_CONTENT_TYPE, subscriptionMessage);
+
+        HttpHandle<String> httpHandle = TracingUtil.getTracing().createHttpHandle("subscribe-topic");
+        HttpRequest subscriptionRequest = httpHandle.build(context);
+
+        try {
+            HttpResponse<String> response = client.send(subscriptionRequest, HttpResponse.BodyHandlers.ofString());
+            httpHandle.finish(response);
+
+            if (response.statusCode() == HttpResponseStatus.NO_CONTENT.code()) {
+                LOGGER.info("Successfully subscribed to topic {}. Response:\n{}", configuration.getTopic(), response.body());
+            } else {
+                throw new RuntimeException(String.format("Failed to subscribe consumer: %s to topic: %s. Response: %s", configuration.getClientId(), configuration.getTopic(), response.body()));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(String.format("Failed to subscribe consumer: %s to topic: %s due to: %s", configuration.getClientId(), configuration.getTopic(), e.getMessage()));
+        }
+    }
+
+    public void consumeMessages() {
+        String contentType = "application/vnd.kafka." + this.configuration.getMessageType() + ".v2+json";
+        HttpContext context = HttpContext.get(configuration.getConsumeMessagesURI(), contentType);
+        try {
+            LOGGER.info("Receiving messages - sending HTTP request to {}", configuration.getConsumeMessagesURI());
+
+            HttpResponse httpResponse = httpHandle.finish(client.send(httpHandle.build(context), HttpResponse.BodyHandlers.ofString()));
+
+            if (httpResponse.statusCode() != HttpResponseStatus.OK.code()) {
+                throw new RuntimeException("Failed to receive messages due to: " + httpResponse.body());
+            } else if (httpResponse.body().equals("[]") && httpResponse.statusCode() == HttpResponseStatus.OK.code()) {
+                LOGGER.info("Array with messages is empty, no messages were received");
+            } else {
+                ConsumerRecord[] records = ConsumerRecordUtils.parseConsumerRecordsFromJson(httpResponse.body().toString());
+                ConsumerRecordUtils.logConsumerRecords(records);
+
+                consumedMessages += records.length;
+            }
+
+        } catch (Exception e) {
+            LOGGER.error("Failed to consume message due to: {}", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+}
