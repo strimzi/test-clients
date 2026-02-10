@@ -37,7 +37,7 @@ runs:
 
     - name: Deploy Java artifacts
       shell: bash
-      run: ./.github/scripts/push-to-central.sh
+      run: make pushtocentral
       env:
         BUILD_REASON: "IndividualCI"
         BRANCH: ${{ github.ref }}

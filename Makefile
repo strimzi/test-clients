@@ -35,3 +35,6 @@ release_maven:
 
 release_clients_version:
 	echo "$(RELEASE_VERSION)\c" > clients.version
+
+pushtocentral:
+	./.github/scripts/push-to-central.sh
