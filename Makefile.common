@@ -1,0 +1,5 @@
+# Makefile.common contains variables and configuration used across multiple Makefiles.
+
+KAFKA_VERSIONS = `cat kafka.version`
+ACTUAL_KAFKA_VERSION = `mvn help:evaluate -Dexpression=kafka.version -q -DforceStdout`
+BUILD_ALL_KAFKA_VERSIONS ?= false

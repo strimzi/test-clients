@@ -1,0 +1,26 @@
+# Makefile.maven contains the shared tasks for building Java applications. This file is
+# included into the Makefile files which contain some Java sources which should be build
+include ./Makefile.common
+
+.PHONY: java_verify
+java_verify:
+	echo "Building JAR file ..."
+	mvn $(MVN_ARGS) verify
+
+.PHONY: java_install
+java_install:
+ifeq ($(BUILD_ALL_KAFKA_VERSIONS),true)
+	@echo "Building project for all Kafka versions."
+	@for version in $(KAFKA_VERSIONS); do \
+		echo "Building project with Kafka version $$version"; \
+		mvn $(MVN_ARGS) install -Dkafka.version=$$version; \
+	done
+else
+	@echo "Building the project"
+	mvn $(MVN_ARGS) install
+endif
+
+.PHONY: java_clean
+java_clean:
+	echo "Cleaning Maven build ..."
+	mvn clean
