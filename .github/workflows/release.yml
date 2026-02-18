@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version (e.g., 0.13.0 for GA or 0.13.0-rc1 for RC)'
+        required: true
+        type: string
+      sourceBuildRunId:
+        description: 'GitHub Actions Run ID of the source build (find in Actions tab URL)'
+        required: true
+        type: string
+
+# Declare default permissions as read only
+permissions:
+  contents: read
+
+jobs:
+  prepare-release-artifacts:
+    name: Prepare Release Artifacts
+    if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/build/release-artifacts
+        with:
+          releaseVersion: ${{ inputs.releaseVersion }}
+          runnerArch: "amd64"
+
+  push-containers:
+    name: Push Containers without suffix (${{ inputs.releaseVersion }})
+    needs:
+      - prepare-release-artifacts
+    if: |-
+      ${{ always() && startsWith(github.ref, 'refs/heads/release-') &&
+        needs.prepare-release-artifacts.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      DOCKER_REGISTRY: "quay.io"
+      DOCKER_ORG: "strimzi-test-clients"
+      DOCKER_TAG: "${{ inputs.releaseVersion }}"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@main
+      - uses: strimzi/github-actions/.github/actions/build/push-containers@main
+        with:
+          architectures: "amd64,arm64,ppc64le,s390x"
+          containerRegistry: "quay.io"
+          containerOrg: "strimzi-test-clients"
+          containerTag: "${{ inputs.releaseVersion }}"
+          registryUser: ${{ secrets.QUAY_USER }}
+          registryPassword: ${{ secrets.QUAY_PASS }}
+          artifactSuffix: "test-clients"
