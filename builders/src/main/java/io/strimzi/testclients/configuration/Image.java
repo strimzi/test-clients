@@ -8,7 +8,7 @@ import io.sundr.builder.annotations.Buildable;
 
 @Buildable
 public class Image {
-    public static String defaultImage = "quay.io/strimzi-test-clients/test-clients:latest-kafka-4.1.1";
+    public static String defaultImage = "quay.io/strimzi-test-clients/test-clients:latest-kafka-4.2.0";
     private String imageName = defaultImage;
     private String imagePullPolicy = "IfNotPresent";
     private String imagePullSecret;
