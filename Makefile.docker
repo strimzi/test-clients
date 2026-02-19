@@ -9,7 +9,7 @@
 TOPDIR=$(dir $(lastword $(MAKEFILE_LIST)))
 ARCHIVE_DIR=$(TOPDIR)docker-images/container-archives
 
-DOCKERFILE_DIR     ?= docker-images/.
+DOCKERFILE_DIR     ?= ./
 DOCKER_REGISTRY    ?= quay.io
 DOCKER_ORG         ?= $(USER)
 DOCKER_TAG         ?= latest
@@ -21,38 +21,79 @@ ifdef DOCKER_ARCHITECTURE
   DOCKER_PLATFORM_TAG_SUFFIX = -$(DOCKER_ARCHITECTURE)
 endif
 
+MANIFEST_ARCHITECTURES ?= $(DOCKER_ARCHITECTURE)
+
 all: docker_build docker_push
 
-docker_build: copy_files
-	echo "Building Docker image ..."
-	$(DOCKER_CMD) $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKERFILE_DIR)
-	rm -rf ./scripts
+.PHONY: docker_build
+docker_build:
+	$(MAKE) execute_docker_goal goal=docker_build_goal
 
+.PHONY: docker_build_goal
+docker_build_goal:
+	@echo "Building Docker image for Kafka version $(KAFKA_VERSION)..."
+	$(DOCKER_CMD) $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) --build-arg kafkaVersion=$(KAFKA_VERSION) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) -f $(DOCKERFILE_DIR)/Dockerfile .
+
+.PHONY: docker_tag
 docker_tag:
+	$(MAKE) execute_docker_goal goal=docker_tag_goal
+
+.PHONY: docker_tag_goal
+docker_tag_goal:
 	echo "Tagging strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) to $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
 	$(DOCKER_CMD) tag strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
-docker_push:docker_tag
+.PHONY: docker_push
+docker_push:
+	$(MAKE) execute_docker_goal goal=docker_push_goal
+
+.PHONY: docker_push_goal
+docker_push_goal: docker_tag
 	echo "Pushing $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
 	$(DOCKER_CMD) push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
 .PHONY: docker_amend_manifest
 docker_amend_manifest:
-	# Create / Amend the manifest
-	$(DOCKER_CMD) manifest create $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) --amend $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+	$(MAKE) execute_docker_goal goal=docker_amend_manifest_goal
 
-.PHONY: docker_push_manifest
-docker_push_manifest:
-	# Push the manifest to the registry
-	$(DOCKER_CMD) manifest push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)
-
-.PHONY: docker_delete_manifest
-docker_delete_manifest:
-	# Delete the manifest to the registry, ignore the error if manifest doesn't exist
-	$(DOCKER_CMD) manifest rm $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) || true
+.PHONY: docker_amend_manifest_goal
+docker_amend_manifest_goal:
+    # Create the multi-platform manifest from architecture-specific images
+	sources="" ; \
+	for arch in $$(echo "$(MANIFEST_ARCHITECTURES)" | tr ',' ' '); do \
+		sources="$$sources $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)" ; \
+	done ; \
+	$(DOCKER_CMD) buildx imagetools create -t $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) $$sources
 
 .PHONY: docker_save
 docker_save:
+	$(MAKE) execute_docker_goal goal=docker_save_goal
+
+.PHONY: docker_save_goal
+docker_save_goal:
 	# Saves the container as TGZ file
 	test -d $(ARCHIVE_DIR) || mkdir -p  $(ARCHIVE_DIR)
-	$(DOCKER_CMD) save $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) | gzip > $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+	$(DOCKER_CMD) save $(DOCKER_PLATFORM) strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) | gzip > $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+
+.PHONY: docker_load
+docker_load:
+	$(MAKE) execute_docker_goal goal=docker_load_goal
+
+.PHONY: docker_load_goal
+docker_load_goal:
+	# Loads the container as TGZ file
+	docker load < $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+
+.PHONY: execute_docker_goal
+execute_docker_goal:
+# Goal for handling execution of specified goals for each of Kafka version
+# It is easier to have this one goal instead of copying the if-else with loops to each of the goal.
+ifeq ($(BUILD_ALL_KAFKA_VERSIONS),true)
+	@echo "Executing '$(goal)' for all Kafka versions"
+	@for version in $(KAFKA_VERSIONS); do \
+		$(MAKE) $(goal) KAFKA_VERSION=$$version DOCKER_TAG=$(DOCKER_TAG)-kafka-$$version; \
+	done
+else
+	@echo "Executing '$(goal)' for single Kafka version: $(ACTUAL_KAFKA_VERSION)"
+	$(MAKE) $(goal) KAFKA_VERSION=$(ACTUAL_KAFKA_VERSION)
+endif

@@ -1,22 +1,14 @@
+include ./Makefile.os
+include ./Makefile.docker
+include ./Makefile.maven
+
 RELEASE_VERSION ?= latest
 VERSION ?= `cat clients.version`
 PROJECT_NAME = test-clients
 
-include ./Makefile.os
-include ./Makefile.docker
-
-DOCKER_TARGETS=docker_build docker_push docker_tag docker_amend_manifest docker_push_manifest docker_delete_manifest
+DOCKER_TARGETS = docker_build docker_push docker_tag docker_load docker_save docker_amend_manifest
 
 release: release_examples release_maven release_clients_version
-
-copy_files:
-	mkdir -p docker-images/tmp/
-	cp clients/src/main/resources/log4j2.properties docker-images/tmp/log4j2.properties
-	cp clients/target/clients-$(VERSION).jar docker-images/tmp/clients-$(VERSION).jar
-	cp admin/target/admin-$(VERSION).jar docker-images/tmp/admin-$(VERSION).jar
-
-clean_files:
-	rm -rf docker-images/tmp/*
 
 next_version:
 	mvn versions:set -DnewVersion=$(shell echo $(NEXT_VERSION) | tr a-z A-Z)
@@ -34,6 +26,8 @@ release_maven:
 
 release_clients_version:
 	echo "$(RELEASE_VERSION)\c" > clients.version
+
+clean: make java_clean
 
 pushtocentral:
 	./.github/scripts/push-to-central.sh

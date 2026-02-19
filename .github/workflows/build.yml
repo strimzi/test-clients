@@ -5,8 +5,6 @@ on:
     branches:
       - "main"
       - "release-*"
-    tags:
-      - "*"
   pull_request:
     branches:
       - "*"
@@ -14,60 +12,94 @@ on:
 # Declare default permissions as read only
 permissions:
   contents: read
-  
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: ./.github/actions/build/build-and-test
-        with:
-          mvnArgs: "-B"
-          runnerArch: "amd64"
+env:
+  BUILD_ALL_KAFKA_VERSIONS: true
 
-  build-and-push-containers:
-    name: Build and Push Containers
-    needs:
-      - build-and-test
-    # TODO - Eventualy we should use matrix strategy, but it requires build process changes, leaving it here as todo
-    # strategy:
-    #   matrix:
-    #     architecture:
-    #       - amd64
-    #       - arm64
-    #       - s390x
-    #       - ppc64le
+jobs:
+  build-test-clients:
+    name: Build Test-Clients
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/build/build-and-push-containers
+      - uses: strimzi/github-actions/.github/actions/dependencies/setup-java@main
         with:
-          # TODO - change this once we will use matrix strategy
-          # architecture: ${{ matrix.architecture }}
-          architecture: "amd64 s390x ppc64le arm64"
+          javaVersion: "21"
+      - uses: strimzi/github-actions/.github/actions/build/build-binaries@main
+        with:
           runnerArch: "amd64"
-          dockerTag: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name|| 'latest' }}
-          quayUser: ${{ secrets.QUAY_USER }}
-          quayPass: ${{ secrets.QUAY_PASS }}
+          artifactSuffix: "test-clients"
+
+  build-containers:
+    name: Build Containers
+    needs:
+      - build-test-clients
+    strategy:
+      matrix:
+        architecture:
+          - amd64
+          - arm64
+          - s390x
+          - ppc64le
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@main
+      - uses: strimzi/github-actions/.github/actions/build/build-containers@main
+        with:
+          architecture: ${{ matrix.architecture }}
+          artifactSuffix: "test-clients"
+          containerRegistry: "quay.io"
+          containerOrg: "strimzi-test-clients"
+          containerTag: "latest"
+          imagesDir: "./docker-images/container-archives"
+
+  push-containers:
+    name: Push Containers
+    needs:
+      - build-test-clients
+      - build-containers
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      DOCKER_REGISTRY: "quay.io"
+      DOCKER_ORG: "strimzi-test-clients"
+      DOCKER_TAG: "latest"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@main
+      - uses: strimzi/github-actions/.github/actions/build/push-containers@main
+        with:
+          architectures: "amd64,arm64,ppc64le,s390x"
+          containerRegistry: "quay.io"
+          containerOrg: "strimzi-test-clients"
+          containerTag: "latest"
+          registryUser: ${{ secrets.QUAY_USER }}
+          registryPassword: ${{ secrets.QUAY_PASS }}
+          artifactSuffix: "test-clients"
 
   deploy-java:
     name: Deploy Java artifacts
     needs:
-      - build-and-test
-      - build-and-push-containers
+      - build-test-clients
+      - build-containers
+      - push-containers
     if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: ./.github/actions/build/deploy-java
+      - uses: strimzi/github-actions/.github/actions/build/deploy-java@main
         with:
-          runnerArch: "amd64"
           gpgPassphrase: ${{ secrets.GPG_PASSPHRASE }}
           gpgSigningKey: ${{ secrets.GPG_SIGNING_KEY }}
           centralUsername: ${{ secrets.CENTRAL_USERNAME }}
           centralPassword: ${{ secrets.CENTRAL_PASSWORD }}
+          artifactSuffix: "test-clients"
+          modules: "builders"
