@@ -1,7 +1,6 @@
 RELEASE_VERSION ?= latest
 VERSION ?= `cat clients.version`
 PROJECT_NAME = test-clients
-GRAAL_VM_VERSION = 17.0.8
 
 include ./Makefile.os
 include ./Makefile.docker
