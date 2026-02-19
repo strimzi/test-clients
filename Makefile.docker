@@ -84,6 +84,15 @@ docker_load_goal:
 	# Loads the container as TGZ file
 	docker load < $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
 
+.PHONY: docker_delete_archive
+docker_delete_archive:
+    $(MAKE) execute_docker_goal goal=docker_delete_archive_goal
+
+.PHONY: docker_delete_archive_goal
+docker_delete_archive_goal:
+    # Deletes the archive
+    rm $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+
 .PHONY: execute_docker_goal
 execute_docker_goal:
 # Goal for handling execution of specified goals for each of Kafka version
