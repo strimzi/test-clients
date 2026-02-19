@@ -6,7 +6,7 @@ RELEASE_VERSION ?= latest
 VERSION ?= `cat clients.version`
 PROJECT_NAME = test-clients
 
-DOCKER_TARGETS = docker_build docker_push docker_tag docker_load docker_save docker_delete_archive docker_amend_manifest
+DOCKER_TARGETS = docker_build docker_push docker_tag docker_load docker_save docker_delete_archive docker_amend_manifest docker_gha_sign_manifest docker_gha_sbom docker_gha_push_sbom
 
 release: release_examples release_maven release_clients_version
 
