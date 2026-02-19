@@ -48,7 +48,7 @@ docker_push:
 	$(MAKE) execute_docker_goal goal=docker_push_goal
 
 .PHONY: docker_push_goal
-docker_push_goal: docker_tag
+docker_push_goal:
 	echo "Pushing $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
 	$(DOCKER_CMD) push $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
