@@ -68,13 +68,10 @@ jobs:
     permissions:
       contents: read
       id-token: write
-    env:
-      DOCKER_REGISTRY: "quay.io"
-      DOCKER_ORG: "strimzi-test-clients"
-      DOCKER_TAG: "latest"
     steps:
       - uses: actions/checkout@v6
       - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@main
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-syft@main
       - uses: strimzi/github-actions/.github/actions/build/push-containers@main
         with:
           architectures: "amd64,arm64,ppc64le,s390x"
