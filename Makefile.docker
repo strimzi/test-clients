@@ -8,6 +8,7 @@
 # is passed to the image build (based on Git commit, default latest)
 TOPDIR=$(dir $(lastword $(MAKEFILE_LIST)))
 ARCHIVE_DIR=$(TOPDIR)docker-images/container-archives
+SBOM_DIR=$(TOPDIR)sbom
 
 DOCKERFILE_DIR     ?= ./
 DOCKER_REGISTRY    ?= quay.io
