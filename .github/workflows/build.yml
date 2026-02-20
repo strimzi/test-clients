@@ -3,7 +3,7 @@ name: Build
 on:
   push:
     branches:
-      - "main"
+      - "add-syft-installation"
       - "release-*"
   pull_request:
     branches:
@@ -54,7 +54,8 @@ jobs:
           architecture: ${{ matrix.architecture }}
           artifactSuffix: "test-clients"
           containerRegistry: "quay.io"
-          containerOrg: "strimzi-test-clients"
+#          containerOrg: "strimzi-test-clients"
+          containerOrg: "lkral"
           containerTag: "latest"
           imagesDir: "./docker-images/container-archives"
 
@@ -63,15 +64,11 @@ jobs:
     needs:
       - build-test-clients
       - build-containers
-    if: ${{ github.ref == 'refs/heads/main' }}
+#    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
-    env:
-      DOCKER_REGISTRY: "quay.io"
-      DOCKER_ORG: "strimzi-test-clients"
-      DOCKER_TAG: "latest"
     steps:
       - uses: actions/checkout@v6
       - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@main
@@ -80,7 +77,8 @@ jobs:
         with:
           architectures: "amd64,arm64,ppc64le,s390x"
           containerRegistry: "quay.io"
-          containerOrg: "strimzi-test-clients"
+#          containerOrg: "strimzi-test-clients"
+          containerOrg: "lkral"
           containerTag: "latest"
           registryUser: ${{ secrets.QUAY_USER }}
           registryPassword: ${{ secrets.QUAY_PASS }}
