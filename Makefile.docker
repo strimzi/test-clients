@@ -61,7 +61,7 @@ docker_amend_manifest_goal:
 	# Create the multi-platform manifest from architecture-specific images
 	sources="" ; \
 	for arch in $$(echo "$(MANIFEST_ARCHITECTURES)" | tr ',' ' '); do \
-		sources="$$sources $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)" ; \
+		sources="$$sources $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)-$$arch" ; \
 	done ; \
 	$(DOCKER_CMD) buildx imagetools create -t $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG) $$sources
 
