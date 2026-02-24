@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      releaseVersion:
+        description: 'Release Version (e.g., 0.13.0 for GA or 0.13.0-rc1 for RC)'
+        required: true
+        type: string
+      sourceBuildRunId:
+        description: 'GitHub Actions Run ID of the source build (find in Actions tab URL)'
+        required: true
+        type: string
+
+# Declare default permissions as read only
+permissions:
+  contents: read
+
+jobs:
+  prepare-and-release-artifacts:
+    name: Prepare and Release Artifacts
+    if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: strimzi/github-actions/.github/actions/dependencies/setup-java@main
+        with:
+          javaVersion: "21"
+      - uses: strimzi/github-actions/.github/actions/build/release-artifacts@main
+        with:
+          releaseVersion: ${{ inputs.releaseVersion }}
+          artifactSuffix: "test-clients"
+      - uses: strimzi/github-actions/.github/actions/build/deploy-java@main
+        with:
+          gpgPassphrase: ${{ secrets.GPG_PASSPHRASE }}
+          gpgSigningKey: ${{ secrets.GPG_SIGNING_KEY }}
+          centralUsername: ${{ secrets.CENTRAL_USERNAME }}
+          centralPassword: ${{ secrets.CENTRAL_PASSWORD }}
+          artifactSuffix: "test-clients"
+          modules: "builders"
+
+  push-containers:
+    name: Push Containers (${{ inputs.releaseVersion }})
+    needs:
+      - prepare-and-release-artifacts
+    if: |-
+      ${{ always() && startsWith(github.ref, 'refs/heads/release-') &&
+        needs.prepare-and-release-artifacts.result == 'success' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+    env:
+      DOCKER_REGISTRY: "quay.io"
+      DOCKER_ORG: "strimzi-test-clients"
+      DOCKER_TAG: "${{ inputs.releaseVersion }}"
+    steps:
+      - uses: actions/checkout@v6
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@main
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-syft@main
+      - uses: strimzi/github-actions/.github/actions/build/push-containers@main
+        with:
+          architectures: "amd64,arm64,ppc64le,s390x"
+          containerRegistry: "quay.io"
+          containerOrg: "strimzi-test-clients"
+          containerTag: "${{ inputs.releaseVersion }}"
+          registryUser: ${{ secrets.QUAY_USER }}
+          registryPassword: ${{ secrets.QUAY_PASS }}
+          artifactSuffix: "test-clients"
