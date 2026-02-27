@@ -57,6 +57,7 @@ public interface ConfigurationConstants {
     String MESSAGE_ENV = "MESSAGE";
     String MESSAGE_TEMPLATE_ENV = "MESSAGE_TEMPLATE";
     String MESSAGE_TYPE_ENV = "MESSAGE_TYPE";
+    String START_TIMESTAMP_ENV = "START_TIMESTAMP";
 
     /**
      * Kafka environment variables

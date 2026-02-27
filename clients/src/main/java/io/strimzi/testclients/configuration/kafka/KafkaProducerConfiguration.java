@@ -11,6 +11,7 @@ import org.apache.kafka.common.header.Header;
 import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.security.InvalidParameterException;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -31,6 +32,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
     private final String messageTemplate;
     private final String keySerializer;
     private final String valueSerializer;
+    private final Long startTimestamp;
 
     public KafkaProducerConfiguration(Map<String, String> map) {
         super(map);
@@ -42,6 +44,17 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         this.messageTemplate = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_TEMPLATE_ENV), null);
         this.messageKey = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.MESSAGE_KEY_ENV), null);
         this.topicName = map.get(ConfigurationConstants.TOPIC_ENV);
+        String startTimestampEnv = ClientsConfigurationUtils.parseStringOrDefault(map.get(ConfigurationConstants.START_TIMESTAMP_ENV), null);
+
+        if (startTimestampEnv != null && !startTimestampEnv.isEmpty()) {
+            try {
+                this.startTimestamp = OffsetDateTime.parse(startTimestampEnv).toInstant().toEpochMilli();
+            } catch (Exception e) {
+                throw new IllegalArgumentException("Invalid Timestamp configured in the START_TIMESTAMP env variable: ", e);
+            }
+        } else {
+            this.startTimestamp = null;
+        }
 
         if (this.topicName == null || topicName.isEmpty()) throw new InvalidParameterException("Topic is not set");
 
@@ -99,6 +112,10 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
         return valueSerializer;
     }
 
+    public Long getStartTimestamp() {
+        return startTimestamp;
+    }
+
     @Override
     public String toString() {
         return "KafkaProducerConfiguration:\n" +
@@ -110,6 +127,7 @@ public class KafkaProducerConfiguration extends KafkaClientsConfiguration {
             "transactionalProducer='" + this.isTransactionalProducer() + "',\n" +
             "messageKey='" + this.getMessageKey() + "',\n" +
             "message='" + this.getMessage() + "',\n" +
+            "startTimestamp='" + this.getStartTimestamp() + "',\n" +
             "messageTemplate='" + this.getMessageTemplate() + "'";
     }
 }
