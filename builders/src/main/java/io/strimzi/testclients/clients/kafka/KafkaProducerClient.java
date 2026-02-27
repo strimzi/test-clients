@@ -23,6 +23,7 @@ public class KafkaProducerClient extends KafkaBaseClient {
     private String messageTemplate;
     private String messageKey;
     private String headers;
+    private String startTimestamp;
 
     private String topicName;
     private Long delayMs;
@@ -68,6 +69,14 @@ public class KafkaProducerClient extends KafkaBaseClient {
 
     public void setHeaders(String headers) {
         this.headers = headers;
+    }
+
+    public String getStartTimestamp() {
+        return startTimestamp;
+    }
+
+    public void setStartTimestamp(String startTimestamp) {
+        this.startTimestamp = startTimestamp;
     }
 
     public String getTopicName() {
@@ -121,6 +130,7 @@ public class KafkaProducerClient extends KafkaBaseClient {
         Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.DELAY_MS_ENV, this.getDelayMs());
         Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.MESSAGE_COUNT_ENV, this.getMessageCount());
         Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.HEADERS_ENV, this.getHeaders());
+        Environment.configureEnvVariableOrSkip(producerSpecificEnvVars, ConfigurationConstants.START_TIMESTAMP_ENV, this.getStartTimestamp());
 
         if (this.getTransactional() != null && this.getTransactional().getTransactionalEnvVar() != null) {
             producerSpecificEnvVars.add(this.getTransactional().getTransactionalEnvVar());
