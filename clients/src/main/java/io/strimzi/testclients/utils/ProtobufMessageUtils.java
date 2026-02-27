@@ -10,8 +10,6 @@ import io.apicurio.registry.serde.protobuf.ProtobufSchemaParser;
 import io.apicurio.registry.utils.protobuf.schema.ProtobufSchema;
 import io.strimzi.testclients.configuration.kafka.KafkaProducerConfiguration;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.Descriptors.Descriptor;
 
@@ -20,7 +18,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -33,12 +30,12 @@ import java.util.Properties;
  * in the producer additional config. Defaults to v3 if not specified.
  */
 public class ProtobufMessageUtils {
-    private static final Logger LOGGER = LogManager.getLogger(ProtobufMessageUtils.class);
-
     private ProtobufMessageUtils() {}
 
     // Internal config to determine Apicurio API version
     private static final String REGISTRY_API_VERSION = "apicurio.registry.api-version";
+    private static final String APICURIO_API_V3 = "v3";
+    private static final String APICURIO_API_V2 = "v2";
 
     // Apicurio registry configuration keys
     private static final String REGISTRY_URL = "apicurio.registry.url";
@@ -49,7 +46,7 @@ public class ProtobufMessageUtils {
     // Defaults
     private static final String DEFAULT_GROUP_ID = "default";
     private static final String DEFAULT_VERSION = "1";
-    private static final String DEFAULT_API_VERSION = "v3";
+    private static final String DEFAULT_API_VERSION = APICURIO_API_V3;
 
     /**
      * Builds a {@link DynamicMessage} from a JSON string using the Protobuf schema
@@ -66,12 +63,7 @@ public class ProtobufMessageUtils {
     public static DynamicMessage buildMessageFromJson(final KafkaProducerConfiguration configuration) {
         try {
             final byte[] protoSchemaBytes = fetchSchema(configuration.getAdditionalConfig());
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Fetched proto schema: [{}]", new String(protoSchemaBytes, StandardCharsets.UTF_8));
-            }
-
             final Descriptor descriptor = parseDescriptor(protoSchemaBytes);
-            LOGGER.info("Parsed descriptor: {}", descriptor.getName());
 
             // Build DynamicMessage using descriptor defining the message structure
             final DynamicMessage.Builder builder = DynamicMessage.newBuilder(descriptor);
@@ -79,7 +71,6 @@ public class ProtobufMessageUtils {
 
             return builder.build();
         } catch (Exception e) {
-            LOGGER.error("Failed to build Protobuf message", e);
             throw new RuntimeException("Failed to build Protobuf message", e);
         }
     }
@@ -94,7 +85,6 @@ public class ProtobufMessageUtils {
      */
     private static byte[] fetchSchema(final Properties config) throws IOException {
         final URL url = buildSchemaUrl(config);
-        LOGGER.info("Fetching Protobuf schema from: {}", url);
         try (final InputStream inputStream = url.openStream()) {
             return inputStream.readAllBytes();
         }
@@ -122,12 +112,12 @@ public class ProtobufMessageUtils {
         final String apiVersion = config.getProperty(REGISTRY_API_VERSION, DEFAULT_API_VERSION);
 
         final String urlString;
-        if ("v2".equals(apiVersion)) {
-            urlString = String.format("%s/apis/registry/v2/groups/%s/artifacts/%s/versions/%s",
-                registryUrl, groupId, artifactId, version);
-        } else if ("v3".equals(apiVersion)) {
-            urlString = String.format("%s/apis/registry/v3/groups/%s/artifacts/%s/versions/%s/content",
-                registryUrl, groupId, artifactId, version);
+        if (APICURIO_API_V2.equals(apiVersion)) {
+            urlString = String.format("%s/apis/registry/%s/groups/%s/artifacts/%s/versions/%s",
+                registryUrl, apiVersion, groupId, artifactId, version);
+        } else if (APICURIO_API_V3.equals(apiVersion)) {
+            urlString = String.format("%s/apis/registry/%s/groups/%s/artifacts/%s/versions/%s/content",
+                registryUrl, apiVersion, groupId, artifactId, version);
         } else {
             throw new IllegalArgumentException("Unsupported Apicurio Registry API version: " + apiVersion + ". Supported versions are: v2, v3");
         }
