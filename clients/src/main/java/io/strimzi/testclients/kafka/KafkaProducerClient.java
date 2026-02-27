@@ -5,12 +5,14 @@
 package io.strimzi.testclients.kafka;
 
 import io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaSerializer;
+import io.apicurio.registry.serde.protobuf.ProtobufKafkaSerializer;
 import io.skodjob.datagenerator.DataGenerator;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.testclients.common.ClientsInterface;
 import io.strimzi.testclients.common.properties.KafkaProperties;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.configuration.kafka.KafkaProducerConfiguration;
+import io.strimzi.testclients.utils.ProtobufMessageUtils;
 import io.strimzi.testclients.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -139,11 +141,15 @@ public class KafkaProducerClient implements ClientsInterface {
             }  else if (this.configuration.getValueSerializer().equals(JsonSchemaKafkaSerializer.class.getName())) {
                 // JSON message
                 message = dataGenerator.generateJsonData();
-            }  else {
+            } else {
                 message = dataGenerator.generateData();
             }
         } else {
-            message = configuration.getMessage() + " - " + numOfMessage;
+            if (this.configuration.getValueSerializer().equals(ProtobufKafkaSerializer.class.getName())) {
+                message = ProtobufMessageUtils.buildMessageFromJson(configuration);
+            } else {
+                message = configuration.getMessage() + " - " + numOfMessage;
+            }
         }
 
         return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),

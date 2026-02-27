@@ -4,11 +4,11 @@
  */
 package io.strimzi.testclients.integration;
 
-import io.apicurio.registry.rest.v2.beans.IfExists;
-import io.apicurio.registry.serde.SerdeConfig;
+import io.apicurio.registry.rest.v3.beans.IfArtifactExists;
 import io.apicurio.registry.serde.avro.AvroKafkaDeserializer;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.config.IdOption;
+import io.apicurio.registry.serde.config.SerdeConfig;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.kafka.KafkaConsumerClient;
@@ -40,7 +40,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class KafkaClientWithRegistryIT extends io.strimzi.testclients.integration.AbstractIT {
-    private static String registryImage = "quay.io/apicurio/apicurio-registry-mem:2.6.5.Final";
+    // Apicurio supports different storages, but the quickest is to use the official v3 image with no external dependencies.
+    // We can use ENVS to specify other types. By default, the in-memory (mem) variant will be chosen.
+    private static String registryImage = "quay.io/apicurio/apicurio-registry:3.1.7";
     private static GenericContainer registry;
 
     @BeforeAll
@@ -66,7 +68,7 @@ public class KafkaClientWithRegistryIT extends io.strimzi.testclients.integratio
             System.lineSeparator() +
             SerdeConfig.AUTO_REGISTER_ARTIFACT + "=" + Boolean.TRUE +
             System.lineSeparator() +
-            SerdeConfig.AUTO_REGISTER_ARTIFACT_IF_EXISTS + "=" + IfExists.RETURN.name();
+            SerdeConfig.AUTO_REGISTER_ARTIFACT_IF_EXISTS + "=" + IfArtifactExists.FIND_OR_CREATE_VERSION.name();
     }
 
     private Stream<Arguments> getImplementedTemplates() {
