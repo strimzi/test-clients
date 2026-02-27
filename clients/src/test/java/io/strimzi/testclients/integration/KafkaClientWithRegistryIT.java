@@ -5,10 +5,10 @@
 package io.strimzi.testclients.integration;
 
 import io.apicurio.registry.rest.v2.beans.IfExists;
-import io.apicurio.registry.serde.SerdeConfig;
 import io.apicurio.registry.serde.avro.AvroKafkaDeserializer;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.config.IdOption;
+import io.apicurio.registry.serde.config.SerdeConfig;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.kafka.KafkaConsumerClient;
