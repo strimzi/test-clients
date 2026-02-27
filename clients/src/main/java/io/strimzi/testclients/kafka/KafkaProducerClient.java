@@ -146,8 +146,26 @@ public class KafkaProducerClient implements ClientsInterface {
             message = configuration.getMessage() + " - " + numOfMessage;
         }
 
-        return new ProducerRecord(configuration.getTopicName(), null, null, configuration.getMessageKey(),
+        return new ProducerRecord(configuration.getTopicName(), null, getTimestamp(numOfMessage), configuration.getMessageKey(),
             message, configuration.getHeaders());
+    }
+
+    /**
+     * Method for getting timestamp based on the original (or start) timestamp, message index, and delay in ms between every message.
+     * In case that start timestamp is `null`, we are returning `null` as we did before.
+     *
+     * @param messageIndex  index of message that we are going to send.
+     *
+     * @return  timestamp - either `null` or start timestamp with delay ms * message index
+     */
+    public Long getTimestamp(int messageIndex) {
+        // in case that we have start timestamp configured, return the timestamp + additional time based on delay ms and message index
+        if (configuration.getStartTimestamp() != null) {
+            return configuration.getStartTimestamp() + (messageIndex * this.configuration.getDelayMs());
+        }
+
+        // otherwise return null and keep the previous behavior
+        return null;
     }
 
     public List<ProducerRecord> generateMessages() {

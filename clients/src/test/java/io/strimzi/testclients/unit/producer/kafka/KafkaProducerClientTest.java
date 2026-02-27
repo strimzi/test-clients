@@ -76,6 +76,35 @@ public class KafkaProducerClientTest {
         assertThat(message, is("Topic is not set"));
     }
 
+    @Test
+    void testGenerateMessageWithTimestamp() {
+        String timestamp = "2026-01-15T10:30:00Z";
+        long timestampInMs = 1768473000000L;
+        int messageCount = 10;
+        long delayMs = 500L;
+
+        Map<String, String> additionalConfig = new HashMap<>(configuration);
+        additionalConfig.put(ConfigurationConstants.START_TIMESTAMP_ENV, timestamp);
+        additionalConfig.put(ConfigurationConstants.DELAY_MS_ENV, "0");
+        additionalConfig.put(ConfigurationConstants.MESSAGE_COUNT_ENV, String.valueOf(messageCount));
+
+        KafkaProducerClient kafkaProducerClient = new KafkaProducerClient(additionalConfig);
+        List<ProducerRecord> producerRecords = kafkaProducerClient.generateMessages();
+
+        // because DELAY_MS is set to 0, every image will have same timestamp
+        producerRecords.forEach(producerRecord -> assertThat(producerRecord.timestamp(), is(timestampInMs)));
+
+        // now configure DELAY_MS to 500ms, every message should have different timestamp
+        additionalConfig.put(ConfigurationConstants.DELAY_MS_ENV, String.valueOf(delayMs));
+        kafkaProducerClient = new KafkaProducerClient(additionalConfig);
+        producerRecords = kafkaProducerClient.generateMessages();
+
+        for (int messageIndex = 0; messageIndex < messageCount; messageIndex++) {
+            long expectedTimestampMs = timestampInMs + (messageIndex * delayMs);
+            assertThat(producerRecords.get(messageIndex).timestamp(), is(expectedTimestampMs));
+        }
+    }
+
     @BeforeEach
     void setup() {
         configuration = new HashMap<>();

@@ -50,6 +50,7 @@ public class KafkaProducerClientTest {
         String messageKey = "my-key";
         String messageTemplate = "template:x";
         String headers = "my-headers";
+        String timestamp = "2026-01-15T10:30:00Z";
 
         KafkaProducerClient kafkaProducerClient = new KafkaProducerClientBuilder()
             .withName(name)
@@ -65,6 +66,7 @@ public class KafkaProducerClientTest {
             .withMessageKey(messageKey)
             .withMessageTemplate(messageTemplate)
             .withHeaders(headers)
+            .withStartTimestamp(timestamp)
             .build();
 
         Job job = kafkaProducerClient.getJob();
@@ -78,7 +80,7 @@ public class KafkaProducerClientTest {
         assertThat(container.getImage(), is(Image.defaultImage));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(13));
+        assertThat(envVars.size(), is(14));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
         assertThat(envVars.get(ConfigurationConstants.ADDITIONAL_CONFIG_ENV), is(additionalConfig));
         assertThat(envVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
@@ -91,6 +93,7 @@ public class KafkaProducerClientTest {
         assertThat(envVars.get(ConfigurationConstants.MESSAGE_KEY_ENV), is(messageKey));
         assertThat(envVars.get(ConfigurationConstants.MESSAGE_TEMPLATE_ENV), is(messageTemplate));
         assertThat(envVars.get(ConfigurationConstants.HEADERS_ENV), is(headers));
+        assertThat(envVars.get(ConfigurationConstants.START_TIMESTAMP_ENV), is(timestamp));
 
         assertThat(envVars.get("RANDOM"), is("value"));
         assertThat(envVars.get("SOME"), is("thing"));

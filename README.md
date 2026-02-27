@@ -67,6 +67,7 @@ Kafka Producer
 * `USER_KEY` - the user's private key
 * `PRODUCER_ACKS` - acknowledgement level
 * `HEADERS` - custom headers list separated by commas of `key1=value1, key2=value2`
+* `START_TIMESTAMP` - timestamp from which will be calculated actual timestamp when sending the messages - can be used for simulating sending messages in the past
 * `ADDITIONAL_CONFIG` - additional configuration for a producer application. Notice, that you can also override any previously set variable by setting this. The form is `key=value` records separated by new line character
 
 Kafka Consumer
