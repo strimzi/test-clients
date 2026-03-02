@@ -4,20 +4,30 @@
  */
 package io.strimzi.testclients.integration;
 
+import com.google.protobuf.DynamicMessage;
+import io.apicurio.registry.client.RegistryClientFactory;
+import io.apicurio.registry.client.common.RegistryClientOptions;
+import io.apicurio.registry.rest.client.RegistryClient;
+import io.apicurio.registry.rest.client.models.CreateArtifact;
+import io.apicurio.registry.rest.client.models.CreateVersion;
+import io.apicurio.registry.rest.client.models.VersionContent;
 import io.apicurio.registry.rest.v3.beans.IfArtifactExists;
 import io.apicurio.registry.serde.avro.AvroKafkaDeserializer;
 import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.config.IdOption;
 import io.apicurio.registry.serde.config.SerdeConfig;
+import io.apicurio.registry.serde.protobuf.ProtobufKafkaSerializer;
 import io.skodjob.datagenerator.enums.ETemplateType;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.kafka.KafkaConsumerClient;
 import io.strimzi.testclients.kafka.KafkaProducerClient;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.TopicConfig;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -38,6 +48,8 @@ import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 public class KafkaClientWithRegistryIT extends io.strimzi.testclients.integration.AbstractIT {
     // Apicurio supports different storages, but the quickest is to use the official v3 image with no external dependencies.
@@ -62,7 +74,7 @@ public class KafkaClientWithRegistryIT extends io.strimzi.testclients.integratio
 
     private String getRegistryConfig() {
         return System.lineSeparator() +
-            "apicurio.registry.url=http://0.0.0.0" + ":" + registry.getMappedPort(8080) + "/apis/registry/v2" +
+            ConfigurationConstants.REGISTRY_URL + "=http://0.0.0.0" + ":" + registry.getMappedPort(8080) + "/apis/registry/v2" +
             System.lineSeparator() +
             SerdeConfig.USE_ID + "=" + IdOption.contentId +
             System.lineSeparator() +
@@ -128,5 +140,96 @@ public class KafkaClientWithRegistryIT extends io.strimzi.testclients.integratio
         Field consumedMessages = KafkaConsumerClient.class.getDeclaredField("consumedMessages");
         consumedMessages.setAccessible(true);
         assertThat(consumedMessages.get(kafkaConsumerClient), is(100));
+    }
+
+    /**
+     * Tests producing and registering messages with a Protobuf schema using Apicurio Schema Registry.
+     *
+     * <p>This test performs the following steps:
+     * <ul>
+     *     <li>Defines a Protobuf schema and registers it as an artifact in Apicurio Registry.</li>
+     *     <li>Creates a Kafka topic with a specific configuration.</li>
+     *     <li>Configures a Kafka producer to use the Protobuf serializer and the registered schema.</li>
+     *     <li>Generates and sends number of Protobuf messages to the Kafka topic.</li>
+     *     <li>Verifies that the produced messages are instances of {@link com.google.protobuf.DynamicMessage}.</li>
+     *     <li>Checks that the expected number of messages were successfully sent by accessing internal producer state via reflection.</li>
+     * </ul>
+     *
+     * <p>This test ensures end-to-end functionality for producing Protobuf-encoded messages
+     * in Kafka while integrating with Apicurio Schema Registry.</p>
+     *
+     * @throws ExecutionException      if asynchronous producer execution fails
+     * @throws InterruptedException    if the producer thread is interrupted
+     * @throws NoSuchFieldException    if internal reflection access fails
+     * @throws IllegalAccessException  if internal reflection access fails
+     * @throws TimeoutException        if message production exceeds the allowed timeout
+     */
+    @Test
+    void testExchangeProtobuf() throws ExecutionException, InterruptedException, NoSuchFieldException, IllegalAccessException, TimeoutException {
+
+        final String topicName = "test-protobuf";
+        final String artifactId = topicName + "-value";
+        final int messageCount = 20;
+        final String message = "{\"name\":\"Bob\",\"age\":30}";
+        final String protoSchema = """
+            syntax = "proto3";
+            message Person {
+                string name = 1;
+                int32 age = 2;
+            }
+            """;
+
+        // Protobuf needs to register schema unlike other types
+        RegistryClientOptions options = RegistryClientOptions.create("http://localhost:" + registry.getMappedPort(8080));
+        RegistryClient client = RegistryClientFactory.create(options);
+
+        CreateArtifact createArtifact = new CreateArtifact();
+        createArtifact.setArtifactId(artifactId);
+        createArtifact.setArtifactType("PROTOBUF");
+
+        VersionContent content = new VersionContent();
+        content.setContent(protoSchema);
+        content.setContentType("application/x-protobuf");
+
+        CreateVersion createVersion = new CreateVersion();
+        createVersion.setContent(content);
+        createArtifact.setFirstVersion(createVersion);
+
+        client.groups().byGroupId(ConfigurationConstants.DEFAULT_GROUP_ID).artifacts().post(createArtifact);
+        // Verify presence of the artifact
+        assertEquals(artifactId, client.groups().byGroupId(ConfigurationConstants.DEFAULT_GROUP_ID).artifacts().byArtifactId(artifactId).get().getArtifactId());
+
+        Map<String, String> configuration = new HashMap<>();
+        configuration.put(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV, kafkaCluster.getBootstrapServers());
+        configuration.put(ConfigurationConstants.TOPIC_ENV, topicName);
+        configuration.put(ConfigurationConstants.MESSAGE_ENV, message);
+        configuration.put(ConfigurationConstants.MESSAGE_COUNT_ENV, "20");
+
+        // Registry config for PROTOBUF
+        configuration.put(ConfigurationConstants.ADDITIONAL_CONFIG_ENV,
+            ConfigurationConstants.REGISTRY_ARTIFACT_ID + "=" + artifactId +
+            System.lineSeparator() +
+            ConfigurationConstants.REGISTRY_API_VERSION + "=" + ConfigurationConstants.APICURIO_API_V2 +
+            System.lineSeparator() +
+            ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG + "=" + ProtobufKafkaSerializer.class.getName() +
+            getRegistryConfig()
+        );
+
+        createKafkaTopic(topicName, Map.of(TopicConfig.RETENTION_MS_CONFIG, "604800000"));
+
+        KafkaProducerClient kafkaProducerClient = new KafkaProducerClient(configuration);
+
+        // Explicitly check the record message type
+        ProducerRecord record = kafkaProducerClient.generateMessage(1);
+        assertInstanceOf(DynamicMessage.class, record.value());
+
+        CompletableFuture<Void> future = CompletableFuture.runAsync(kafkaProducerClient::run);
+
+        future.get(10, TimeUnit.SECONDS);
+
+        Field producedMessages = KafkaProducerClient.class.getDeclaredField("messageSuccessfullySent");
+        producedMessages.setAccessible(true);
+
+        assertThat(producedMessages.get(kafkaProducerClient), is(messageCount));
     }
 }

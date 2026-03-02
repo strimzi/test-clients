@@ -8,6 +8,7 @@ import com.google.protobuf.util.JsonFormat;
 import io.apicurio.registry.serde.protobuf.ProtobufKafkaSerializer;
 import io.apicurio.registry.serde.protobuf.ProtobufSchemaParser;
 import io.apicurio.registry.utils.protobuf.schema.ProtobufSchema;
+import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.configuration.kafka.KafkaProducerConfiguration;
 
 import com.google.protobuf.DynamicMessage;
@@ -31,22 +32,6 @@ import java.util.Properties;
  */
 public class ProtobufMessageUtils {
     private ProtobufMessageUtils() {}
-
-    // Internal config to determine Apicurio API version
-    private static final String REGISTRY_API_VERSION = "apicurio.registry.api-version";
-    private static final String APICURIO_API_V3 = "v3";
-    private static final String APICURIO_API_V2 = "v2";
-
-    // Apicurio registry configuration keys
-    private static final String REGISTRY_URL = "apicurio.registry.url";
-    private static final String REGISTRY_GROUP_ID = "apicurio.registry.group-id";
-    private static final String REGISTRY_ARTIFACT_ID = "apicurio.registry.artifact-id";
-    private static final String REGISTRY_ARTIFACT_VERSION = "apicurio.registry.artifact-version";
-
-    // Defaults
-    private static final String DEFAULT_GROUP_ID = "default";
-    private static final String DEFAULT_VERSION = "1";
-    private static final String DEFAULT_API_VERSION = APICURIO_API_V3;
 
     /**
      * Builds a {@link DynamicMessage} from a JSON string using the Protobuf schema
@@ -105,19 +90,19 @@ public class ProtobufMessageUtils {
      * @throws IllegalArgumentException     if the specified API version is not supported
      */
     private static URL buildSchemaUrl(final Properties config) throws MalformedURLException {
-        final String registryUrl = config.getProperty(REGISTRY_URL);
-        final String groupId = config.getProperty(REGISTRY_GROUP_ID, DEFAULT_GROUP_ID);
-        final String artifactId = config.getProperty(REGISTRY_ARTIFACT_ID);
-        final String version = config.getProperty(REGISTRY_ARTIFACT_VERSION, DEFAULT_VERSION);
-        final String apiVersion = config.getProperty(REGISTRY_API_VERSION, DEFAULT_API_VERSION);
+        final String registryUrl = config.getProperty(ConfigurationConstants.REGISTRY_URL);
+        final String groupId = config.getProperty(ConfigurationConstants.REGISTRY_GROUP_ID, ConfigurationConstants.DEFAULT_GROUP_ID);
+        final String artifactId = config.getProperty(ConfigurationConstants.REGISTRY_ARTIFACT_ID);
+        final String version = config.getProperty(ConfigurationConstants.REGISTRY_ARTIFACT_VERSION, ConfigurationConstants.REGISTRY_DEFAULT_ARTIFACT_VERSION);
+        final String apiVersion = config.getProperty(ConfigurationConstants.REGISTRY_API_VERSION, ConfigurationConstants.REGISTRY_DEFAULT_API_VERSION);
 
         final String urlString;
-        if (APICURIO_API_V2.equals(apiVersion)) {
-            urlString = String.format("%s/apis/registry/%s/groups/%s/artifacts/%s/versions/%s",
-                registryUrl, apiVersion, groupId, artifactId, version);
-        } else if (APICURIO_API_V3.equals(apiVersion)) {
-            urlString = String.format("%s/apis/registry/%s/groups/%s/artifacts/%s/versions/%s/content",
-                registryUrl, apiVersion, groupId, artifactId, version);
+        if (ConfigurationConstants.APICURIO_API_V2.equals(apiVersion)) {
+            urlString = String.format("%s/groups/%s/artifacts/%s/versions/%s",
+                registryUrl, groupId, artifactId, version);
+        } else if (ConfigurationConstants.APICURIO_API_V3.equals(apiVersion)) {
+            urlString = String.format("%s/groups/%s/artifacts/%s/versions/%s/content",
+                registryUrl, groupId, artifactId, version);
         } else {
             throw new IllegalArgumentException("Unsupported Apicurio Registry API version: " + apiVersion + ". Supported versions are: v2, v3");
         }
