@@ -147,4 +147,19 @@ public interface ConfigurationConstants {
     String HTTP_CONSUMER_POST_JSON_CONTENT_TYPE = "application/vnd.kafka.v2+json";
 
     String CONFIG_FOLDER_PATH_ENV = "CONFIG_FOLDER_PATH";
+    
+    // Internal config to determine Apicurio API version
+    String REGISTRY_API_VERSION = "apicurio.registry.api-version";
+    String APICURIO_API_V3 = "v3";
+    String APICURIO_API_V2 = "v2";
+
+    // Apicurio registry configuration keys
+    String REGISTRY_URL = "apicurio.registry.url";
+    String REGISTRY_GROUP_ID = "apicurio.registry.group-id";
+    String REGISTRY_ARTIFACT_ID = "apicurio.registry.artifact-id";
+    String REGISTRY_ARTIFACT_VERSION = "apicurio.registry.artifact-version";
+
+    // Default apicurio values
+    String REGISTRY_DEFAULT_ARTIFACT_VERSION = "1";
+    String REGISTRY_DEFAULT_API_VERSION = ConfigurationConstants.APICURIO_API_V3;
 }

@@ -32,7 +32,7 @@ if [[ ! -z "${CLIENT_TYPE}" ]]; then
   export CLASSPATH="${JAR}:${CLASSPATH}"
 
   # Make sure that we use /dev/urandom
-  JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp -Djava.security.egd=file:/dev/./urandom"
+  JAVA_OPTS="${JAVA_OPTS} -Dvertx.cacheDirBase=/tmp/vertx -Djava.security.egd=file:/dev/./urandom"
 
   exec java $JAVA_OPTS -cp $CLASSPATH $MAIN
 fi
