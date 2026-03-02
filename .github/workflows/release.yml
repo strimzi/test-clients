@@ -37,7 +37,7 @@ jobs:
           centralUsername: ${{ secrets.CENTRAL_USERNAME }}
           centralPassword: ${{ secrets.CENTRAL_PASSWORD }}
           artifactSuffix: "test-clients"
-          modules: "builders"
+          modules: "clients-common,builders"
 
   push-containers:
     name: Push Containers (${{ inputs.releaseVersion }})
