@@ -34,13 +34,14 @@ public class KafkaProducerConfigurationTest {
         KafkaProducerConfiguration kafkaProducerConfiguration = new KafkaProducerConfiguration(configuration);
 
         assertAll(
-                () -> assertThat(kafkaProducerConfiguration.getAcks(), is(ConfigurationConstants.DEFAULT_PRODUCER_ACKS)),
-                () -> assertThat(kafkaProducerConfiguration.getHeaders(), nullValue()),
-                () -> assertThat(kafkaProducerConfiguration.getMessage(), is(ConfigurationConstants.DEFAULT_MESSAGE)),
-                () -> assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION)),
-                () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(false)),
-                () -> assertThat(kafkaProducerConfiguration.getTopicName(), is("my-topic")),
-                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), nullValue())
+            () -> assertThat(kafkaProducerConfiguration.getAcks(), is(ConfigurationConstants.DEFAULT_PRODUCER_ACKS)),
+            () -> assertThat(kafkaProducerConfiguration.getHeaders(), nullValue()),
+            () -> assertThat(kafkaProducerConfiguration.getMessage(), is(ConfigurationConstants.DEFAULT_MESSAGE)),
+            () -> assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(ConfigurationConstants.DEFAULT_MESSAGES_PER_TRANSACTION)),
+            () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(false)),
+            () -> assertThat(kafkaProducerConfiguration.getTopicName(), is("my-topic")),
+            () -> assertThat(kafkaProducerConfiguration.getMessageKey(), nullValue()),
+            () -> assertThat(kafkaProducerConfiguration.getStartTimestamp(), nullValue())
         );
     }
 
@@ -56,6 +57,8 @@ public class KafkaProducerConfigurationTest {
         String messageType = "text";
         int messagesPerTransaction = 125;
         String additionalConfig = ProducerConfig.TRANSACTIONAL_ID_CONFIG + " = my-id";
+        String timestamp = "2026-01-15T10:30:00Z";
+        long timestampInMs = 1768473000000L;
 
         List<Header> expectedHeadersList = new ArrayList<>();
         expectedHeadersList.add(new RecordHeader("header_key_one", "header_value_one".getBytes()));
@@ -71,20 +74,22 @@ public class KafkaProducerConfigurationTest {
         configuration.put(ConfigurationConstants.MESSAGE_TEMPLATE_ENV, messageTemplate);
         configuration.put(ConfigurationConstants.MESSAGE_TYPE_ENV, messageType);
         configuration.put(ConfigurationConstants.MESSAGES_PER_TRANSACTION_ENV, String.valueOf(messagesPerTransaction));
+        configuration.put(ConfigurationConstants.START_TIMESTAMP_ENV, timestamp);
         configuration.put(ConfigurationConstants.ADDITIONAL_CONFIG_ENV, additionalConfig);
 
         KafkaProducerConfiguration kafkaProducerConfiguration = new KafkaProducerConfiguration(configuration);
 
         assertAll(
-                () -> assertThat(kafkaProducerConfiguration.getAcks(), is(acks)),
-                () -> assertThat(kafkaProducerConfiguration.getHeaders(), is(expectedHeadersList)),
-                () -> assertThat(kafkaProducerConfiguration.getMessage(), is(message)),
-                () -> assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(messagesPerTransaction)),
-                () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(true)),
-                () -> assertThat(kafkaProducerConfiguration.getTopicName(), is(topicName)),
-                () -> assertThat(kafkaProducerConfiguration.getBootstrapServers(), is(bootstrapServer)),
-                () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageKey)),
-                () -> assertThat(kafkaProducerConfiguration.getMessageTemplate(), is(messageTemplate))
+            () -> assertThat(kafkaProducerConfiguration.getAcks(), is(acks)),
+            () -> assertThat(kafkaProducerConfiguration.getHeaders(), is(expectedHeadersList)),
+            () -> assertThat(kafkaProducerConfiguration.getMessage(), is(message)),
+            () -> assertThat(kafkaProducerConfiguration.getMessagesPerTransaction(), is(messagesPerTransaction)),
+            () -> assertThat(kafkaProducerConfiguration.isTransactionalProducer(), is(true)),
+            () -> assertThat(kafkaProducerConfiguration.getTopicName(), is(topicName)),
+            () -> assertThat(kafkaProducerConfiguration.getBootstrapServers(), is(bootstrapServer)),
+            () -> assertThat(kafkaProducerConfiguration.getMessageKey(), is(messageKey)),
+            () -> assertThat(kafkaProducerConfiguration.getMessageTemplate(), is(messageTemplate)),
+            () -> assertThat(kafkaProducerConfiguration.getStartTimestamp(), is(timestampInMs))
         );
     }
 
