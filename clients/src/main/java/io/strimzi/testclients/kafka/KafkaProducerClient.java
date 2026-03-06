@@ -4,6 +4,7 @@
  */
 package io.strimzi.testclients.kafka;
 
+import io.apicurio.registry.serde.avro.AvroKafkaSerializer;
 import io.apicurio.registry.serde.jsonschema.JsonSchemaKafkaSerializer;
 import io.apicurio.registry.serde.protobuf.ProtobufKafkaSerializer;
 import io.skodjob.datagenerator.DataGenerator;
@@ -12,6 +13,8 @@ import io.strimzi.testclients.common.ClientsInterface;
 import io.strimzi.testclients.common.properties.KafkaProperties;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.configuration.kafka.KafkaProducerConfiguration;
+import io.strimzi.testclients.utils.AvroMessageUtils;
+import io.strimzi.testclients.utils.JsonMessgeUtils;
 import io.strimzi.testclients.utils.ProtobufMessageUtils;
 import io.strimzi.testclients.tracing.TracingUtil;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -147,6 +150,10 @@ public class KafkaProducerClient implements ClientsInterface {
         } else {
             if (this.configuration.getValueSerializer().equals(ProtobufKafkaSerializer.class.getName())) {
                 message = ProtobufMessageUtils.buildMessageFromJson(configuration);
+            } else if (this.configuration.getValueSerializer().equals(AvroKafkaSerializer.class.getName())) {
+                message = AvroMessageUtils.buildMessageFromJson(configuration);
+            } else if (this.configuration.getValueSerializer().equals(JsonSchemaKafkaSerializer.class.getName())) {
+                message = JsonMessgeUtils.buildMessageFromJson(configuration);
             } else {
                 message = configuration.getMessage() + " - " + numOfMessage;
             }

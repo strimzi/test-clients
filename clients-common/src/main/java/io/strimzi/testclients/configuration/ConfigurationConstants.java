@@ -155,7 +155,6 @@ public interface ConfigurationConstants {
     String APICURIO_API_V2 = "v2";
 
     // Apicurio registry configuration keys
-    String REGISTRY_URL = "apicurio.registry.url";
     String REGISTRY_GROUP_ID = "apicurio.registry.group-id";
     String REGISTRY_ARTIFACT_ID = "apicurio.registry.artifact-id";
     String REGISTRY_ARTIFACT_VERSION = "apicurio.registry.artifact-version";
