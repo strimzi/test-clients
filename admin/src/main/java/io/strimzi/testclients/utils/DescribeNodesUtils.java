@@ -12,6 +12,9 @@ import org.apache.kafka.common.Node;
 
 import java.util.List;
 
+/**
+ * Class handling the output of describe nodes call, returning the information either as plaintext or as JSON.
+ */
 public class DescribeNodesUtils {
     /**
      * Returns the output of the `node describe` command based on the `--output` option.

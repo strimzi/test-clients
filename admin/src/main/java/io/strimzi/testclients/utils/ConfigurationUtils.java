@@ -18,6 +18,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * Class handling the configuration of the admin-client - mainly loading and configuring the configuration file on specified path.
+ */
 public class ConfigurationUtils {
 
     private static final String HOME_DIR = System.getProperty("user.home");
@@ -63,12 +66,20 @@ public class ConfigurationUtils {
 
     /**
      * Check if configuration file exists
+     *
      * @return boolean determining the existence of the config.properties file
      */
     public static boolean configurationFileExists() {
         return configurationFileExists(getConfigFilePath());
     }
 
+    /**
+     * Check if configuration file exists on specific path.
+     *
+     * @param configFilePath    path to config file that should exist.
+     *
+     * @return boolean determining the existence of the config.properties file
+     */
     public static boolean configurationFileExists(String configFilePath) {
         File configFile = new File(configFilePath);
 
@@ -92,6 +103,9 @@ public class ConfigurationUtils {
 
     /**
      * Loads Properties from the config.properties file
+     *
+     * @param configFilePath    path to the configuration file.
+     *
      * @return Properties loaded from the config.properties file
      */
     public static Properties getPropertiesFromConfigurationFile(String configFilePath) {
@@ -109,7 +123,9 @@ public class ConfigurationUtils {
     /**
      * Loads Properties from the configuration file specified by {@code configFilePath}
      * and builds {@link Map} based on it.
+     *
      * @param configFilePath file path to the configuration file
+     *
      * @return {@link Map} with configuration from file
      */
     public static Map<String, String> getMapOfPropertiesFromConfigurationFile(String configFilePath) {

@@ -6,16 +6,38 @@ package io.strimzi.testclients.models;
 
 import org.apache.kafka.clients.admin.TopicDescription;
 
+/**
+ * Record for storing the Kafka Topic description.
+ *
+ * @param name              name of the Kafka Topic.
+ * @param partitionCount    number of partitions.
+ * @param replicaCount      number of replicas.
+ */
 public record KafkaTopicDescription(String name, int partitionCount, int replicaCount) {
 
+    /**
+     * Gets name of the Kafka Topic.
+     *
+     * @return name of the Kafka Topic.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets number of partitions.
+     *
+     * @return  number of partitions.
+     */
     public int getPartitionCount() {
         return partitionCount;
     }
 
+    /**
+     * Gets number of replicas.
+     *
+     * @return number of replicas.
+     */
     public int getReplicaCount() {
         return replicaCount;
     }
