@@ -16,6 +16,9 @@ on:
 permissions:
   contents: read
 
+env:
+  BUILD_ALL_KAFKA_VERSIONS: true
+
 jobs:
   prepare-and-release-artifacts:
     name: Prepare and Release Artifacts

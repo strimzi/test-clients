@@ -14,6 +14,7 @@ DOCKERFILE_DIR     ?= ./
 DOCKER_REGISTRY    ?= quay.io
 DOCKER_ORG         ?= $(USER)
 DOCKER_TAG         ?= latest
+BUILD_TAG          ?= latest
 DOCKER_VERSION_ARG ?= $(VERSION)
 DOCKER_CMD         ?= docker
 
@@ -144,9 +145,17 @@ execute_docker_goal:
 ifeq ($(BUILD_ALL_KAFKA_VERSIONS),true)
 	@echo "Executing '$(goal)' for all Kafka versions"
 	@for version in $(KAFKA_VERSIONS); do \
-		$(MAKE) $(goal) KAFKA_VERSION=$$version DOCKER_TAG=$(DOCKER_TAG)-kafka-$$version; \
+		if [ "$(goal)" = "docker_load_goal" ] || [ "$(goal)" = "docker_save_goal" ]; then \
+			$(MAKE) $(goal) KAFKA_VERSION=$$version DOCKER_TAG=$(BUILD_TAG)-kafka-$$version; \
+		else \
+			$(MAKE) $(goal) KAFKA_VERSION=$$version DOCKER_TAG=$(DOCKER_TAG)-kafka-$$version; \
+		fi; \
 	done
 else
 	@echo "Executing '$(goal)' for single Kafka version: $(ACTUAL_KAFKA_VERSION)"
-	$(MAKE) $(goal) KAFKA_VERSION=$(ACTUAL_KAFKA_VERSION)
+	@if [ "$(goal)" = "docker_load_goal" ] || [ "$(goal)" = "docker_save_goal" ]; then \
+		$(MAKE) $(goal) KAFKA_VERSION=$(ACTUAL_KAFKA_VERSION) DOCKER_TAG=$(BUILD_TAG); \
+	else \
+		$(MAKE) $(goal) KAFKA_VERSION=$(ACTUAL_KAFKA_VERSION); \
+	fi;
 endif
