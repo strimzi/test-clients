@@ -68,3 +68,4 @@ jobs:
           registryUser: ${{ secrets.QUAY_USER }}
           registryPassword: ${{ secrets.QUAY_PASS }}
           artifactSuffix: "test-clients"
+          buildRunId: ${{ inputs.sourceBuildRunId }}
