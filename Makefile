@@ -8,7 +8,7 @@ PROJECT_NAME = test-clients
 
 DOCKER_TARGETS = docker_build docker_push docker_tag docker_load docker_save docker_delete_archive docker_amend_manifest docker_gha_sign_manifest docker_gha_sbom docker_gha_push_sbom
 
-release: release_examples release_maven release_clients_version
+release: release_examples release_maven release_clients_version release_package
 
 next_version:
 	mvn versions:set -DnewVersion=$(shell echo $(NEXT_VERSION) | tr a-z A-Z)
@@ -26,6 +26,10 @@ release_maven:
 
 release_clients_version:
 	echo "$(RELEASE_VERSION)\c" > clients.version
+
+release_package:
+	tar -z -cf ./strimzi-test-clients-$(RELEASE_VERSION).tar.gz ./examples
+	zip -r ./strimzi-test-clients-$(RELEASE_VERSION).zip ./examples
 
 clean: make java_clean
 
