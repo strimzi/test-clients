@@ -16,7 +16,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class KafkaProducerClient extends KafkaBaseClient {
     private String acks;
     private String message;

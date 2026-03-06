@@ -6,7 +6,7 @@ package io.strimzi.testclients.configuration;
 
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class Image {
     public static String defaultImage = "quay.io/strimzi-test-clients/test-clients:latest-kafka-4.2.0";
     private String imageName = defaultImage;

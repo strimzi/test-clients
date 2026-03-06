@@ -8,7 +8,7 @@ import io.strimzi.testclients.configuration.Tracing;
 import io.strimzi.testclients.configuration.TracingBuilder;
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class HttpProducerConsumer extends HttpCommon {
     private String producerName;
     private String consumerName;

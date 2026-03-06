@@ -8,7 +8,7 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class Transactional {
     private Long messagesPerTransaction = null;
 
