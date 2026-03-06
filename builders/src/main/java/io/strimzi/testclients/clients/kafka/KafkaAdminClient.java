@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class KafkaAdminClient extends KafkaBaseClient {
     private String configFolderPath;
 

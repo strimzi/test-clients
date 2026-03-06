@@ -7,5 +7,9 @@
 <suppressions>
 
     <!-- Note that [/\\] must be used as the path separator for cross-platform support -->
+    <suppress checks=".*"
+              files="io[/\\]strimzi[/\\]testclients[/\\]clients[/\\].*(Builder|Fluent|FluentImpl)\.java"/>
+    <suppress checks=".*"
+              files="io[/\\]strimzi[/\\]testclients[/\\]configuration[/\\].*(Builder|Fluent|FluentImpl)\.java"/>
 
 </suppressions>

@@ -9,6 +9,7 @@
         <version>0.13.0-SNAPSHOT</version>
     </parent>
 
+    <name>Strimzi Test-Clients Admin Client</name>
     <artifactId>admin</artifactId>
 
     <dependencies>
