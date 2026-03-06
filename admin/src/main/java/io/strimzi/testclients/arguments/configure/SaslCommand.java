@@ -14,7 +14,7 @@ import java.util.Properties;
 
 /**
  * Subcommand for setting up SASL related configuration of admin-client
- * Users can either set "SASL JAAS configuration" or "username & password" for the client
+ * Users can either set "SASL JAAS configuration" or "username and password" for the client
  */
 @CommandLine.Command(name = "sasl")
 public class SaslCommand implements CommandInterface {

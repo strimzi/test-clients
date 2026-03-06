@@ -6,6 +6,9 @@ package io.strimzi.testclients.arguments;
 
 import java.util.concurrent.Callable;
 
+/**
+ * Default interface for all commands of the admin-client.
+ */
 public interface CommandInterface extends Callable<Integer> {
 
     @Override

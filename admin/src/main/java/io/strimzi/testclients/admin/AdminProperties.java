@@ -15,6 +15,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * Class used for handling Admin-client related properties.
+ */
 public class AdminProperties {
 
     /**

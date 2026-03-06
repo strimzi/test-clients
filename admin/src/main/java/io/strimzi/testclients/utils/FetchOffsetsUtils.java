@@ -12,6 +12,9 @@ import org.apache.kafka.common.TopicPartition;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class handling the output of list offset call, returning the information either as plaintext or as JSON.
+ */
 public class FetchOffsetsUtils {
 
     /**

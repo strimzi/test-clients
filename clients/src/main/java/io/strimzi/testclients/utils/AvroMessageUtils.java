@@ -20,14 +20,13 @@ public class AvroMessageUtils {
      * Builds an Avro {@link GenericRecord} from a JSON message using
      * the schema provided in the producer configuration.
      *
-     * <p>This method:
+     * This method:
      * <ul>
      *     <li>Fetches the Avro schema from the additional producer configuration.</li>
      *     <li>Parses the schema definition.</li>
      *     <li>Deserializes the JSON message into a map of field values.</li>
      *     <li>Populates a {@link GenericRecordBuilder} with the parsed fields.</li>
      * </ul>
-     * </p>
      *
      * @param configuration the Kafka producer configuration containing the
      *                      message payload and schema configuration
