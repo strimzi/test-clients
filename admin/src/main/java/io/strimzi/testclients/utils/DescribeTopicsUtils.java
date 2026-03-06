@@ -10,6 +10,9 @@ import io.strimzi.testclients.models.KafkaTopicDescription;
 
 import java.util.List;
 
+/**
+ * Class handling the output of describe topics call, returning the information either as plaintext or as JSON.
+ */
 public class DescribeTopicsUtils {
 
     /**
