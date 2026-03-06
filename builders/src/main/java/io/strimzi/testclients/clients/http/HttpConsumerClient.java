@@ -15,7 +15,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class HttpConsumerClient extends HttpClientBase {
     private String clientId;
     private Long pollInterval = 1000L;

@@ -9,7 +9,7 @@ import io.strimzi.testclients.configuration.TracingBuilder;
 import io.strimzi.testclients.configuration.Transactional;
 import io.sundr.builder.annotations.Buildable;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class KafkaProducerConsumer extends KafkaCommon {
     private String producerName;
     private String consumerName;

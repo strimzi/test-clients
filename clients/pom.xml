@@ -9,6 +9,7 @@
         <version>0.13.0</version>
     </parent>
 
+    <name>Strimzi Test-Clients Implementation</name>
     <artifactId>clients</artifactId>
 
     <dependencies>

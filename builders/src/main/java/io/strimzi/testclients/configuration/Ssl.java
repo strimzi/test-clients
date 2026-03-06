@@ -10,7 +10,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class Ssl {
     private String sslTruststoreCertificate;
     private String sslKeystoreKey;

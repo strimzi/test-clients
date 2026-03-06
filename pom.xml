@@ -9,6 +9,37 @@
     <packaging>pom</packaging>
     <version>0.13.0</version>
 
+    <name>Strimzi Test-Clients</name>
+    <description>Test-Clients used for testing message transmission to Kafka and Bridge clusters</description>
+    <url>https://strimzi.io/</url>
+
+    <scm>
+        <connection>scm:git:git://github.com/strimzi/test-clients.git</connection>
+        <developerConnection>scm:git:ssh://github.com:strimzi/test-clients.git</developerConnection>
+        <url>https://github.com/strimzi/test-clients</url>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/strimzi/test-clients/issues</url>
+    </issueManagement>
+
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Strimzi Project Maintainers</name>
+            <email>cncf-strimzi-maintainers@lists.cncf.io</email>
+            <organization>Strimzi</organization>
+            <organizationUrl>https://github.com/strimzi/governance</organizationUrl>
+        </developer>
+    </developers>
+
     <modules>
         <module>tracing</module>
         <module>clients</module>
@@ -32,6 +63,9 @@
         <maven.surefire.version>3.5.2</maven.surefire.version>
         <maven.checkstyle.version>3.2.1</maven.checkstyle.version>
         <maven-shade.version>3.2.1</maven-shade.version>
+        <maven.source.version>3.2.1</maven.source.version>
+        <maven.jar.version>3.3.0</maven.jar.version>
+
         <log4j.version>2.24.3</log4j.version>
         <sl4j.version>2.0.17</sl4j.version>
 
@@ -89,6 +123,7 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -295,6 +330,19 @@
                         </configuration>
                         <goals>
                             <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>${maven.source.version}</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
                         </goals>
                     </execution>
                 </executions>

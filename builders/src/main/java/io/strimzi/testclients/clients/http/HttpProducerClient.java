@@ -15,7 +15,7 @@ import io.sundr.builder.annotations.Buildable;
 import java.util.ArrayList;
 import java.util.List;
 
-@Buildable
+@Buildable(editableEnabled = false)
 public class HttpProducerClient extends HttpClientBase {
     private Long delayMs = 0L;
     private String message;
