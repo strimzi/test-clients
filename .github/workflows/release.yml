@@ -16,6 +16,9 @@ on:
 permissions:
   contents: read
 
+env:
+  BUILD_ALL_KAFKA_VERSIONS: true
+
 jobs:
   prepare-and-release-artifacts:
     name: Prepare and Release Artifacts
@@ -37,7 +40,7 @@ jobs:
           centralUsername: ${{ secrets.CENTRAL_USERNAME }}
           centralPassword: ${{ secrets.CENTRAL_PASSWORD }}
           artifactSuffix: "test-clients"
-          modules: "clients-common,builders"
+          modules: "./,clients-common,builders"
 
   push-containers:
     name: Push Containers (${{ inputs.releaseVersion }})
@@ -68,3 +71,4 @@ jobs:
           registryUser: ${{ secrets.QUAY_USER }}
           registryPassword: ${{ secrets.QUAY_PASS }}
           artifactSuffix: "test-clients"
+          buildRunId: ${{ inputs.sourceBuildRunId }}
