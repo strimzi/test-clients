@@ -14,6 +14,7 @@ DOCKERFILE_DIR     ?= ./
 DOCKER_REGISTRY    ?= quay.io
 DOCKER_ORG         ?= $(USER)
 DOCKER_TAG         ?= latest
+BUILD_TAG          ?= latest
 DOCKER_VERSION_ARG ?= $(VERSION)
 DOCKER_CMD         ?= docker
 
@@ -33,7 +34,7 @@ docker_build:
 .PHONY: docker_build_goal
 docker_build_goal:
 	@echo "Building Docker image for Kafka version $(KAFKA_VERSION)..."
-	$(DOCKER_CMD) $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) --build-arg kafkaVersion=$(KAFKA_VERSION) -t strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) -f $(DOCKERFILE_DIR)/Dockerfile .
+	$(DOCKER_CMD) $(DOCKER_BUILDX) build $(DOCKER_PLATFORM) --build-arg version=$(DOCKER_VERSION_ARG) --build-arg kafkaVersion=$(KAFKA_VERSION) -t strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) -f $(DOCKERFILE_DIR)/Dockerfile .
 
 .PHONY: docker_tag
 docker_tag:
@@ -41,8 +42,8 @@ docker_tag:
 
 .PHONY: docker_tag_goal
 docker_tag_goal:
-	echo "Tagging strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) to $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
-	$(DOCKER_CMD) tag strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
+	echo "Tagging strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) to $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) ..."
+	$(DOCKER_CMD) tag strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) $(DOCKER_REGISTRY)/$(DOCKER_ORG)/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX)
 
 .PHONY: docker_push
 docker_push:
@@ -74,7 +75,7 @@ docker_save:
 docker_save_goal:
 	# Saves the container as TGZ file
 	test -d $(ARCHIVE_DIR) || mkdir -p  $(ARCHIVE_DIR)
-	$(DOCKER_CMD) save $(DOCKER_PLATFORM) strimzi/$(PROJECT_NAME):$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) | gzip > $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+	$(DOCKER_CMD) save $(DOCKER_PLATFORM) strimzi/$(PROJECT_NAME):$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX) | gzip > $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
 
 .PHONY: docker_load
 docker_load:
@@ -83,7 +84,7 @@ docker_load:
 .PHONY: docker_load_goal
 docker_load_goal:
 	# Loads the container as TGZ file
-	docker load < $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+	docker load < $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
 
 .PHONY: docker_delete_archive
 docker_delete_archive:
@@ -92,7 +93,7 @@ docker_delete_archive:
 .PHONY: docker_delete_archive_goal
 docker_delete_archive_goal:
 	# Deletes the archive
-	rm $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(DOCKER_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
+	rm $(ARCHIVE_DIR)/$(PROJECT_NAME)-$(BUILD_TAG)$(DOCKER_PLATFORM_TAG_SUFFIX).tar.gz
 
 .PHONY: docker_gha_sign_manifest
 docker_gha_sign_manifest:
@@ -144,9 +145,9 @@ execute_docker_goal:
 ifeq ($(BUILD_ALL_KAFKA_VERSIONS),true)
 	@echo "Executing '$(goal)' for all Kafka versions"
 	@for version in $(KAFKA_VERSIONS); do \
-		$(MAKE) $(goal) KAFKA_VERSION=$$version DOCKER_TAG=$(DOCKER_TAG)-kafka-$$version; \
+        $(MAKE) $(goal) KAFKA_VERSION=$$version DOCKER_TAG=$(DOCKER_TAG)-kafka-$$version BUILD_TAG=$(BUILD_TAG)-kafka-$$version; \
 	done
 else
 	@echo "Executing '$(goal)' for single Kafka version: $(ACTUAL_KAFKA_VERSION)"
-	$(MAKE) $(goal) KAFKA_VERSION=$(ACTUAL_KAFKA_VERSION)
+	$(MAKE) $(goal) KAFKA_VERSION=$(ACTUAL_KAFKA_VERSION);
 endif

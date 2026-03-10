@@ -102,4 +102,4 @@ jobs:
           centralUsername: ${{ secrets.CENTRAL_USERNAME }}
           centralPassword: ${{ secrets.CENTRAL_PASSWORD }}
           artifactSuffix: "test-clients"
-          modules: "clients-common,builders"
+          modules: "./,clients-common,builders"
