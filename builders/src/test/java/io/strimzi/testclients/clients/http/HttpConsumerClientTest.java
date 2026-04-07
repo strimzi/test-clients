@@ -31,8 +31,8 @@ public class HttpConsumerClientTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
-        long pollInterval = 10L;
+        int messageCount = 300;
+        int pollInterval = 10;
         String topicName = "my-topic";
         String endpointPrefix = "prefix";
         String sslTruststoreCert = "truststore";
@@ -48,7 +48,7 @@ public class HttpConsumerClientTest {
         );
         String clientId = "my-client";
         String consumerGroup = "my-consumer-group";
-        long pollTimeout = 1L;
+        int pollTimeout = 1;
 
         HttpConsumerClient httpConsumerClient = new HttpConsumerClientBuilder()
             .withName(name)
@@ -101,8 +101,8 @@ public class HttpConsumerClientTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
-        long pollInterval = 10L;
+        int messageCount = 300;
+        int pollInterval = 10;
         String topicName = "my-topic";
         String serviceNameEnvVar = "OTEL_SERVICE_NAME";
         String tracingType = "OpenTelemetry";
@@ -136,8 +136,8 @@ public class HttpConsumerClientTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
-        long pollInterval = 10L;
+        int messageCount = 300;
+        int pollInterval = 10;
         String topicName = "my-topic";
 
         String imageName = "my-custom.registry.io/org/repo:latest";

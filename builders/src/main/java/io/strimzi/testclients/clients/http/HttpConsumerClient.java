@@ -18,8 +18,8 @@ import java.util.List;
 @Buildable(editableEnabled = false)
 public class HttpConsumerClient extends HttpClientBase {
     private String clientId;
-    private Long pollInterval = 1000L;
-    private Long pollTimeout = 100L;
+    private Integer pollInterval = 1000;
+    private Integer pollTimeout = 100;
     private String consumerGroup;
 
     public String getClientId() {
@@ -30,19 +30,19 @@ public class HttpConsumerClient extends HttpClientBase {
         this.clientId = clientId;
     }
 
-    public Long getPollInterval() {
+    public Integer getPollInterval() {
         return pollInterval;
     }
 
-    public void setPollInterval(Long pollInterval) {
+    public void setPollInterval(Integer pollInterval) {
         this.pollInterval = pollInterval;
     }
 
-    public Long getPollTimeout() {
+    public Integer getPollTimeout() {
         return pollTimeout;
     }
 
-    public void setPollTimeout(Long pollTimeout) {
+    public void setPollTimeout(Integer pollTimeout) {
         this.pollTimeout = pollTimeout;
     }
 

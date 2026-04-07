@@ -24,8 +24,8 @@ public class KafkaProducerConsumer extends KafkaCommon {
     private String messageKey;
     private String headers;
 
-    private Long messageCount;
-    private Long delayMs;
+    private Integer messageCount;
+    private Integer delayMs;
 
     private Transactional transactional;
 
@@ -101,7 +101,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
         this.transactional = transactional;
     }
 
-    public void setMessageCount(Long messageCount) {
+    public void setMessageCount(Integer messageCount) {
         this.messageCount = messageCount;
     }
 
@@ -141,15 +141,15 @@ public class KafkaProducerConsumer extends KafkaCommon {
         this.acks = acks;
     }
 
-    public Long getDelayMs() {
+    public Integer getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(Long delayMs) {
+    public void setDelayMs(Integer delayMs) {
         this.delayMs = delayMs;
     }
 
-    public Long getMessageCount() {
+    public Integer getMessageCount() {
         return messageCount;
     }
 

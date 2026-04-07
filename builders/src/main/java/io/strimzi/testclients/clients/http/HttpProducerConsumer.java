@@ -17,9 +17,9 @@ public class HttpProducerConsumer extends HttpCommon {
     private String consumerGroup;
     private String messageTemplate;
     private String clientId;
-    private Long pollTimeout;
+    private Integer pollTimeout;
 
-    private Long delayMs = 0L;
+    private Integer delayMs = 0;
 
     private HttpProducerClient httpProducerClient;
     private HttpConsumerClient httpConsumerClient;
@@ -78,19 +78,19 @@ public class HttpProducerConsumer extends HttpCommon {
         this.clientId = clientId;
     }
 
-    public Long getPollTimeout() {
+    public Integer getPollTimeout() {
         return pollTimeout;
     }
 
-    public void setPollTimeout(Long pollTimeout) {
+    public void setPollTimeout(Integer pollTimeout) {
         this.pollTimeout = pollTimeout;
     }
 
-    public Long getDelayMs() {
+    public Integer getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(Long delayMs) {
+    public void setDelayMs(Integer delayMs) {
         this.delayMs = delayMs;
     }
 

@@ -42,8 +42,8 @@ public class KafkaProducerClientTest {
                 .build()
         );
         String additionalConfig = "my.config = value";
-        long messageCount = 500;
-        long delayMs = 30;
+        int messageCount = 500;
+        int delayMs = 30;
 
         String acks = "0";
         String message = "my hello message";

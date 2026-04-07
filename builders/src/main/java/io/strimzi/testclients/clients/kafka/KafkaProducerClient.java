@@ -26,8 +26,8 @@ public class KafkaProducerClient extends KafkaBaseClient {
     private String startTimestamp;
 
     private String topicName;
-    private Long delayMs;
-    private Long messageCount;
+    private Integer delayMs;
+    private Integer messageCount;
 
     private Transactional transactional;
 
@@ -90,19 +90,19 @@ public class KafkaProducerClient extends KafkaBaseClient {
         this.topicName = topicName;
     }
 
-    public Long getDelayMs() {
+    public Integer getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(Long delayMs) {
+    public void setDelayMs(Integer delayMs) {
         this.delayMs = delayMs;
     }
 
-    public Long getMessageCount() {
+    public Integer getMessageCount() {
         return messageCount;
     }
 
-    public void setMessageCount(Long messageCount) {
+    public void setMessageCount(Integer messageCount) {
         this.messageCount = messageCount;
     }
 

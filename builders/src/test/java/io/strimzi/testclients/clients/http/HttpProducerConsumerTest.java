@@ -32,9 +32,9 @@ public class HttpProducerConsumerTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
+        int messageCount = 300;
         String message = "hello there";
-        long delayMs = 10L;
+        int delayMs = 10;
         String topicName = "my-topic";
         String endpointPrefix = "prefix";
         String sslTruststoreCert = "truststore";
@@ -50,7 +50,7 @@ public class HttpProducerConsumerTest {
                 .build()
         );
         String clientId = "my-client";
-        Long pollTimeout = 1L;
+        int pollTimeout = 1;
 
         HttpProducerConsumer httpProducerConsumer = new HttpProducerConsumerBuilder()
             .withProducerName(producerName)
