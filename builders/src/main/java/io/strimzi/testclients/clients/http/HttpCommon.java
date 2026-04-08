@@ -18,7 +18,7 @@ class HttpCommon {
     private String endpointPrefix;
 
     private String topicName;
-    private Long messageCount = 100L;
+    private Integer messageCount = 100;
     private String messageType;
 
     private String sslTruststoreCertificate;
@@ -79,11 +79,11 @@ class HttpCommon {
         this.topicName = topicName;
     }
 
-    public Long getMessageCount() {
+    public Integer getMessageCount() {
         return messageCount;
     }
 
-    public void setMessageCount(Long messageCount) {
+    public void setMessageCount(Integer messageCount) {
         this.messageCount = messageCount;
     }
 

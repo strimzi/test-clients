@@ -44,8 +44,8 @@ public class KafkaConsumerClientTest {
         String additionalConfig = "my.config = value";
         String clientId = "my-client";
         String consumerGroup = "my-consumer-group";
-        long messageCount = 500;
-        long delayMs = 30;
+        int messageCount = 500;
+        int delayMs = 30;
         String clientRack = "rack1";
 
         KafkaConsumerClient kafkaConsumerClient = new KafkaConsumerClientBuilder()

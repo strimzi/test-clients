@@ -17,15 +17,15 @@ import java.util.List;
 
 @Buildable(editableEnabled = false)
 public class HttpProducerClient extends HttpClientBase {
-    private Long delayMs = 0L;
+    private Integer delayMs = 0;
     private String message;
     private String messageTemplate;
 
-    public Long getDelayMs() {
+    public Integer getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(Long delayMs) {
+    public void setDelayMs(Integer delayMs) {
         this.delayMs = delayMs;
     }
 

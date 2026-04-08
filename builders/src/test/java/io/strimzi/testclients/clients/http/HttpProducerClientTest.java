@@ -31,9 +31,9 @@ public class HttpProducerClientTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
+        int messageCount = 300;
         String message = "hello there";
-        long delayMs = 10L;
+        int delayMs = 10;
         String topicName = "my-topic";
         String endpointPrefix = "prefix";
         String sslTruststoreCert = "truststore";
@@ -94,8 +94,8 @@ public class HttpProducerClientTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
-        long delayMs = 10L;
+        int messageCount = 300;
+        int delayMs = 10;
         String topicName = "my-topic";
         String serviceNameEnvVar = "OTEL_SERVICE_NAME";
         String tracingType = "OpenTelemetry";
@@ -129,8 +129,8 @@ public class HttpProducerClientTest {
         String namespaceName = "my-namespace";
         String hostName = "localhost";
         int port = 8080;
-        long messageCount = 300L;
-        long delayMs = 10L;
+        int messageCount = 300;
+        int delayMs = 10;
         String topicName = "my-topic";
 
         String imageName = "my-custom.registry.io/org/repo:latest";

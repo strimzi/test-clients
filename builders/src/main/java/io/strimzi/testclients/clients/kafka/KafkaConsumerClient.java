@@ -21,8 +21,8 @@ public class KafkaConsumerClient extends KafkaBaseClient {
     private String clientRack;
     private String topicName;
     private String consumerGroup;
-    private Long delayMs;
-    private Long messageCount;
+    private Integer delayMs;
+    private Integer messageCount;
 
     public String getClientId() {
         return clientId;
@@ -59,19 +59,19 @@ public class KafkaConsumerClient extends KafkaBaseClient {
         this.consumerGroup = consumerGroup;
     }
 
-    public Long getDelayMs() {
+    public Integer getDelayMs() {
         return delayMs;
     }
 
-    public void setDelayMs(Long delayMs) {
+    public void setDelayMs(Integer delayMs) {
         this.delayMs = delayMs;
     }
 
-    public Long getMessageCount() {
+    public Integer getMessageCount() {
         return messageCount;
     }
 
-    public void setMessageCount(Long messageCount) {
+    public void setMessageCount(Integer messageCount) {
         this.messageCount = messageCount;
     }
 
