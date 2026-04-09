@@ -5,10 +5,8 @@
 package io.strimzi.testclients.clients.kafka;
 
 import io.fabric8.kubernetes.api.model.EnvVar;
+import io.strimzi.testclients.configuration.Authentication;
 import io.strimzi.testclients.configuration.Image;
-import io.strimzi.testclients.configuration.OAuth;
-import io.strimzi.testclients.configuration.Sasl;
-import io.strimzi.testclients.configuration.Ssl;
 import io.strimzi.testclients.configuration.Tracing;
 
 import java.util.List;
@@ -19,9 +17,7 @@ class KafkaCommon {
     private String bootstrapAddress;
 
     private Image image = new Image();
-    private OAuth oauth;
-    private Sasl sasl;
-    private Ssl ssl;
+    private Authentication authentication;
     private Tracing tracing;
 
     private List<EnvVar> additionalEnvVars;
@@ -57,28 +53,12 @@ class KafkaCommon {
         this.image = image;
     }
 
-    public OAuth getOauth() {
-        return oauth;
+    public Authentication getAuthentication() {
+        return authentication;
     }
 
-    public void setOauth(OAuth oauth) {
-        this.oauth = oauth;
-    }
-
-    public Sasl getSasl() {
-        return sasl;
-    }
-
-    public void setSasl(Sasl sasl) {
-        this.sasl = sasl;
-    }
-
-    public Ssl getSsl() {
-        return ssl;
-    }
-
-    public void setSsl(Ssl ssl) {
-        this.ssl = ssl;
+    public void setAuthentication(Authentication authentication) {
+        this.authentication = authentication;
     }
 
     public Tracing getTracing() {

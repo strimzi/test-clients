@@ -7,6 +7,7 @@ package io.strimzi.testclients.clients.http;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarSource;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
@@ -64,7 +65,13 @@ public class HttpProducerClientTest {
 
         Job httpProducerJob = httpProducerClient.getJob();
         Container container = httpProducerJob.getSpec().getTemplate().getSpec().getContainers().get(0);
-        Map<String, String> producerEnvVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+        Map<String, String> envVars = container.getEnv().stream()
+            .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+
+        Map<String, EnvVarSource> envVarsWithValueFrom = container.getEnv().stream()
+            .filter(e -> e.getValueFrom() != null)
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValueFrom));
 
         assertThat(httpProducerJob.getMetadata().getName(), is(name));
         assertThat(httpProducerJob.getMetadata().getNamespace(), is(namespaceName));
@@ -72,19 +79,20 @@ public class HttpProducerClientTest {
         assertThat(container.getName(), is(name));
         assertThat(container.getImage(), is(Image.defaultImage));
 
-        assertThat(producerEnvVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
-        assertThat(producerEnvVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
-        assertThat(producerEnvVars.get(ConfigurationConstants.MESSAGE_COUNT_ENV), is(String.valueOf(messageCount)));
-        assertThat(producerEnvVars.get(ConfigurationConstants.MESSAGE_ENV), is(message));
-        assertThat(producerEnvVars.get(ConfigurationConstants.DELAY_MS_ENV), is(String.valueOf(delayMs)));
-        assertThat(producerEnvVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
-        assertThat(producerEnvVars.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), is(endpointPrefix));
-        assertThat(producerEnvVars.get(ConfigurationConstants.CA_CRT_ENV), is(sslTruststoreCert));
-        assertThat(producerEnvVars.get("RANDOM"), is("value"));
-        assertThat(producerEnvVars.get("SOME"), is("thing"));
+        assertThat(envVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
+        assertThat(envVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
+        assertThat(envVars.get(ConfigurationConstants.MESSAGE_COUNT_ENV), is(String.valueOf(messageCount)));
+        assertThat(envVars.get(ConfigurationConstants.MESSAGE_ENV), is(message));
+        assertThat(envVars.get(ConfigurationConstants.DELAY_MS_ENV), is(String.valueOf(delayMs)));
+        assertThat(envVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
+        assertThat(envVars.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), is(endpointPrefix));
+        assertThat(envVars.get("RANDOM"), is("value"));
+        assertThat(envVars.get("SOME"), is("thing"));
+
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.CA_CRT_ENV).getSecretKeyRef().getName(), is(sslTruststoreCert));
 
         // these should not exist
-        assertNull(producerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV));
+        assertNull(envVars.get(ConfigurationConstants.TRACING_TYPE_ENV));
         assertThat(httpProducerJob.getSpec().getTemplate().getSpec().getImagePullSecrets(), is(List.of()));
     }
 

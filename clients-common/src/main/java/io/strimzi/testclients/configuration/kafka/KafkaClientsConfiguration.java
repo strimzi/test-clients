@@ -26,6 +26,7 @@ import static io.strimzi.testclients.configuration.ConfigurationConstants.OAUTH_
 import static io.strimzi.testclients.configuration.ConfigurationConstants.OAUTH_TOKEN_ENDPOINT_URI_ENV;
 import static io.strimzi.testclients.configuration.ConfigurationConstants.SASL_JAAS_CONFIG_ENV;
 import static io.strimzi.testclients.configuration.ConfigurationConstants.SASL_MECHANISM_ENV;
+import static io.strimzi.testclients.configuration.ConfigurationConstants.SECURITY_PROTOCOL_ENV;
 import static io.strimzi.testclients.configuration.ConfigurationConstants.TRACING_TYPE_ENV;
 import static io.strimzi.testclients.configuration.ConfigurationConstants.USER_CRT_ENV;
 import static io.strimzi.testclients.configuration.ConfigurationConstants.USER_KEY_ENV;
@@ -36,6 +37,7 @@ public class KafkaClientsConfiguration {
     private final String bootstrapServers;
     private final long delayMs;
     private final int messageCount;
+    private final String securityProtocol;
     private final String sslTruststoreCertificate;
     private final String sslKeystoreKey;
     private final String sslKeystoreCertificateChain;
@@ -56,6 +58,7 @@ public class KafkaClientsConfiguration {
         this.bootstrapServers = map.get(BOOTSTRAP_SERVERS_ENV);
         this.delayMs = parseLongOrDefault(map.get(DELAY_MS_ENV), DEFAULT_DELAY_MS);
         this.messageCount = parseIntOrDefault(map.get(MESSAGE_COUNT_ENV), DEFAULT_MESSAGES_COUNT);
+        this.securityProtocol = map.get(SECURITY_PROTOCOL_ENV);
         this.sslTruststoreCertificate = map.get(CA_CRT_ENV);
         this.sslKeystoreKey = map.get(USER_KEY_ENV);
         this.sslKeystoreCertificateChain = map.get(USER_CRT_ENV);
@@ -84,6 +87,10 @@ public class KafkaClientsConfiguration {
 
     public int getMessageCount() {
         return messageCount;
+    }
+
+    public String getSecurityProtocol() {
+        return securityProtocol;
     }
 
     public String getSslTruststoreCertificate() {
@@ -175,6 +182,7 @@ public class KafkaClientsConfiguration {
         return "bootstrapServers='" + this.getBootstrapServers() + "',\n" +
             "delayMs='" + this.getDelayMs() + "',\n" +
             "messageCount='" + this.getMessageCount() + "',\n" +
+            "securityProtocol='" + this.getSecurityProtocol() + "',\n" +
             "sslTruststoreCertificate='" + sslTruststoreCertificate + "',\n" +
             "sslKeystoreKey='" + sslKeystoreKey + "',\n" +
             "sslKeystoreCertificateChain='" + sslKeystoreCertificateChain + "',\n" +

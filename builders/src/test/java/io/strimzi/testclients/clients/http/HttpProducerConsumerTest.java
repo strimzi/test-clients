@@ -7,6 +7,7 @@ package io.strimzi.testclients.clients.http;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarSource;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
@@ -73,7 +74,13 @@ public class HttpProducerConsumerTest {
         // Producer part
         Job httpProducerJob = httpProducerConsumer.getProducer().getJob();
         Container container = httpProducerJob.getSpec().getTemplate().getSpec().getContainers().get(0);
-        Map<String, String> producerEnvVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+        Map<String, String> envVars = container.getEnv().stream()
+            .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+
+        Map<String, EnvVarSource> envVarsWithValueFrom = container.getEnv().stream()
+            .filter(e -> e.getValueFrom() != null)
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValueFrom));
 
         assertThat(httpProducerJob.getMetadata().getName(), is(producerName));
         assertThat(httpProducerJob.getMetadata().getNamespace(), is(namespaceName));
@@ -81,25 +88,32 @@ public class HttpProducerConsumerTest {
         assertThat(container.getName(), is(producerName));
         assertThat(container.getImage(), is(Image.defaultImage));
 
-        assertThat(producerEnvVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
-        assertThat(producerEnvVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
-        assertThat(producerEnvVars.get(ConfigurationConstants.MESSAGE_COUNT_ENV), is(String.valueOf(messageCount)));
-        assertThat(producerEnvVars.get(ConfigurationConstants.MESSAGE_ENV), is(message));
-        assertThat(producerEnvVars.get(ConfigurationConstants.DELAY_MS_ENV), is(String.valueOf(delayMs)));
-        assertThat(producerEnvVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
-        assertThat(producerEnvVars.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), is(endpointPrefix));
-        assertThat(producerEnvVars.get(ConfigurationConstants.CA_CRT_ENV), is(sslTruststoreCert));
-        assertThat(producerEnvVars.get("RANDOM"), is("value"));
-        assertThat(producerEnvVars.get("SOME"), is("thing"));
+        assertThat(envVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
+        assertThat(envVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
+        assertThat(envVars.get(ConfigurationConstants.MESSAGE_COUNT_ENV), is(String.valueOf(messageCount)));
+        assertThat(envVars.get(ConfigurationConstants.MESSAGE_ENV), is(message));
+        assertThat(envVars.get(ConfigurationConstants.DELAY_MS_ENV), is(String.valueOf(delayMs)));
+        assertThat(envVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
+        assertThat(envVars.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), is(endpointPrefix));
+        assertThat(envVars.get("RANDOM"), is("value"));
+        assertThat(envVars.get("SOME"), is("thing"));
+
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.CA_CRT_ENV).getSecretKeyRef().getName(), is(sslTruststoreCert));
 
         // these should not exist
-        assertNull(producerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV));
+        assertNull(envVars.get(ConfigurationConstants.TRACING_TYPE_ENV));
         assertThat(httpProducerJob.getSpec().getTemplate().getSpec().getImagePullSecrets(), is(List.of()));
 
         // Consumer part
         Job httpConsumerJob = httpProducerConsumer.getConsumer().getJob();
         container = httpConsumerJob.getSpec().getTemplate().getSpec().getContainers().get(0);
-        Map<String, String> consumerEnvVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+        envVars = container.getEnv().stream()
+            .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+
+        envVarsWithValueFrom = container.getEnv().stream()
+            .filter(e -> e.getValueFrom() != null)
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValueFrom));
 
         assertThat(httpConsumerJob.getMetadata().getName(), is(consumerName));
         assertThat(httpConsumerJob.getMetadata().getNamespace(), is(namespaceName));
@@ -107,22 +121,23 @@ public class HttpProducerConsumerTest {
         assertThat(container.getName(), is(consumerName));
         assertThat(container.getImage(), is(Image.defaultImage));
 
-        assertThat(consumerEnvVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.MESSAGE_COUNT_ENV), is(String.valueOf(messageCount)));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.POLL_INTERVAL_ENV), is(String.valueOf(delayMs)));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.POLL_TIMEOUT_ENV), is(String.valueOf(pollTimeout)));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), is(endpointPrefix));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.CA_CRT_ENV), is(sslTruststoreCert));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.CLIENT_ID_ENV), is(clientId));
-        assertThat(consumerEnvVars.get(ConfigurationConstants.GROUP_ID_ENV), is(consumerGroup));
+        assertThat(envVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
+        assertThat(envVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
+        assertThat(envVars.get(ConfigurationConstants.MESSAGE_COUNT_ENV), is(String.valueOf(messageCount)));
+        assertThat(envVars.get(ConfigurationConstants.POLL_INTERVAL_ENV), is(String.valueOf(delayMs)));
+        assertThat(envVars.get(ConfigurationConstants.POLL_TIMEOUT_ENV), is(String.valueOf(pollTimeout)));
+        assertThat(envVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
+        assertThat(envVars.get(ConfigurationConstants.ENDPOINT_PREFIX_ENV), is(endpointPrefix));
+        assertThat(envVars.get(ConfigurationConstants.CLIENT_ID_ENV), is(clientId));
+        assertThat(envVars.get(ConfigurationConstants.GROUP_ID_ENV), is(consumerGroup));
 
-        assertThat(consumerEnvVars.get("RANDOM"), is("value"));
-        assertThat(consumerEnvVars.get("SOME"), is("thing"));
+        assertThat(envVars.get("RANDOM"), is("value"));
+        assertThat(envVars.get("SOME"), is("thing"));
+
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.CA_CRT_ENV).getSecretKeyRef().getName(), is(sslTruststoreCert));
 
         // these should not exist
-        assertNull(consumerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV));
+        assertNull(envVars.get(ConfigurationConstants.TRACING_TYPE_ENV));
         assertThat(httpConsumerJob.getSpec().getTemplate().getSpec().getImagePullSecrets(), is(List.of()));
     }
 
@@ -219,26 +234,7 @@ public class HttpProducerConsumerTest {
 
     @Test
     void testEmptyBuilderThrowsExceptionsForImportantFields() {
-        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder().build());
-        assertThat(illegalArgumentException.getMessage(), is("Producer name cannot be empty"));
-
-        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
-            .withProducerName("")
-            .build());
-        assertThat(illegalArgumentException.getMessage(), is("Producer name cannot be empty"));
-
-        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
-            .withProducerName("client")
-            .build());
-        assertThat(illegalArgumentException.getMessage(), is("Consumer name cannot be empty"));
-
-        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
-            .withProducerName("client")
-            .withConsumerName("")
-            .build());
-        assertThat(illegalArgumentException.getMessage(), is("Consumer name cannot be empty"));
-
-        illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
+        IllegalArgumentException illegalArgumentException = assertThrows(IllegalArgumentException.class, () -> new HttpProducerConsumerBuilder()
             .withProducerName("client")
             .withConsumerName("client")
             .build());

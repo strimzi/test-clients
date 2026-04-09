@@ -25,7 +25,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
     private String headers;
 
     private Integer messageCount;
-    private Integer delayMs;
+    private Integer delayMs = 0;
 
     private Transactional transactional;
 
@@ -37,9 +37,6 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setProducerName(String producerName) {
-        if (producerName == null || producerName.isEmpty()) {
-            throw new IllegalArgumentException("Producer name cannot be empty");
-        }
         this.producerName = producerName;
     }
 
@@ -48,9 +45,6 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public void setConsumerName(String consumerName) {
-        if (consumerName == null || consumerName.isEmpty()) {
-            throw new IllegalArgumentException("Consumer name cannot be empty");
-        }
         this.consumerName = consumerName;
     }
 
@@ -162,6 +156,10 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     private KafkaProducerClient configureProducer() {
+        if (producerName == null || producerName.isEmpty()) {
+            throw new IllegalArgumentException("Producer name cannot be empty");
+        }
+
         Tracing producerTracing = null;
 
         if (getTracing() != null) {
@@ -186,9 +184,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
             .withNamespaceName(getNamespaceName())
             .withBootstrapAddress(getBootstrapAddress())
             .withImage(getImage())
-            .withOauth(getOauth())
-            .withSasl(getSasl())
-            .withSsl(getSsl())
+            .withAuthentication(getAuthentication())
             .withTracing(producerTracing)
             .withAdditionalEnvVars(getAdditionalEnvVars())
             .withAdditionalConfig(getAdditionalConfig())
@@ -204,6 +200,10 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     private KafkaConsumerClient configureConsumer() {
+        if (consumerName == null || consumerName.isEmpty()) {
+            throw new IllegalArgumentException("Consumer name cannot be empty");
+        }
+
         Tracing consumerTracing = null;
 
         if (getTracing() != null) {
@@ -225,10 +225,8 @@ public class KafkaProducerConsumer extends KafkaCommon {
             .withNamespaceName(getNamespaceName())
             .withBootstrapAddress(getBootstrapAddress())
             .withImage(getImage())
-            .withOauth(getOauth())
-            .withSasl(getSasl())
-            .withSsl(getSsl())
             .withTracing(consumerTracing)
+            .withAuthentication(getAuthentication())
             .withAdditionalEnvVars(getAdditionalEnvVars())
             .withAdditionalConfig(getAdditionalConfig())
             .build();
