@@ -9,7 +9,7 @@ import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
 import io.fabric8.kubernetes.api.model.EnvVarSource;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.configuration.Image;
 import org.junit.jupiter.api.Test;
