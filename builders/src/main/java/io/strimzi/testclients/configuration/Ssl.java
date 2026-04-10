@@ -40,12 +40,12 @@ public class Ssl {
         this.sslKeystoreCertificateChain = sslKeystoreCertificateChain;
     }
 
-    public List<EnvVar> getSslEnvVar() {
+    public List<EnvVar> getSslEnvVars() {
         List<EnvVar> envVars = new ArrayList<>();
 
-        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.CA_CRT_ENV, this.getSslTruststoreCertificate());
-        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.USER_KEY_ENV, this.getSslKeystoreKey());
-        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.USER_CRT_ENV, this.getSslKeystoreCertificateChain());
+        Environment.configureEnvVariableWithValueFromSecretOrSkip(envVars, ConfigurationConstants.CA_CRT_ENV, this.getSslTruststoreCertificate(), "ca.crt");
+        Environment.configureEnvVariableWithValueFromSecretOrSkip(envVars, ConfigurationConstants.USER_KEY_ENV, this.getSslKeystoreKey(), "user.key");
+        Environment.configureEnvVariableWithValueFromSecretOrSkip(envVars, ConfigurationConstants.USER_CRT_ENV, this.getSslKeystoreCertificateChain(), "user.crt");
 
         return envVars;
     }

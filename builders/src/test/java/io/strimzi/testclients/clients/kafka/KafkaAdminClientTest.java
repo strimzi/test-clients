@@ -7,6 +7,7 @@ package io.strimzi.testclients.clients.kafka;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarSource;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.extensions.Deployment;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
@@ -116,13 +117,15 @@ public class KafkaAdminClientTest {
             .withName(name)
             .withNamespaceName(namespaceName)
             .withBootstrapAddress(bootstrapAddress)
-            .withNewOauth()
-                .withOauthClientId(clientId)
-                .withOauthAccessToken(accessToken)
-                .withOauthClientSecret(clientSecret)
-                .withOauthRefreshToken(refreshToken)
-                .withOauthTokenEndpointUri(endpointUri)
-            .endOauth()
+            .withNewAuthentication()
+                .withNewOauth()
+                    .withOauthClientId(clientId)
+                    .withOauthAccessToken(accessToken)
+                    .withOauthClientSecret(clientSecret)
+                    .withOauthRefreshToken(refreshToken)
+                    .withOauthTokenEndpointUri(endpointUri)
+                .endOauth()
+            .endAuthentication()
             .build();
 
         Deployment deployment = kafkaAdminClient.getDeployment();
@@ -146,6 +149,7 @@ public class KafkaAdminClientTest {
         String namespaceName = "my-namespace";
         String bootstrapAddress = "localhost:9092";
 
+        String securityProtocol = "SASL_SSL";
         String jaasConfig = "jaas-config";
         String mechanism = "plain";
         String password = "tajne";
@@ -155,12 +159,15 @@ public class KafkaAdminClientTest {
             .withName(name)
             .withNamespaceName(namespaceName)
             .withBootstrapAddress(bootstrapAddress)
-            .withNewSasl()
-                .withSaslJaasConfig(jaasConfig)
-                .withSaslMechanism(mechanism)
-                .withSaslPassword(password)
-                .withSaslUserName(username)
-            .endSasl()
+            .withNewAuthentication()
+                .withNewSasl()
+                    .withSaslJaasConfig(jaasConfig)
+                    .withSaslMechanism(mechanism)
+                    .withSaslPassword(password)
+                    .withSaslUserName(username)
+                .endSasl()
+                .withSecurityProtocol(securityProtocol)
+            .endAuthentication()
             .build();
 
         Deployment deployment = kafkaAdminClient.getDeployment();
@@ -168,9 +175,10 @@ public class KafkaAdminClientTest {
         Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(5));
+        assertThat(envVars.size(), is(6));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
 
+        assertThat(envVars.get(ConfigurationConstants.SECURITY_PROTOCOL_ENV), is(securityProtocol));
         assertThat(envVars.get(ConfigurationConstants.SASL_JAAS_CONFIG_ENV), is(jaasConfig));
         assertThat(envVars.get(ConfigurationConstants.SASL_MECHANISM_ENV), is(mechanism));
         assertThat(envVars.get(ConfigurationConstants.USER_NAME_ENV), is(username));
@@ -191,24 +199,33 @@ public class KafkaAdminClientTest {
             .withName(name)
             .withNamespaceName(namespaceName)
             .withBootstrapAddress(bootstrapAddress)
-            .withNewSsl()
-                .withSslTruststoreCertificate(truststore)
-                .withSslKeystoreCertificateChain(keystoreCert)
-                .withSslKeystoreKey(keystoreKey)
-            .endSsl()
+            .withNewAuthentication()
+                .withNewSsl()
+                    .withSslTruststoreCertificate(truststore)
+                    .withSslKeystoreCertificateChain(keystoreCert)
+                    .withSslKeystoreKey(keystoreKey)
+                .endSsl()
+            .endAuthentication()
             .build();
 
         Deployment deployment = kafkaAdminClient.getDeployment();
         Container container = deployment.getSpec().getTemplate().getSpec().getContainers().get(0);
-        Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+        Map<String, String> envVars = container.getEnv().stream()
+            .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+
+        Map<String, EnvVarSource> envVarsWithValueFrom = container.getEnv().stream()
+            .filter(e -> e.getValueFrom() != null)
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValueFrom));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(4));
+        assertThat(envVars.size(), is(1));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
 
-        assertThat(envVars.get(ConfigurationConstants.CA_CRT_ENV), is(truststore));
-        assertThat(envVars.get(ConfigurationConstants.USER_CRT_ENV), is(keystoreCert));
-        assertThat(envVars.get(ConfigurationConstants.USER_KEY_ENV), is(keystoreKey));
+        assertThat(envVarsWithValueFrom.size(), is(3));
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.CA_CRT_ENV).getSecretKeyRef().getName(), is(truststore));
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.USER_CRT_ENV).getSecretKeyRef().getName(), is(keystoreCert));
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.USER_KEY_ENV).getSecretKeyRef().getName(), is(keystoreKey));
     }
 
     @Test

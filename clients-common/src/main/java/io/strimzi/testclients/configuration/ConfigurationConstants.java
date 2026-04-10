@@ -74,6 +74,7 @@ public interface ConfigurationConstants {
      * Kafka basic env variables
      */
     String BOOTSTRAP_SERVERS_ENV = "BOOTSTRAP_SERVERS";
+    String SECURITY_PROTOCOL_ENV = "SECURITY_PROTOCOL";
     String SASL_JAAS_CONFIG_ENV = "SASL_JAAS_CONFIG";
     String USER_NAME_ENV = "USER_NAME";
     String USER_PASSWORD_ENV = "USER_PASSWORD";

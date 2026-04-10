@@ -55,16 +55,8 @@ public class KafkaBaseClient extends KafkaCommon {
             envVars.addAll(this.getTracing().getTracingEnvVars());
         }
 
-        if (this.getOauth() != null && !this.getOauth().getOAuthEnvVars().isEmpty()) {
-            envVars.addAll(this.getOauth().getOAuthEnvVars());
-        }
-
-        if (this.getSasl() != null && !this.getSasl().getSaslEnvVars().isEmpty()) {
-            envVars.addAll(this.getSasl().getSaslEnvVars());
-        }
-
-        if (this.getSsl() != null && !this.getSsl().getSslEnvVar().isEmpty()) {
-            envVars.addAll(this.getSsl().getSslEnvVar());
+        if (this.getAuthentication() != null && !this.getAuthentication().getAuthenticationEnvVars().isEmpty()) {
+            envVars.addAll(this.getAuthentication().getAuthenticationEnvVars());
         }
 
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.BOOTSTRAP_SERVERS_ENV, this.getBootstrapAddress());

@@ -7,6 +7,7 @@ package io.strimzi.testclients.clients.kafka;
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.EnvVarBuilder;
+import io.fabric8.kubernetes.api.model.EnvVarSource;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.strimzi.testclients.configuration.ClientType;
@@ -148,13 +149,15 @@ public class KafkaProducerClientTest {
             .withNamespaceName(namespaceName)
             .withBootstrapAddress(bootstrapAddress)
             .withTopicName(topicName)
-            .withNewOauth()
-                .withOauthClientId(clientId)
-                .withOauthAccessToken(accessToken)
-                .withOauthClientSecret(clientSecret)
-                .withOauthRefreshToken(refreshToken)
-                .withOauthTokenEndpointUri(endpointUri)
-            .endOauth()
+            .withNewAuthentication()
+                .withNewOauth()
+                    .withOauthClientId(clientId)
+                    .withOauthAccessToken(accessToken)
+                    .withOauthClientSecret(clientSecret)
+                    .withOauthRefreshToken(refreshToken)
+                    .withOauthTokenEndpointUri(endpointUri)
+                .endOauth()
+            .endAuthentication()
             .build();
 
         Job job = kafkaProducerClient.getJob();
@@ -181,6 +184,7 @@ public class KafkaProducerClientTest {
         String bootstrapAddress = "localhost:9092";
         String topicName = "my-topic";
 
+        String securityProtocol = "SASL_SSL";
         String jaasConfig = "jaas-config";
         String mechanism = "plain";
         String password = "tajne";
@@ -191,12 +195,15 @@ public class KafkaProducerClientTest {
             .withNamespaceName(namespaceName)
             .withBootstrapAddress(bootstrapAddress)
             .withTopicName(topicName)
-            .withNewSasl()
-                .withSaslJaasConfig(jaasConfig)
-                .withSaslMechanism(mechanism)
-                .withSaslPassword(password)
-                .withSaslUserName(username)
-            .endSasl()
+            .withNewAuthentication()
+                .withNewSasl()
+                    .withSaslJaasConfig(jaasConfig)
+                    .withSaslMechanism(mechanism)
+                    .withSaslPassword(password)
+                    .withSaslUserName(username)
+                .endSasl()
+                .withSecurityProtocol(securityProtocol)
+            .endAuthentication()
             .build();
 
         Job job = kafkaProducerClient.getJob();
@@ -204,11 +211,12 @@ public class KafkaProducerClientTest {
         Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(7));
+        assertThat(envVars.size(), is(8));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
         assertThat(envVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
         assertThat(envVars.get(ConfigurationConstants.CLIENT_TYPE_ENV), is(ClientType.KafkaProducer.name()));
 
+        assertThat(envVars.get(ConfigurationConstants.SECURITY_PROTOCOL_ENV), is(securityProtocol));
         assertThat(envVars.get(ConfigurationConstants.SASL_JAAS_CONFIG_ENV), is(jaasConfig));
         assertThat(envVars.get(ConfigurationConstants.SASL_MECHANISM_ENV), is(mechanism));
         assertThat(envVars.get(ConfigurationConstants.USER_NAME_ENV), is(username));
@@ -231,26 +239,36 @@ public class KafkaProducerClientTest {
             .withNamespaceName(namespaceName)
             .withBootstrapAddress(bootstrapAddress)
             .withTopicName(topicName)
-            .withNewSsl()
-                .withSslTruststoreCertificate(truststore)
-                .withSslKeystoreCertificateChain(keystoreCert)
-                .withSslKeystoreKey(keystoreKey)
-            .endSsl()
+            .withNewAuthentication()
+                .withNewSsl()
+                    .withSslTruststoreCertificate(truststore)
+                    .withSslKeystoreCertificateChain(keystoreCert)
+                    .withSslKeystoreKey(keystoreKey)
+                .endSsl()
+            .endAuthentication()
             .build();
 
         Job job = kafkaProducerClient.getJob();
         Container container = job.getSpec().getTemplate().getSpec().getContainers().get(0);
-        Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+
+        Map<String, String> envVars = container.getEnv().stream()
+            .filter(e -> e.getValue() != null && !e.getValue().isEmpty())
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
+
+        Map<String, EnvVarSource> envVarsWithValueFrom = container.getEnv().stream()
+            .filter(e -> e.getValueFrom() != null)
+            .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValueFrom));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(6));
+        assertThat(envVars.size(), is(3));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
         assertThat(envVars.get(ConfigurationConstants.TOPIC_ENV), is(topicName));
         assertThat(envVars.get(ConfigurationConstants.CLIENT_TYPE_ENV), is(ClientType.KafkaProducer.name()));
 
-        assertThat(envVars.get(ConfigurationConstants.CA_CRT_ENV), is(truststore));
-        assertThat(envVars.get(ConfigurationConstants.USER_CRT_ENV), is(keystoreCert));
-        assertThat(envVars.get(ConfigurationConstants.USER_KEY_ENV), is(keystoreKey));
+        assertThat(envVarsWithValueFrom.size(), is(3));
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.CA_CRT_ENV).getSecretKeyRef().getName(), is(truststore));
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.USER_CRT_ENV).getSecretKeyRef().getName(), is(keystoreCert));
+        assertThat(envVarsWithValueFrom.get(ConfigurationConstants.USER_KEY_ENV).getSecretKeyRef().getName(), is(keystoreKey));
     }
 
     @Test

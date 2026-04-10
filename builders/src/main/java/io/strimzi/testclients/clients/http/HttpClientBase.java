@@ -62,7 +62,7 @@ class HttpClientBase extends HttpCommon {
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.MESSAGE_COUNT_ENV, this.getMessageCount());
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.ENDPOINT_PREFIX_ENV, this.getEndpointPrefix());
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.MESSAGE_TYPE_ENV, this.getMessageType());
-        Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.CA_CRT_ENV, this.getSslTruststoreCertificate());
+        Environment.configureEnvVariableWithValueFromSecretOrSkip(envVars, ConfigurationConstants.CA_CRT_ENV, this.getSslTruststoreCertificate(), "ca.crt");
 
         return new JobBuilder()
             .withNewMetadata()
