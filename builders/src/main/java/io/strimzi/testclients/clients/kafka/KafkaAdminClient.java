@@ -7,8 +7,8 @@ package io.strimzi.testclients.clients.kafka;
 import io.fabric8.kubernetes.api.model.EnvVar;
 import io.fabric8.kubernetes.api.model.LocalObjectReference;
 import io.fabric8.kubernetes.api.model.PodSpecBuilder;
-import io.fabric8.kubernetes.api.model.extensions.Deployment;
-import io.fabric8.kubernetes.api.model.extensions.DeploymentBuilder;
+import io.fabric8.kubernetes.api.model.apps.Deployment;
+import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.strimzi.testclients.configuration.ConfigurationConstants;
 import io.strimzi.testclients.configuration.Environment;
 import io.sundr.builder.annotations.Buildable;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Buildable(editableEnabled = false)
 public class KafkaAdminClient extends KafkaBaseClient {
-    private String configFolderPath;
+    private String configFolderPath = "/tmp";
 
     public String getConfigFolderPath() {
         return configFolderPath;
@@ -69,12 +69,16 @@ public class KafkaAdminClient extends KafkaBaseClient {
                 .withName(this.getName())
             .endMetadata()
             .withNewSpec()
+                .withNewSelector()
+                    .addToMatchLabels(labels)
+                .endSelector()
                 .withNewTemplate()
                     .withNewMetadata()
+                        .withName(this.getName())
+                        .withNamespace(this.getNamespaceName())
                         .withLabels(labels)
                     .endMetadata()
                     .withNewSpecLike(podSpecBuilder.build())
-                        .withRestartPolicy("Never")
                         .addNewContainer()
                             .withName(this.getName())
                             .withImagePullPolicy(this.getImage().getImagePullPolicy())
