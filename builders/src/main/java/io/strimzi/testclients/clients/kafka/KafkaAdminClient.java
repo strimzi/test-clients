@@ -20,7 +20,7 @@ import java.util.Map;
 
 @Buildable(editableEnabled = false)
 public class KafkaAdminClient extends KafkaBaseClient {
-    private String configFolderPath;
+    private String configFolderPath = "/tmp";
 
     public String getConfigFolderPath() {
         return configFolderPath;
@@ -69,12 +69,16 @@ public class KafkaAdminClient extends KafkaBaseClient {
                 .withName(this.getName())
             .endMetadata()
             .withNewSpec()
+                .withNewSelector()
+                    .addToMatchLabels(labels)
+                .endSelector()
                 .withNewTemplate()
                     .withNewMetadata()
+                        .withName(this.getName())
+                        .withNamespace(this.getNamespaceName())
                         .withLabels(labels)
                     .endMetadata()
                     .withNewSpecLike(podSpecBuilder.build())
-                        .withRestartPolicy("Never")
                         .addNewContainer()
                             .withName(this.getName())
                             .withImagePullPolicy(this.getImage().getImagePullPolicy())
