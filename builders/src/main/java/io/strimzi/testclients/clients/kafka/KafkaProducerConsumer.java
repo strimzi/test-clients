@@ -29,9 +29,6 @@ public class KafkaProducerConsumer extends KafkaCommon {
 
     private Transactional transactional;
 
-    private KafkaProducerClient kafkaProducerClient;
-    private KafkaConsumerClient kafkaConsumerClient;
-
     public String getProducerName() {
         return producerName;
     }
@@ -148,14 +145,6 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public KafkaProducerClient getProducer() {
-        if (kafkaProducerClient == null) {
-            kafkaProducerClient = configureProducer();
-        }
-
-        return kafkaProducerClient;
-    }
-
-    private KafkaProducerClient configureProducer() {
         if (producerName == null || producerName.isEmpty()) {
             throw new IllegalArgumentException("Producer name cannot be empty");
         }
@@ -192,14 +181,6 @@ public class KafkaProducerConsumer extends KafkaCommon {
     }
 
     public KafkaConsumerClient getConsumer() {
-        if (kafkaConsumerClient == null) {
-            kafkaConsumerClient = configureConsumer();
-        }
-
-        return kafkaConsumerClient;
-    }
-
-    private KafkaConsumerClient configureConsumer() {
         if (consumerName == null || consumerName.isEmpty()) {
             throw new IllegalArgumentException("Consumer name cannot be empty");
         }
