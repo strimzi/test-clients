@@ -140,6 +140,7 @@ public class KafkaAdminClientTest {
         // this will ensure that no other env variables are set, only those we are setting
         assertThat(envVars.size(), is(8));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
+        assertThat(envVars.get(ConfigurationConstants.CONFIG_FOLDER_PATH_ENV), is("/tmp"));
 
         assertThat(envVars.get(ConfigurationConstants.OAUTH_CLIENT_ID_ENV), is(clientId));
         assertThat(envVars.get(ConfigurationConstants.OAUTH_ACCESS_TOKEN_ENV), is(accessToken));
@@ -181,8 +182,9 @@ public class KafkaAdminClientTest {
         Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(6));
+        assertThat(envVars.size(), is(7));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
+        assertThat(envVars.get(ConfigurationConstants.CONFIG_FOLDER_PATH_ENV), is("/tmp"));
 
         assertThat(envVars.get(ConfigurationConstants.SECURITY_PROTOCOL_ENV), is(securityProtocol));
         assertThat(envVars.get(ConfigurationConstants.SASL_JAAS_CONFIG_ENV), is(jaasConfig));
@@ -225,8 +227,9 @@ public class KafkaAdminClientTest {
             .collect(Collectors.toMap(EnvVar::getName, EnvVar::getValueFrom));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(1));
+        assertThat(envVars.size(), is(2));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
+        assertThat(envVars.get(ConfigurationConstants.CONFIG_FOLDER_PATH_ENV), is("/tmp"));
 
         assertThat(envVarsWithValueFrom.size(), is(3));
         assertThat(envVarsWithValueFrom.get(ConfigurationConstants.CA_CRT_ENV).getSecretKeyRef().getName(), is(truststore));
@@ -259,8 +262,9 @@ public class KafkaAdminClientTest {
         Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(3));
+        assertThat(envVars.size(), is(4));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
+        assertThat(envVars.get(ConfigurationConstants.CONFIG_FOLDER_PATH_ENV), is("/tmp"));
 
         assertThat(envVars.get(ConfigurationConstants.TRACING_TYPE_ENV), is(tracingType));
         assertThat(envVars.get(serviceNameEnvVar), is(name));
