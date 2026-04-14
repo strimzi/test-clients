@@ -112,6 +112,10 @@ public class KafkaAdminClientTest {
         String clientSecret = "client-secret";
         String refreshToken = "my-refresh-token";
         String endpointUri = "localhost:8080";
+        EnvVar oauthEnvVar = new EnvVarBuilder()
+            .withName("OAUTH_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM")
+            .withValue("ARNOST")
+            .build();
 
         KafkaAdminClient kafkaAdminClient = new KafkaAdminClientBuilder()
             .withName(name)
@@ -124,6 +128,7 @@ public class KafkaAdminClientTest {
                     .withOauthClientSecret(clientSecret)
                     .withOauthRefreshToken(refreshToken)
                     .withOauthTokenEndpointUri(endpointUri)
+                    .withAdditionalOAuthEnvVars(oauthEnvVar)
                 .endOauth()
             .endAuthentication()
             .build();
@@ -133,7 +138,7 @@ public class KafkaAdminClientTest {
         Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(6));
+        assertThat(envVars.size(), is(8));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
 
         assertThat(envVars.get(ConfigurationConstants.OAUTH_CLIENT_ID_ENV), is(clientId));
@@ -141,6 +146,7 @@ public class KafkaAdminClientTest {
         assertThat(envVars.get(ConfigurationConstants.OAUTH_CLIENT_SECRET_ENV), is(clientSecret));
         assertThat(envVars.get(ConfigurationConstants.OAUTH_REFRESH_TOKEN_ENV), is(refreshToken));
         assertThat(envVars.get(ConfigurationConstants.OAUTH_TOKEN_ENDPOINT_URI_ENV), is(endpointUri));
+        assertThat(envVars.get("OAUTH_SSL_ENDPOINT_IDENTIFICATION_ALGORITHM"), is("ARNOST"));
     }
 
     @Test
