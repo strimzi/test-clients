@@ -155,6 +155,10 @@ public class HttpProducerConsumerTest {
         String tracingServiceName = "tracing";
         String producerServiceName = tracingServiceName + "-producer";
         String consumerServiceName = tracingServiceName + "-consumer";
+        EnvVar additionalTracingEnv = new EnvVarBuilder()
+            .withName("OTEL_EXPORTER_OTLP_ENDPOINT")
+            .withValue("endpoint")
+            .build();
 
         HttpProducerConsumer httpProducerConsumer = new HttpProducerConsumerBuilder()
             .withProducerName(producerName)
@@ -167,6 +171,7 @@ public class HttpProducerConsumerTest {
                 .withServiceName(tracingServiceName)
                 .withServiceNameEnvVar(serviceNameEnvVar)
                 .withTracingType(tracingType)
+                .withAdditionalTracingEnvVars(additionalTracingEnv)
             .endTracing()
             .build();
 
@@ -177,7 +182,7 @@ public class HttpProducerConsumerTest {
 
         assertThat(producerEnvVars.get(serviceNameEnvVar), is(producerServiceName));
         assertThat(producerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV), is(tracingType));
-
+        assertThat(producerEnvVars.get("OTEL_EXPORTER_OTLP_ENDPOINT"), is("endpoint"));
 
         // Consumer part
         Job httpConsumerJob = httpProducerConsumer.getConsumer().getJob();
@@ -186,6 +191,7 @@ public class HttpProducerConsumerTest {
 
         assertThat(consumerEnvVars.get(serviceNameEnvVar), is(consumerServiceName));
         assertThat(consumerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV), is(tracingType));
+        assertThat(consumerEnvVars.get("OTEL_EXPORTER_OTLP_ENDPOINT"), is("endpoint"));
     }
 
     @Test

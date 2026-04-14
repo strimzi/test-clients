@@ -97,6 +97,7 @@ public class HttpProducerConsumer extends HttpCommon {
                 .withTracingType(getTracing().getTracingType())
                 .withServiceNameEnvVar(getTracing().getServiceNameEnvVar())
                 .withServiceName(getTracing().getServiceName() + "-producer")
+                .withAdditionalTracingEnvVars(getTracing().getAdditionalTracingEnvVars())
                 .build();
         }
 
@@ -131,6 +132,7 @@ public class HttpProducerConsumer extends HttpCommon {
                 .withTracingType(getTracing().getTracingType())
                 .withServiceNameEnvVar(getTracing().getServiceNameEnvVar())
                 .withServiceName(getTracing().getServiceName() + "-consumer")
+                .withAdditionalTracingEnvVars(getTracing().getAdditionalTracingEnvVars())
                 .build();
         }
 

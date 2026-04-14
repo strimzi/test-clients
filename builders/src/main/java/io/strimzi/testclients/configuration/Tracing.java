@@ -16,6 +16,7 @@ public class Tracing {
     private String serviceName;
     private String serviceNameEnvVar;
     private String tracingType;
+    private List<EnvVar> additionalTracingEnvVars;
 
     public String getServiceName() {
         return serviceName;
@@ -41,6 +42,14 @@ public class Tracing {
         this.tracingType = tracingType;
     }
 
+    public List<EnvVar> getAdditionalTracingEnvVars() {
+        return additionalTracingEnvVars;
+    }
+
+    public void setAdditionalTracingEnvVars(List<EnvVar> additionalTracingEnvVars) {
+        this.additionalTracingEnvVars = additionalTracingEnvVars;
+    }
+
     public List<EnvVar> getTracingEnvVars() {
         List<EnvVar> envVars = new ArrayList<>();
 
@@ -54,6 +63,10 @@ public class Tracing {
         }
 
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.TRACING_TYPE_ENV, this.getTracingType());
+
+        if (additionalTracingEnvVars != null && !additionalTracingEnvVars.isEmpty()) {
+            envVars.addAll(additionalTracingEnvVars);
+        }
 
         return envVars;
     }

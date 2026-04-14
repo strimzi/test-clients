@@ -115,6 +115,10 @@ public class HttpConsumerClientTest {
         String topicName = "my-topic";
         String serviceNameEnvVar = "OTEL_SERVICE_NAME";
         String tracingType = "OpenTelemetry";
+        EnvVar additionalTracingEnv = new EnvVarBuilder()
+            .withName("OTEL_EXPORTER_OTLP_ENDPOINT")
+            .withValue("endpoint")
+            .build();
 
         HttpConsumerClient httpConsumerClient = new HttpConsumerClientBuilder()
             .withName(name)
@@ -128,6 +132,7 @@ public class HttpConsumerClientTest {
                 .withServiceNameEnvVar(serviceNameEnvVar)
                 .withServiceName(name)
                 .withTracingType(tracingType)
+                .withAdditionalTracingEnvVars(additionalTracingEnv)
             .endTracing()
             .build();
 
@@ -137,6 +142,7 @@ public class HttpConsumerClientTest {
 
         assertThat(consumerEnvVars.get(serviceNameEnvVar), is(name));
         assertThat(consumerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV), is(tracingType));
+        assertThat(consumerEnvVars.get("OTEL_EXPORTER_OTLP_ENDPOINT"), is("endpoint"));
     }
 
     @Test
