@@ -21,9 +21,6 @@ public class HttpProducerConsumer extends HttpCommon {
 
     private Integer delayMs = 0;
 
-    private HttpProducerClient httpProducerClient;
-    private HttpConsumerClient httpConsumerClient;
-
     public String getProducerName() {
         return producerName;
     }
@@ -89,13 +86,6 @@ public class HttpProducerConsumer extends HttpCommon {
     }
 
     public HttpProducerClient getProducer() {
-        if (httpProducerClient == null) {
-            httpProducerClient = configureProducer();
-        }
-        return httpProducerClient;
-    }
-
-    private HttpProducerClient configureProducer() {
         if (producerName == null || producerName.isEmpty()) {
             throw new IllegalArgumentException("Producer name cannot be empty");
         }
@@ -130,14 +120,6 @@ public class HttpProducerConsumer extends HttpCommon {
     }
 
     public HttpConsumerClient getConsumer() {
-        if (httpConsumerClient == null) {
-            httpConsumerClient = configureConsumer();
-        }
-
-        return httpConsumerClient;
-    }
-
-    private HttpConsumerClient configureConsumer() {
         if (consumerName == null || consumerName.isEmpty()) {
             throw new IllegalArgumentException("Consumer name cannot be empty");
         }
