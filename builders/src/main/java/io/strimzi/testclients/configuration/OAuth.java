@@ -17,6 +17,7 @@ public class OAuth {
     private String oauthAccessToken;
     private String oauthRefreshToken;
     private String oauthTokenEndpointUri;
+    private List<EnvVar> additionalOAuthEnvVars;
 
     public String getOauthClientId() {
         return oauthClientId;
@@ -58,6 +59,14 @@ public class OAuth {
         this.oauthTokenEndpointUri = oauthTokenEndpointUri;
     }
 
+    public List<EnvVar> getAdditionalOAuthEnvVars() {
+        return additionalOAuthEnvVars;
+    }
+
+    public void setAdditionalOAuthEnvVars(List<EnvVar> additionalOAuthEnvVars) {
+        this.additionalOAuthEnvVars = additionalOAuthEnvVars;
+    }
+
     public List<EnvVar> getOAuthEnvVars() {
         List<EnvVar> envVars = new ArrayList<>();
 
@@ -66,6 +75,10 @@ public class OAuth {
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_ACCESS_TOKEN_ENV, this.getOauthAccessToken());
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_REFRESH_TOKEN_ENV, this.getOauthRefreshToken());
         Environment.configureEnvVariableOrSkip(envVars, ConfigurationConstants.OAUTH_TOKEN_ENDPOINT_URI_ENV, this.getOauthTokenEndpointUri());
+
+        if (additionalOAuthEnvVars != null && !additionalOAuthEnvVars.isEmpty()) {
+            envVars.addAll(additionalOAuthEnvVars);
+        }
 
         return envVars;
     }
