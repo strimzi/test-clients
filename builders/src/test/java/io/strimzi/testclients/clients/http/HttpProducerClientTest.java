@@ -107,6 +107,10 @@ public class HttpProducerClientTest {
         String topicName = "my-topic";
         String serviceNameEnvVar = "OTEL_SERVICE_NAME";
         String tracingType = "OpenTelemetry";
+        EnvVar additionalTracingEnv = new EnvVarBuilder()
+            .withName("OTEL_EXPORTER_OTLP_ENDPOINT")
+            .withValue("endpoint")
+            .build();
 
         HttpProducerClient httpProducerClient = new HttpProducerClientBuilder()
             .withName(name)
@@ -120,6 +124,7 @@ public class HttpProducerClientTest {
                 .withServiceNameEnvVar(serviceNameEnvVar)
                 .withServiceName(name)
                 .withTracingType(tracingType)
+                .withAdditionalTracingEnvVars(additionalTracingEnv)
             .endTracing()
             .build();
 
@@ -129,6 +134,7 @@ public class HttpProducerClientTest {
 
         assertThat(producerEnvVars.get(serviceNameEnvVar), is(name));
         assertThat(producerEnvVars.get(ConfigurationConstants.TRACING_TYPE_ENV), is(tracingType));
+        assertThat(producerEnvVars.get("OTEL_EXPORTER_OTLP_ENDPOINT"), is("endpoint"));
     }
 
     @Test

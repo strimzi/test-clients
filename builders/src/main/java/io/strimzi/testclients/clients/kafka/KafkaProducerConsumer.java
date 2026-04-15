@@ -156,6 +156,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
                 .withTracingType(getTracing().getTracingType())
                 .withServiceNameEnvVar(getTracing().getServiceNameEnvVar())
                 .withServiceName(getTracing().getServiceName() + "-producer")
+                .withAdditionalTracingEnvVars(getTracing().getAdditionalTracingEnvVars())
                 .build();
         }
 
@@ -192,6 +193,7 @@ public class KafkaProducerConsumer extends KafkaCommon {
                 .withTracingType(getTracing().getTracingType())
                 .withServiceNameEnvVar(getTracing().getServiceNameEnvVar())
                 .withServiceName(getTracing().getServiceName() + "-consumer")
+                .withAdditionalTracingEnvVars(getTracing().getAdditionalTracingEnvVars())
                 .build();
         }
 

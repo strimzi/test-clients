@@ -293,6 +293,10 @@ public class KafkaStreamsClientTest {
 
         String tracingType = "OpenTelemetry";
         String serviceNameEnvVar = "OTEL_SERVICE_NAME";
+        EnvVar additionalTracingEnv = new EnvVarBuilder()
+            .withName("OTEL_EXPORTER_OTLP_ENDPOINT")
+            .withValue("endpoint")
+            .build();
 
         KafkaStreamsClient kafkaStreamsClient = new KafkaStreamsClientBuilder()
             .withName(name)
@@ -305,6 +309,7 @@ public class KafkaStreamsClientTest {
                 .withServiceName(name)
                 .withTracingType(tracingType)
                 .withServiceNameEnvVar(serviceNameEnvVar)
+                .withAdditionalTracingEnvVars(additionalTracingEnv)
             .endTracing()
             .build();
 
@@ -313,7 +318,7 @@ public class KafkaStreamsClientTest {
         Map<String, String> envVars = container.getEnv().stream().collect(Collectors.toMap(EnvVar::getName, EnvVar::getValue));
 
         // this will ensure that no other env variables are set, only those we are setting
-        assertThat(envVars.size(), is(7));
+        assertThat(envVars.size(), is(8));
         assertThat(envVars.get(ConfigurationConstants.BOOTSTRAP_SERVERS_ENV), is(bootstrapAddress));
         assertThat(envVars.get(ConfigurationConstants.CLIENT_TYPE_ENV), is(ClientType.KafkaStreams.name()));
         assertThat(envVars.get(ConfigurationConstants.APPLICATION_ID_ENV), is(applicationId));
@@ -322,6 +327,7 @@ public class KafkaStreamsClientTest {
 
         assertThat(envVars.get(ConfigurationConstants.TRACING_TYPE_ENV), is(tracingType));
         assertThat(envVars.get(serviceNameEnvVar), is(name));
+        assertThat(envVars.get("OTEL_EXPORTER_OTLP_ENDPOINT"), is("endpoint"));
     }
 
     @Test
