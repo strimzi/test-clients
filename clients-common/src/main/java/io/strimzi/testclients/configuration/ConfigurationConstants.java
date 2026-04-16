@@ -78,7 +78,7 @@ public interface ConfigurationConstants {
     String SASL_JAAS_CONFIG_ENV = "SASL_JAAS_CONFIG";
     String USER_NAME_ENV = "USER_NAME";
     String USER_PASSWORD_ENV = "USER_PASSWORD";
-    String SASL_MECHANISM_ENV = "SASL_MECHANISM_ENV";
+    String SASL_MECHANISM_ENV = "SASL_MECHANISM";
     String CA_CRT_ENV = "CA_CRT";
     String USER_KEY_ENV = "USER_KEY";
     String USER_CRT_ENV = "USER_CRT";
@@ -121,6 +121,7 @@ public interface ConfigurationConstants {
     String OAUTH_ACCESS_TOKEN_PROPERTY = "oauth.access.token";
     String OAUTH_REFRESH_TOKEN_PROPERTY = "oauth.refresh.token";
     String OAUTH_TOKEN_ENDPOINT_URI_PROPERTY = "oauth.token.endpoint.uri";
+    String SECURITY_PROTOCOL_PROPERTY = "security.protocol";
     String ADDITIONAL_CONFIG_PROPERTY = "additional.config";
 
     List<String> BASIC_PROPERTY_LIST = List.of(
@@ -137,6 +138,7 @@ public interface ConfigurationConstants {
         OAUTH_ACCESS_TOKEN_PROPERTY,
         OAUTH_REFRESH_TOKEN_PROPERTY,
         OAUTH_TOKEN_ENDPOINT_URI_PROPERTY,
+        SECURITY_PROTOCOL_PROPERTY,
         ADDITIONAL_CONFIG_PROPERTY
     );
 
