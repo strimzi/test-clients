@@ -87,7 +87,7 @@ public class KafkaProducerConsumerTest {
         assertThat(job.getMetadata().getNamespace(), is(namespaceName));
 
         assertThat(container.getName(), is(producerName));
-        assertThat(container.getImage(), is(Image.defaultImage));
+        assertThat(container.getImage(), is(Image.TEST_CLIENTS_DEFAULT_IMAGE));
 
         // this will ensure that no other env variables are set, only those we are setting
         assertThat(envVars.size(), is(13));
@@ -116,7 +116,7 @@ public class KafkaProducerConsumerTest {
         assertThat(job.getMetadata().getNamespace(), is(namespaceName));
 
         assertThat(container.getName(), is(consumerName));
-        assertThat(container.getImage(), is(Image.defaultImage));
+        assertThat(container.getImage(), is(Image.TEST_CLIENTS_DEFAULT_IMAGE));
 
         // this will ensure that no other env variables are set, only those we are setting
         assertThat(envVars.size(), is(11));

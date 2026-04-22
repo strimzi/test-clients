@@ -81,7 +81,7 @@ public class HttpConsumerClientTest {
         assertThat(httpConsumerJob.getMetadata().getNamespace(), is(namespaceName));
 
         assertThat(container.getName(), is(name));
-        assertThat(container.getImage(), is(Image.defaultImage));
+        assertThat(container.getImage(), is(Image.TEST_CLIENTS_DEFAULT_IMAGE));
 
         assertThat(envVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
         assertThat(envVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));

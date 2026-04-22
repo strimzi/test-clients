@@ -56,4 +56,18 @@ public class Environment {
             );
         }
     }
+
+    /**
+     * Method for returning value of the environment variable, or default in case that the env value is empty or null.
+     *
+     * @param envVariable   Name of the environment variable from which the value should be taken.
+     * @param defaultValue  Default value if value in enviroment variable is empty.
+     *
+     * @return  value of the environment variable, or default in case that the env value is empty or null.
+     */
+    public static String getEnvOrDefault(String envVariable, String defaultValue) {
+        String envValue = System.getenv(envVariable);
+
+        return envValue == null || envValue.isEmpty() ? defaultValue : envValue;
+    }
 }

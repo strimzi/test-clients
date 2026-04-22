@@ -86,7 +86,7 @@ public class HttpProducerConsumerTest {
         assertThat(httpProducerJob.getMetadata().getNamespace(), is(namespaceName));
 
         assertThat(container.getName(), is(producerName));
-        assertThat(container.getImage(), is(Image.defaultImage));
+        assertThat(container.getImage(), is(Image.TEST_CLIENTS_DEFAULT_IMAGE));
 
         assertThat(envVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
         assertThat(envVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
@@ -119,7 +119,7 @@ public class HttpProducerConsumerTest {
         assertThat(httpConsumerJob.getMetadata().getNamespace(), is(namespaceName));
 
         assertThat(container.getName(), is(consumerName));
-        assertThat(container.getImage(), is(Image.defaultImage));
+        assertThat(container.getImage(), is(Image.TEST_CLIENTS_DEFAULT_IMAGE));
 
         assertThat(envVars.get(ConfigurationConstants.HOSTNAME_ENV), is(hostName));
         assertThat(envVars.get(ConfigurationConstants.PORT_ENV), is(String.valueOf(port)));
