@@ -71,7 +71,7 @@ public class KafkaConsumerClientTest {
         assertThat(job.getMetadata().getNamespace(), is(namespaceName));
 
         assertThat(container.getName(), is(name));
-        assertThat(container.getImage(), is(Image.defaultImage));
+        assertThat(container.getImage(), is(Image.TEST_CLIENTS_DEFAULT_IMAGE));
 
         // this will ensure that no other env variables are set, only those we are setting
         assertThat(envVars.size(), is(11));
