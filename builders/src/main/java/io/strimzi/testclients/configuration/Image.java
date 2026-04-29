@@ -9,7 +9,7 @@ import io.sundr.builder.annotations.Buildable;
 @Buildable(editableEnabled = false)
 public class Image {
     public static final String STRIMZI_TEST_CLIENTS_DEFAULT_IMAGE_ENV = "STRIMZI_TEST_CLIENTS_DEFAULT_IMAGE";
-    public static final String TEST_CLIENTS_DEFAULT_IMAGE = "quay.io/strimzi-test-clients/test-clients:latest-kafka-4.2.0";
+    public static final String TEST_CLIENTS_DEFAULT_IMAGE = "quay.io/strimzi-test-clients/test-clients:0.14.0-kafka-4.2.0";
 
     private String imageName = Environment.getEnvOrDefault(STRIMZI_TEST_CLIENTS_DEFAULT_IMAGE_ENV, TEST_CLIENTS_DEFAULT_IMAGE);
     private String imagePullPolicy = "IfNotPresent";
