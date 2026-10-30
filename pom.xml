@@ -89,7 +89,7 @@
         <apicurio-registry.version>3.3.3</apicurio-registry.version>
         <protobuf.version>4.36.2</protobuf.version>
 
-        <strimzi-test-container.version>0.118.0-RC1</strimzi-test-container.version>
+        <strimzi-test-container.version>0.118.0</strimzi-test-container.version>
 
         <fabric8.version>7.9.0</fabric8.version>
         <sundrio.version>0.400.0</sundrio.version>
