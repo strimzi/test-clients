@@ -25,15 +25,15 @@ jobs:
     if: ${{ startsWith(github.ref, 'refs/heads/release-') }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: strimzi/github-actions/.github/actions/dependencies/setup-java@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: strimzi/github-actions/.github/actions/dependencies/setup-java@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
         with:
           javaVersion: "21"
-      - uses: strimzi/github-actions/.github/actions/build/release-artifacts@v1
+      - uses: strimzi/github-actions/.github/actions/build/release-artifacts@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
         with:
           releaseVersion: ${{ inputs.releaseVersion }}
           artifactSuffix: "test-clients"
-      - uses: strimzi/github-actions/.github/actions/build/deploy-java@v1
+      - uses: strimzi/github-actions/.github/actions/build/deploy-java@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
         with:
           gpgPassphrase: ${{ secrets.GPG_PASSPHRASE }}
           gpgSigningKey: ${{ secrets.GPG_SIGNING_KEY }}
@@ -50,6 +50,9 @@ jobs:
       ${{ always() && startsWith(github.ref, 'refs/heads/release-') &&
         needs.prepare-and-release-artifacts.result == 'success' }}
     runs-on: ubuntu-latest
+    outputs:
+      images: ${{ steps.push-containers.outputs.images }}
+      sbomsArtifact: ${{ steps.push-containers.outputs.sbomsArtifact }}
     permissions:
       contents: read
       packages: write
@@ -59,10 +62,13 @@ jobs:
       DOCKER_ORG: "strimzi-test-clients"
       DOCKER_TAG: "${{ inputs.releaseVersion }}"
     steps:
-      - uses: actions/checkout@v6
-      - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@v1
-      - uses: strimzi/github-actions/.github/actions/dependencies/install-syft@v1
-      - uses: strimzi/github-actions/.github/actions/build/push-containers@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-docker@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
+      - uses: strimzi/github-actions/.github/actions/dependencies/install-syft@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
+        with:
+          version: "1.57.1"
+      - id: push-containers
+        uses: strimzi/github-actions/.github/actions/build/push-containers@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
         with:
           architectures: "amd64,arm64,ppc64le,s390x"
           containerRegistry: "quay.io"
@@ -72,3 +78,23 @@ jobs:
           registryPassword: ${{ secrets.QUAY_PASS }}
           artifactSuffix: "test-clients"
           buildRunId: ${{ inputs.sourceBuildRunId }}
+
+  attest:
+    name: Attestation
+    needs:
+      - push-containers
+      - prepare-and-release-artifacts
+    if: |-
+      ${{ always() && startsWith(github.ref, 'refs/heads/release-') &&
+        needs.push-containers.result == 'success'
+      }}
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    uses: strimzi/github-actions/.github/workflows/reusable-attest.yml@bb4758d4afacd9c0ff8f426395bbbece41fd142a # v4.0
+    with:
+      containerImages: ${{ needs.push-containers.outputs.images }}
+      sbomsArtifact: ${{ needs.push-containers.outputs.sbomsArtifact }}
+      artifactSuffix: "test-clients"
+      releaseVersion: ${{ inputs.releaseVersion }}
