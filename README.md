@@ -137,3 +137,36 @@ HTTP Consumer
 
 ## Admin Client
 See [README.md](admin/README.md)
+
+## Artifact attestations
+
+Strimzi Test Clients release archives and container images are published with [GitHub artifact attestations](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds) containing [SLSA build provenance](https://slsa.dev/provenance/v1) and, for container images, an [SPDX](https://spdx.dev/) SBOM.
+The attestations are signed keylessly with [Sigstore](https://www.sigstore.dev/) using the GitHub Actions OIDC identity, so no public key is needed to verify them.
+They are created by the shared [Strimzi GitHub Actions](https://github.com/strimzi/github-actions) workflows, so the `--signer-repo strimzi/github-actions` option is required when verifying them.
+You can verify them with the [GitHub CLI](https://cli.github.com/).
+
+To verify a release archive downloaded from the GitHub release page:
+
+```
+gh attestation verify strimzi-test-clients-<version>.tar.gz --repo strimzi/test-clients --signer-repo strimzi/github-actions
+```
+
+Each GitHub release also contains the attestation bundle `release-<version>.intoto.jsonl`.
+You can use it to verify the archive without querying the GitHub Attestation API:
+
+```
+gh attestation verify strimzi-test-clients-<version>.tar.gz --bundle release-<version>.intoto.jsonl --repo strimzi/test-clients --signer-repo strimzi/github-actions
+```
+
+Container images are attested per architecture, so use the architecture-specific tag (for example `-amd64`, `-arm64`, `-ppc64le` or `-s390x`) or its digest instead of the multi-architecture tag.
+To verify the build provenance of a container image:
+
+```
+gh attestation verify oci://quay.io/strimzi-test-clients/test-clients:<version>-kafka-<kafka-version>-amd64 --repo strimzi/test-clients --signer-repo strimzi/github-actions
+```
+
+To verify the SBOM attestation of a container image:
+
+```
+gh attestation verify oci://quay.io/strimzi-test-clients/test-clients:<version>-kafka-<kafka-version>-amd64 --repo strimzi/test-clients --signer-repo strimzi/github-actions --predicate-type https://spdx.dev/Document/v2.3
+```
