@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -165,12 +166,12 @@ public class ConfigurationUtils {
      */
     public static void copyFileToConfigurationFolder(String filePath, String fileNameInConfigFolder) {
         Path sourceFilePath = Paths.get(filePath);
-        Path targetFilePath = Paths.get(getConfigFilePath() + fileNameInConfigFolder);
+        Path targetFilePath = Paths.get(getConfigFolderPath() + fileNameInConfigFolder);
 
         try {
-            Files.copy(sourceFilePath, targetFilePath);
+            Files.copy(sourceFilePath, targetFilePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to copy file from path: " + filePath + " to the configuration folder due to: ", e.getCause());
+            throw new RuntimeException("Unable to copy file from path: " + filePath + " to the configuration folder due to: ", e);
         }
     }
 
@@ -180,7 +181,7 @@ public class ConfigurationUtils {
      * @return file contents in String
      */
     public static String getContentsOfTheFileInConfigFolder(String fileName) {
-        Path filePath = Paths.get(getConfigFilePath() + fileName);
+        Path filePath = Paths.get(getConfigFolderPath() + fileName);
 
         try {
             return String.join("\n", Files.readAllLines(filePath));
@@ -189,7 +190,11 @@ public class ConfigurationUtils {
         }
     }
 
-    private static String getConfigFolderPath() {
+    /**
+     * Path of the configuration folder, holding config.properties and the certificate files copied by `configure ssl`
+     * @return path to the configuration folder, ending with "/"
+     */
+    public static String getConfigFolderPath() {
         String specificFolderPath = System.getenv(ConfigurationConstants.CONFIG_FOLDER_PATH_ENV);
         return specificFolderPath == null || specificFolderPath.isEmpty() ? CONFIG_FOLDER_PATH_DEFAULT : specificFolderPath + "/" + CONFIG_FOLDER_NAME;
     }

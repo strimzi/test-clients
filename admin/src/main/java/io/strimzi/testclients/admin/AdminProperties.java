@@ -44,7 +44,7 @@ public class AdminProperties {
             String value = String.valueOf(v);
 
             if (sslFields.contains(key) && value.startsWith("@")) {
-                value = ConfigurationUtils.getContentsOfTheFileInConfigFolder(value);
+                value = ConfigurationUtils.getContentsOfTheFileInConfigFolder(value.substring(1));
             }
 
             propertiesInMap.put(key, value);

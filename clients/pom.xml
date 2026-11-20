@@ -22,6 +22,12 @@
             <artifactId>clients-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.strimzi.test-clients</groupId>
+            <artifactId>clients-common</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
         </dependency>

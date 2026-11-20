@@ -26,6 +26,12 @@
             <artifactId>clients-common</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.strimzi.test-clients</groupId>
+            <artifactId>clients-common</artifactId>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.strimzi</groupId>
             <artifactId>kafka-kubernetes-config-provider</artifactId>
         </dependency>
